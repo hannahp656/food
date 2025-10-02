@@ -1,0 +1,309 @@
+document.addEventListener("DOMContentLoaded", () => {
+  const days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+  const meals = ["breakfast","lunch","dinner"];
+  const overlay = document.getElementById("overlay");
+  const closeOverlay = document.getElementById("closeOverlay");
+  const recipeSearch = document.getElementById("recipeSearch");
+  const searchResults = document.getElementById("searchResults");
+  const customRecipe = document.getElementById("customRecipe");
+  let activeMealBox = null;
+
+  // Build planner
+  const planner = document.getElementById("planner");
+  days.forEach(day => {
+    const section = document.createElement("div");
+    section.className = "day";
+    section.innerHTML = `<h2>${day}</h2><div class="meals"></div>`;
+    const mealsContainer = section.querySelector(".meals");
+
+    meals.forEach(meal => {
+      const box = document.createElement("div");
+      box.className = "meal-box";
+      box.dataset.day = day.toLowerCase();
+      box.dataset.meal = meal;
+      box.innerHTML = `
+        <div class="meal-header">
+          <h3>${meal.charAt(0).toUpperCase() + meal.slice(1)}</h3>
+          <div class="controls">
+            <button class="add-btn">+</button>
+            <button class="edit-btn">✎</button>
+          </div>
+        </div>
+        <ul class="meal-list"></ul>
+      `;
+      mealsContainer.appendChild(box);
+    });
+
+    planner.appendChild(section);
+  });
+
+  // Load saved data
+  loadMeals();
+
+  // Add button -> open overlay
+  document.querySelectorAll(".add-btn").forEach(btn => {
+    btn.addEventListener("click", e => {
+      activeMealBox = e.target.closest(".meal-box");
+      overlay.classList.remove("hidden");
+      recipeSearch.value = "";
+      customRecipe.value = "";
+      searchResults.innerHTML = "";
+    });
+  });
+
+  // Edit button -> toggle edit mode
+  document.querySelectorAll(".edit-btn").forEach(btn => {
+    btn.addEventListener("click", e => {
+      const box = e.target.closest(".meal-box");
+      box.classList.toggle("editing");
+    });
+  });
+
+  // Close overlay
+  closeOverlay.addEventListener("click", () => overlay.classList.add("hidden"));
+
+  // Search recipes
+  recipeSearch.addEventListener("input", async () => {
+    const query = recipeSearch.value.toLowerCase();
+    searchResults.innerHTML = "";
+    if (!query) return;
+
+    const res = await fetch("recipes.html");
+    const text = await res.text();
+    const doc = new DOMParser().parseFromString(text, "text/html");
+    const cards = doc.querySelectorAll(".recipe-card");
+
+    cards.forEach(card => {
+      const title = card.querySelector("h3").textContent;
+      const link = card.querySelector("a").getAttribute("href");
+      if (title.toLowerCase().includes(query)) {
+        const li = document.createElement("li");
+        li.textContent = title;
+        li.addEventListener("click", () => {
+          addMealItem(title, link);
+          overlay.classList.add("hidden");
+        });
+        searchResults.appendChild(li);
+      }
+    });
+  });
+
+  // Add custom recipe
+  customRecipe.addEventListener("keypress", e => {
+    if (e.key === "Enter" && customRecipe.value.trim()) {
+      addMealItem(customRecipe.value.trim(), null);
+      overlay.classList.add("hidden");
+    }
+  });
+
+  function addMealItem(title, link, targetBox = activeMealBox) {
+  if (!targetBox) return;
+  const li = document.createElement("li");
+
+  if (link) {
+    const a = document.createElement("a");
+    a.href = link;
+    a.textContent = title;
+    li.appendChild(a);
+  } else {
+    li.textContent = title;
+  }
+
+  const del = document.createElement("button");
+  del.textContent = "✕";
+  del.className = "delete-btn";
+  del.addEventListener("click", () => {
+    li.remove();
+    saveMeals();
+  });
+  li.appendChild(del);
+
+  targetBox.querySelector(".meal-list").appendChild(li);
+  saveMeals();
+}
+
+
+  function saveMeals() {
+    const data = {};
+    document.querySelectorAll(".meal-box").forEach(box => {
+      const day = box.dataset.day;
+      const meal = box.dataset.meal;
+      if (!data[day]) data[day] = {};
+      data[day][meal] = [];
+      box.querySelectorAll("li").forEach(li => {
+        const a = li.querySelector("a");
+        data[day][meal].push({
+          title: a ? a.textContent : li.childNodes[0].textContent,
+          link: a ? a.href : null
+        });
+      });
+    });
+    localStorage.setItem("mealPlan", JSON.stringify(data));
+  }
+
+  function loadMeals() {
+    const data = JSON.parse(localStorage.getItem("mealPlan") || "{}");
+    Object.keys(data).forEach(day => {
+      Object.keys(data[day]).forEach(meal => {
+        const box = document.querySelector(`.meal-box[data-day="${day}"][data-meal="${meal}"]`);
+        if (box) {
+          const list = box.querySelector(".meal-list");
+          data[day][meal].forEach(item => {
+            const li = document.createElement("li");
+            if (item.link) {
+              const a = document.createElement("a");
+              a.href = item.link;
+              a.textContent = item.title;
+              li.appendChild(a);
+            } else {
+              li.textContent = item.title;
+            }
+            const del = document.createElement("button");
+            del.textContent = "✕";
+            del.className = "delete-btn";
+            del.addEventListener("click", () => {
+              li.remove();
+              saveMeals();
+            });
+            li.appendChild(del);
+            list.appendChild(li);
+          });
+        }
+      });
+    });
+  }
+    // Clear All button
+  document.getElementById("clearAll").addEventListener("click", () => {
+    if (confirm("Are you sure you want to clear the entire meal plan?")) {
+      localStorage.removeItem("mealPlan");
+      document.querySelectorAll(".meal-list").forEach(list => list.innerHTML = "");
+    }
+  });
+
+    // Render saved recipes
+  function loadSavedRecipes() {
+  const container = document.getElementById("savedRecipesList");
+  container.innerHTML = "";
+  const saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
+
+  saved.forEach((recipe, index) => {
+    const card = document.createElement("div");
+    card.className = "recipe-card";
+    card.draggable = true;
+    card.dataset.index = index; // track recipe position
+
+    card.innerHTML = `
+      <img src="${recipe.img}" alt="${recipe.title}">
+      <div class="content">
+        <h3>${recipe.title}</h3>
+        <div class="card-tags">${recipe.tags.map(tag => `<span class="tag">${tag}</span>`).join("")}</div>
+        <a href="${recipe.link}" target="_blank">View Recipe</a>
+        <button class="delete-saved">✕</button>
+      </div>
+    `;
+
+    // Drag start
+    card.addEventListener("dragstart", e => {
+      e.dataTransfer.setData("application/json", JSON.stringify(recipe));
+    });
+
+    // Delete saved recipe
+    card.querySelector(".delete-saved").addEventListener("click", () => {
+      let updated = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
+      updated.splice(index, 1);
+      localStorage.setItem("savedRecipes", JSON.stringify(updated));
+      loadSavedRecipes();
+    });
+
+    container.appendChild(card);
+  });
+}
+
+
+
+  loadSavedRecipes();
+
+  // Update Print Plan button to use styled layout
+  document.getElementById("printPlan").addEventListener("click", () => {
+    const data = JSON.parse(localStorage.getItem("mealPlan") || "{}");
+
+    let html = `
+      <html>
+        <head>
+          <title>Printable Meal Plan</title>
+          <style>
+            body { font-family: Montserrat, sans-serif; padding: 20px; background: #f8fbf6; }
+            h1 { text-align: center; color: #3a4d39; }
+            .day { margin-bottom: 24px; background: #fff; padding: 16px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+            .day h2 { margin: 0 0 10px; color: #7a9d54; }
+            .meal { margin-bottom: 8px; }
+            .meal h3 { margin: 0 0 6px; color: #3a4d39; }
+            ul { list-style: none; padding: 0; margin: 0 0 12px; }
+            li { margin: 4px 0; }
+            a { color: #7a9d54; text-decoration: none; }
+            a:hover { text-decoration: underline; }
+          </style>
+        </head>
+        <body>
+          <h1>Weekly Meal Plan</h1>
+    `;
+
+    Object.keys(data).forEach(day => {
+      html += `<div class="day"><h2>${day.charAt(0).toUpperCase() + day.slice(1)}</h2>`;
+      Object.keys(data[day]).forEach(meal => {
+        html += `<div class="meal"><h3>${meal.charAt(0).toUpperCase() + meal.slice(1)}</h3><ul>`;
+        data[day][meal].forEach(item => {
+          if (item.link) {
+            html += `<li><a href="${item.link}" target="_blank">${item.title}</a></li>`;
+          } else {
+            html += `<li>${item.title}</li>`;
+          }
+        });
+        html += `</ul></div>`;
+      });
+      html += `</div>`;
+    });
+
+    html += `</body></html>`;
+
+    const newTab = window.open();
+    newTab.document.write(html);
+    newTab.document.close();
+  });
+  // Make meal lists droppable
+  document.querySelectorAll(".meal-list").forEach(list => {
+    list.addEventListener("dragover", e => {
+      e.preventDefault(); // allow drop
+      list.style.background = "rgba(122,157,84,0.08)";
+    });
+    list.addEventListener("dragleave", () => {
+      list.style.background = "";
+    });
+    list.addEventListener("drop", e => {
+      e.preventDefault();
+      list.style.background = "";
+
+      const data = JSON.parse(e.dataTransfer.getData("application/json"));
+      addMealItem(data.title, data.link, list.closest(".meal-box"));
+    });
+  });
+async function fetchIngredients(recipeUrl) {
+  try {
+    const res = await fetch(recipeUrl);
+    const text = await res.text();
+    const doc = new DOMParser().parseFromString(text, "text/html");
+
+    // look for JSON metadata in recipe page
+    const dataEl = doc.querySelector("#recipe-data");
+    if (!dataEl) return [];
+
+    const data = JSON.parse(dataEl.textContent);
+    return data.ingredients || []; // expects ingredients array in metadata
+  } catch (e) {
+    console.error("Error fetching ingredients from", recipeUrl, e);
+    return [];
+  }
+}
+
+
+});

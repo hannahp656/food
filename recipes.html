@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hannah's Recipes - Gallery</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>html{font-family: Montserrat, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, system-ui, -apple-system, sans-serif;}</style>
+  <script src="https://kit.fontawesome.com/76fcfe601b.js" crossorigin="anonymous"></script>
+  
+</head>
+<body>
+  <nav>
+    <div class="container">
+      <div class="brand">Hannah's Recipes</div>
+      <div class="links">
+        <a href="index.html">Home</a>
+        <a href="meal-planner.html">Meal Planner</a>
+        <a href="recipes.html">Recipes</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="container">
+      <h1>Recipe Gallery</h1>
+    </div>
+  </header>
+
+  <div class="filter-bar">
+    <input type="text" id="searchInput" placeholder="Search by ingredient...">
+    <select id="categoryFilter">
+      <option value="">All Categories</option>
+      <option value="full meal">Full Meal</option>
+      <option value="entree">Entree</option>
+      <option value="side dish">Side Dish</option>
+      <option value="snack">Snack</option>
+      <option value="dessert">Dessert</option>
+    </select>
+    <input type="number" id="timeFilter" placeholder="Max Time (min)" min="1" style="width:120px;">
+    <input type="number" id="servingsFilter" placeholder="Servings" min="1" style="width:100px;">
+  </div>
+  <main>
+    <section class="gallery" id="gallery">
+
+    </section>
+  </main>
+  <script>
+    // Simple filter logic for gallery
+    const searchInput = document.getElementById('searchInput');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const timeFilter = document.getElementById('timeFilter');
+    const servingsFilter = document.getElementById('servingsFilter');
+    const cards = document.querySelectorAll('.recipe-card');
+
+    function filterGallery() {
+      const search = searchInput.value.toLowerCase();
+      const category = categoryFilter.value;
+      const maxTime = parseInt(timeFilter.value, 10) || null;
+      const servings = parseInt(servingsFilter.value, 10) || null;
+
+      cards.forEach(card => {
+        const ingredients = card.dataset.ingredients.toLowerCase();
+        const cardCategory = card.dataset.category;
+        const cardTime = parseInt(card.dataset.time, 10);
+        const cardServings = parseInt(card.dataset.servings, 10);
+
+        let show = true;
+
+        if (search && !ingredients.includes(search)) show = false;
+        if (category && cardCategory !== category) show = false;
+        if (maxTime && cardTime > maxTime) show = false;
+        if (servings && cardServings !== servings) show = false;
+
+        card.style.display = show ? '' : 'none';
+      });
+    }
+
+    searchInput.addEventListener('input', filterGallery);
+    categoryFilter.addEventListener('change', filterGallery);
+    timeFilter.addEventListener('input', filterGallery);
+    servingsFilter.addEventListener('input', filterGallery);
+  </script>
+  <script>
+  // List all recipe files here
+  const recipeFiles = [
+    "recipes/recipe-sausage-fajita-pasta.html",
+    "recipes/recipe-garlic-parm-chicken-and-potato-skillet.html"
+
+    // add new recipe pages here
+  ];
+
+  async function loadRecipes() {
+    const gallery = document.getElementById("gallery");
+
+    for (let file of recipeFiles) {
+      try {
+        const res = await fetch(file);
+        const text = await res.text();
+        const doc = new DOMParser().parseFromString(text, "text/html");
+        const dataEl = doc.querySelector("#recipe-data");
+
+        if (!dataEl) continue;
+        const data = JSON.parse(dataEl.textContent);
+
+        const card = document.createElement("div");
+        card.className = "recipe-card";
+        card.innerHTML = `
+          <img src="${data.image}" alt="${data.title}">
+          <div class="content">
+            <h3>${data.title}</h3>
+            <div class="card-tags">
+              ${data.tags.map(tag => `<span class="tag">${tag}</span>`).join("")}
+            </div>
+            <a href="${data.link}">View Recipe</a>
+          </div>
+        `;
+        gallery.appendChild(card);
+      } catch (err) {
+        console.error("Error loading recipe:", file, err);
+      }
+    }
+  }
+
+  loadRecipes();
+</script>
+
+</body>
