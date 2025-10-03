@@ -36,35 +36,7 @@
     </div>
   </nav>
   <!-- hero section -->
-  <header class="hero recipe-hero">
-    <div class="container">
-      <a class="back-link" href="../recipes.html">&#8592; Back to Recipes</a>
-      <a href="meal-planner.html" id="saveRecipeBtn" class="btn btn--secondary">Add to Meal Plan</a>
-
-<script>
-  document.getElementById("saveRecipeBtn").addEventListener("click", e => {
-    e.preventDefault();
-    const recipe = {
-      title: document.querySelector("header.hero h1").textContent,
-      link: window.location.pathname,
-      img: document.querySelector(".hero img") ? document.querySelector(".hero img").src : "../recipe_images/default.jpg",
-      tags: Array.from(document.querySelectorAll(".recipe-tags .tag")).map(t => t.textContent)
-    };
-
-    let saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
-    saved.push(recipe);
-    localStorage.setItem("savedRecipes", JSON.stringify(saved));
-    window.location.href = "meal-planner.html";
-  });
-</script>
-
-      <h1>Sausage Fajita Pasta</h1> <!-- CHANGE NAME -->
-      <div class="recipe-tags"> <!-- CHANGE TAGS -->
-        <span class="tag"><i class="fa-regular fa-clock"></i> 40 min</span>
-        <span class="tag">4 servings</span>
-        <span class="tag">Full Meal</span>
-      </div>
-    </div>
+  
     <header class="hero recipe-hero">
       <div class="container">
         <h1></h1>
