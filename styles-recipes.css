@@ -137,3 +137,21 @@
   font-size: 0.9rem;
   padding: 6px 12px;
 }
+
+.recipe-hero .top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.recipe-hero .top-row .back-link {
+  position: static;   /* reset absolute */
+  margin: 0;
+}
+
+.recipe-hero .top-row #saveRecipeBtn {
+  font-size: 0.9rem;
+  padding: 6px 12px;
+}
