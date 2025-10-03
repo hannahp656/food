@@ -50,12 +50,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
   // Insert tags
-  const tagsContainer = document.querySelector(".recipe-tags");
-  if (tagsContainer && data.tags) {
-    tagsContainer.innerHTML = data.tags
-      .map(tag => `<span class="tag">${tag}</span>`)
-      .join("");
-  }
+  const recipeTags = document.querySelector(".recipe-tags");
+if (recipeTags && data.tags) {
+  recipeTags.innerHTML = data.tags.map(tag => {
+    if (/\bmin\b|\bhour\b/i.test(tag)) {
+      return `<span class="chip chip--soft"><i class="fa-regular fa-clock"></i> ${tag}</span>`;
+    }
+    return `<span class="chip chip--soft">${tag}</span>`;
+  }).join("");
+}
 
 
 
