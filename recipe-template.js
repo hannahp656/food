@@ -23,15 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .join("");
   }
 
-  // Insert video container
-const videoContainer = document.querySelector(".video-container");
-if (videoContainer && data.video) {
-  let coverImg = data.videoCover || data.image || "../recipe_images/default.jpg";
-  videoContainer.innerHTML = `
-    <img class="video-cover" src="${coverImg}" alt="${data.title}">
-    <iframe class="video-embed" src="${data.video}" allowfullscreen></iframe>
-  `;
-}
+
 
   // Insert ingredients
 const ingList = document.querySelector(".ingredients-list");
