@@ -10,8 +10,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Insert hero image (if your hero has one)
   const heroImg = document.querySelector("header.hero img");
-  if (heroImg && data.image) {
-    heroImg.src = data.image;
+  if (heroImg && data.cover) {
+    heroImg.src = data.cover;
     heroImg.alt = data.title;
   }
 
@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (data.video) {
         const videoElement = document.createElement('video');
         videoElement.src = data.video;
-        videoElement.poster = data.image;
+        videoElement.poster = data.cover;
         videoElement.setAttribute('controls', ''); // Adds playback controls
         videoElement.setAttribute('autoplay', ''); // Autoplays the video
         videoElement.setAttribute('muted', ''); // Mutes the video for autoplay
