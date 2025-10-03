@@ -66,13 +66,15 @@ if (recipeTags && data.tags) {
 const ingList = document.querySelector(".ingredients-list");
 if (ingList && data.ingredients) {
   const units = ["cup","cups","tbsp","tsp","teaspoon","teaspoons","tablespoon","tablespoons","g","kg","ml","l","oz","lb","pound","pounds","clove","cloves","slice","slices","can","cans","package","packages","breast","breasts"];
-  const descriptors = ["of","chopped","minced","diced","sliced","grated","shredded","fresh","ground"];
+  const descriptors = ["of","chopped","minced","diced","sliced","grated","shredded","fresh","ground","finely"];
+  const amountWords = ["pinch","handful","dash","slice","clove","teaspoon","tablespoon"];
 
   function looksLikeAmount(word) {
-    return /^\d+([\/\.]\d+)?$/.test(word); // matches 1, 1/2, 0.5, etc.
+    return /^\d+([\/\.]\d+)?$/.test(word) || amountWords.includes(word.toLowerCase());
   }
 
   ingList.innerHTML = data.ingredients.map(line => {
+    // Split trailing notes after comma
     let [beforeComma, afterComma] = line.split(/,(.+)/); 
     beforeComma = beforeComma.trim();
     afterComma = afterComma ? afterComma.trim() : "";
@@ -80,23 +82,32 @@ if (ingList && data.ingredients) {
     const parts = beforeComma.split(" ");
     let amount = "";
     let unit = "";
+    const leadingDescriptors = [];
 
-    // Detect amount only if it looks like a number/fraction
-    if (parts.length > 0 && looksLikeAmount(parts[0])) amount = parts.shift();
+    // Detect amount
+    if (parts.length && looksLikeAmount(parts[0])) amount = parts.shift();
 
     // Detect unit
-    if (parts.length > 0 && units.includes(parts[0].toLowerCase())) {
-      unit = parts.shift();
-    }
+    if (parts.length && units.includes(parts[0].toLowerCase())) unit = parts.shift();
 
-    // Separate leading descriptors (like "chopped", "fresh", etc.)
-    const leadingDescriptors = [];
-    while (parts.length && descriptors.includes(parts[0].toLowerCase())) {
-      leadingDescriptors.push(parts.shift());
-    }
+    // Separate descriptors anywhere in the remaining parts
+    const ingredientWords = [];
+    parts.forEach(word => {
+      if (descriptors.includes(word.toLowerCase())) {
+        leadingDescriptors.push(word);
+      } else {
+        ingredientWords.push(word);
+      }
+    });
 
-    // Everything left is the actual ingredient (can be multiple words)
-    const ingredient = parts.join(" ");
+    const ingredient = ingredientWords.join(" ");
+
+    // Handle trailing descriptors after the comma (keep them outside the span)
+    let trailing = "";
+    if (afterComma) {
+      // Optionally, you could split afterComma and filter descriptors if needed
+      trailing = ", " + afterComma.trim();
+    }
 
     // Build HTML
     let html = `<li>`;
@@ -104,12 +115,13 @@ if (ingList && data.ingredients) {
     if (unit) html += unit + " ";
     if (leadingDescriptors.length) html += leadingDescriptors.join(" ") + " ";
     if (ingredient) html += `<span class="ingredient-tag">${ingredient}</span>`;
-    if (afterComma) html += `, ${afterComma}`;
+    html += trailing;
     html += `</li>`;
 
     return html;
   }).join("");
 }
+
 
 
 
