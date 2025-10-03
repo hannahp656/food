@@ -32,14 +32,6 @@
     justify-content: center;
 }
 
-/* Delete or comment out the overlay styles that are conflicting */
-/*
-.video-cover { ... }
-.video-embed { ... }
-.video-container.playing .video-cover { ... }
-.video-container.playing .video-embed { ... }
-*/
-
 /* Add a style to make sure the video element fills the container correctly */
 .video-container video {
     width: 100%;
@@ -135,3 +127,13 @@
         margin-left: 0.5em;
       }
     }
+    .recipe-hero .top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.recipe-hero #saveRecipeBtn {
+  font-size: 0.9rem;
+  padding: 6px 12px;
+}
