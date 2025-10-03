@@ -37,7 +37,22 @@
   </nav>
   <!-- hero section -->
  
+<script>
+  document.getElementById("saveRecipeBtn").addEventListener("click", e => {
+    e.preventDefault();
+    const recipe = {
+      title: document.querySelector("header.hero h1").textContent,
+      link: window.location.pathname,
+      img: document.querySelector(".hero img") ? document.querySelector(".hero img").src : "../recipe_images/default.jpg",
+      tags: Array.from(document.querySelectorAll(".recipe-tags .tag")).map(t => t.textContent)
+    };
 
+    let saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
+    saved.push(recipe);
+    localStorage.setItem("savedRecipes", JSON.stringify(saved));
+    window.location.href = "meal-planner.html";
+  });
+</script>
 
   <header class="hero recipe-hero">
       <div class="container">
@@ -46,7 +61,16 @@
         <div class="recipe-tags"></div>
       </div>
     </header>
-  
+  <main class="container">
+      <section>
+        <h2>Ingredients</h2>
+        <ul class="ingredients-list"></ul>
+      </section>
+      <section>
+        <h2>Instructions</h2>
+        <ol class="instructions-list"></ol>
+      </section>
+    </main>
   <script type="application/json" id="recipe-data">
   {
     "title": "Sausage Fajita Pasta",
