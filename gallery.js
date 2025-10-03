@@ -1,6 +1,5 @@
 const recipeFiles = [
-  "recipes/recipe-sausage-fajita-pasta.html",
-  "recipes/recipe-garlic-parm-chicken-&-potato-skillet.html"
+  "recipes/recipe-sausage-fajita-pasta.html"
 
   // Add new recipe files here as you create them
 ];
