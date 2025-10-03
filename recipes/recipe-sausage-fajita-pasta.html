@@ -2,25 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Sausage Fajita Pasta - Hannah's Recipes</title> <!-- CHANGE TITLE -->
+  <title>Sausage Fajita Pasta - Hannah's Recipes</title>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../styles.css">
   <link rel="stylesheet" href="../styles-recipes.css">
-  <style>html{font-family: Montserrat, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, system-ui, -apple-system, sans-serif;}</style>
+  <style>
+    html { font-family: Montserrat, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, system-ui, -apple-system, sans-serif; }
+  </style>
   <script src="https://kit.fontawesome.com/76fcfe601b.js" crossorigin="anonymous"></script>
-  <!-- Simple script to swap cover for TikTok embed on click -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      var container = document.querySelector('.video-container');
-      if (container) {
-        var cover = container.querySelector('.video-cover');
-        cover.addEventListener('click', function() {
-          container.classList.add('playing');
-        });
-      }
-    });
-  </script>
 </head>
 
 <body class="cute-home">
@@ -35,46 +25,58 @@
       </div>
     </div>
   </nav>
+
   <!-- hero section -->
- 
-<script>
-  document.getElementById("saveRecipeBtn").addEventListener("click", e => {
-    e.preventDefault();
-    const recipe = {
-      title: document.querySelector("header.hero h1").textContent,
-      link: window.location.pathname,
-      img: document.querySelector(".hero img") ? document.querySelector(".hero img").src : "../recipe_images/default.jpg",
-      tags: Array.from(document.querySelectorAll(".recipe-tags .tag")).map(t => t.textContent)
-    };
-
-    let saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
-    saved.push(recipe);
-    localStorage.setItem("savedRecipes", JSON.stringify(saved));
-    window.location.href = "meal-planner.html";
-  });
-</script>
-
   <header class="hero recipe-hero">
-      <div class="container">
-        <h1></h1>
-        <img src="" alt="">
-        <div class="recipe-tags"></div>
+    <div class="container">
+      <a class="back-link" href="../recipes.html">&#8592; Back to Recipes</a>
+      <h1></h1>
+      <div class="recipe-tags"></div>
+    </div>
+  </header>
+
+  <!-- recipe layout -->
+  <div class="container split" style="margin-top:20px;display:flex;gap:24px;align-items:flex-start;">
+    <!-- recipe video & image -->
+    <div class="left-col" style="flex:0 0 420px;">
+      <div class="video-container">
+        <!-- placeholder; you can update this to embed TikTok or image -->
+        <img class="video-cover" src="../recipe_images/default.jpg" alt="">
+        <iframe class="video-embed" src="" allowfullscreen></iframe>
       </div>
-    </header>
-  <main class="container">
-      <section>
-        <h2>Ingredients</h2>
-        <ul class="ingredients-list"></ul>
-      </section>
-      <section>
-        <h2>Instructions</h2>
-        <ol class="instructions-list"></ol>
-      </section>
-    </main>
+    </div>
+
+    <!-- recipe content -->
+    <div class="right-col" style="flex:1;">
+      <main>
+        <div class="recipe-container">
+          <!-- ingredients -->
+          <div class="recipe-content">
+            <section class="ingredients">
+              <details open>
+                <summary><h3>Ingredients</h3></summary>
+                <ul class="ingredients-list"></ul>
+              </details>
+            </section>
+          </div>
+
+          <!-- instructions -->
+          <div class="recipe-content">
+            <section class="instructions">
+              <h3>Instructions</h3>
+              <ol class="instructions-list"></ol>
+            </section>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- recipe JSON -->
   <script type="application/json" id="recipe-data">
   {
     "title": "Sausage Fajita Pasta",
-    "image": "recipe_images/Sausage_Fajita_Pasta.jpg",
+    "image": "../recipe_images/Sausage_Fajita_Pasta.jpg",
     "link": "recipes/recipe-sausage-fajita-pasta.html",
     "tags": ["Full Meal", "40 min", "4 servings"],
     "ingredients": [
@@ -122,6 +124,7 @@
     ]
   }
   </script>
+
   <script src="../recipe-template.js"></script>
 </body>
 </html>
