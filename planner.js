@@ -193,7 +193,7 @@ document.addEventListener("DOMContentLoaded", () => {
     card.dataset.index = index; // track recipe position
 
     card.innerHTML = `
-      <img src="${recipe.img}" alt="${recipe.title}">
+      <img src="${recipe.image}" alt="${recipe.title}">
       <div class="content">
         <h3>${recipe.title}</h3>
         <div class="card-tags">${recipe.tags.map(tag => `<span class="tag">${tag}</span>`).join("")}</div>
