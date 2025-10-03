@@ -68,6 +68,10 @@ if (ingList && data.ingredients) {
   const units = ["cup","cups","tbsp","tsp","teaspoon","teaspoons","tablespoon","tablespoons","g","kg","ml","l","oz","lb","pound","pounds","clove","cloves","slice","slices","can","cans","package","packages","breast","breasts"];
   const descriptors = ["of","chopped","minced","diced","sliced","grated","shredded","fresh","ground"];
 
+  function looksLikeAmount(word) {
+    return /^\d+([\/\.]\d+)?$/.test(word); // matches 1, 1/2, 0.5, etc.
+  }
+
   ingList.innerHTML = data.ingredients.map(line => {
     let [beforeComma, afterComma] = line.split(/,(.+)/); 
     beforeComma = beforeComma.trim();
@@ -77,15 +81,15 @@ if (ingList && data.ingredients) {
     let amount = "";
     let unit = "";
 
-    // Detect amount
-    if (parts.length > 0) amount = parts.shift();
+    // Detect amount only if it looks like a number/fraction
+    if (parts.length > 0 && looksLikeAmount(parts[0])) amount = parts.shift();
 
     // Detect unit
     if (parts.length > 0 && units.includes(parts[0].toLowerCase())) {
       unit = parts.shift();
     }
 
-    // Separate descriptors at the start of the ingredient
+    // Separate leading descriptors (like "chopped", "fresh", etc.)
     const leadingDescriptors = [];
     while (parts.length && descriptors.includes(parts[0].toLowerCase())) {
       leadingDescriptors.push(parts.shift());
@@ -106,6 +110,7 @@ if (ingList && data.ingredients) {
     return html;
   }).join("");
 }
+
 
 
 
