@@ -37,22 +37,7 @@
   </nav>
   <!-- hero section -->
  
-<script>
-  document.getElementById("saveRecipeBtn").addEventListener("click", e => {
-    e.preventDefault();
-    const recipe = {
-      title: document.querySelector("header.hero h1").textContent,
-      link: window.location.pathname,
-      img: document.querySelector(".hero img") ? document.querySelector(".hero img").src : "../recipe_images/default.jpg",
-      tags: Array.from(document.querySelectorAll(".recipe-tags .tag")).map(t => t.textContent)
-    };
 
-    let saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
-    saved.push(recipe);
-    localStorage.setItem("savedRecipes", JSON.stringify(saved));
-    window.location.href = "meal-planner.html";
-  });
-</script>
 
   <header class="hero recipe-hero">
       <div class="container">
