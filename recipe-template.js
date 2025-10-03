@@ -4,6 +4,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const data = JSON.parse(dataEl.textContent);
 
+  // Set document title dynamically
+  document.title = `${data.title} - Hannah's Recipes`;
+  
   // Insert title
   const h1 = document.querySelector("header.hero h1");
   if (h1) h1.textContent = data.title;
