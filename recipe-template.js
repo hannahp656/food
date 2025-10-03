@@ -65,36 +65,48 @@ if (recipeTags && data.tags) {
   // Insert ingredients
 const ingList = document.querySelector(".ingredients-list");
 if (ingList && data.ingredients) {
+  const units = ["cup","cups","tbsp","tsp","teaspoon","teaspoons","tablespoon","tablespoons","g","kg","ml","l","oz","lb","pound","pounds","clove","cloves","slice","slices","can","cans","package","packages","breast","breasts"];
+  const descriptors = ["of","chopped","minced","diced","sliced","grated","shredded","fresh","ground"];
+
   ingList.innerHTML = data.ingredients.map(line => {
-    // Split notes after first comma
-    let [beforeComma, afterComma] = line.split(/,(.+)/); // splits once at first comma
+    let [beforeComma, afterComma] = line.split(/,(.+)/); 
     beforeComma = beforeComma.trim();
     afterComma = afterComma ? afterComma.trim() : "";
 
     const parts = beforeComma.split(" ");
-    let amount = parts.shift(); // e.g. "1" or "1/2"
-    let maybeUnit = "";
-    let name = "";
+    let amount = "";
+    let unit = "";
 
-    // If next token is a known unit
-    const units = ["cup","cups","tbsp","tsp","teaspoon","teaspoons","tablespoon","tablespoons","g","kg","ml","l","oz","lb","pound","pounds","clove","cloves","slice","slices","can","cans","package","packages","breast","breasts"];
-    if (parts.length > 1 && units.includes(parts[0].toLowerCase())) {
-      maybeUnit = parts.shift();
+    // Detect amount
+    if (parts.length > 0) amount = parts.shift();
+
+    // Detect unit
+    if (parts.length > 0 && units.includes(parts[0].toLowerCase())) {
+      unit = parts.shift();
     }
 
-    // Everything left before the comma is the ingredient name
-    name = parts.join(" ");
+    // Separate descriptors at the start of the ingredient
+    const leadingDescriptors = [];
+    while (parts.length && descriptors.includes(parts[0].toLowerCase())) {
+      leadingDescriptors.push(parts.shift());
+    }
+
+    // Everything left is the actual ingredient (can be multiple words)
+    const ingredient = parts.join(" ");
 
     // Build HTML
-    let html = `<li>${amount}`;
-    if (maybeUnit) html += ` ${maybeUnit}`;
-    if (name) html += ` <span class="ingredient-tag">${name}</span>`;
+    let html = `<li>`;
+    if (amount) html += amount + " ";
+    if (unit) html += unit + " ";
+    if (leadingDescriptors.length) html += leadingDescriptors.join(" ") + " ";
+    if (ingredient) html += `<span class="ingredient-tag">${ingredient}</span>`;
     if (afterComma) html += `, ${afterComma}`;
     html += `</li>`;
 
     return html;
   }).join("");
 }
+
 
 
   // Insert instructions
