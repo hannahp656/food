@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (data.video) {
         const videoElement = document.createElement('video');
         videoElement.src = `../../${data.video}`;
-        videoElement.poster = `../../${data.image}`;
+        videoElement.poster = data.image;
         videoElement.setAttribute('controls', ''); // Adds playback controls
         videoElement.setAttribute('autoplay', ''); // Autoplays the video
         videoElement.setAttribute('muted', ''); // Mutes the video for autoplay
