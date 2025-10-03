@@ -14,6 +14,23 @@ document.addEventListener("DOMContentLoaded", () => {
     heroImg.src = data.image;
     heroImg.alt = data.title;
   }
+
+  const saveBtn = document.getElementById("saveRecipeBtn");
+  if (saveBtn) {
+    saveBtn.addEventListener("click", () => {
+      // Get existing saved recipes
+      const saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
+
+      // Check if already saved (avoid duplicates)
+      if (!saved.some(r => r.link === data.link)) {
+        saved.push(data);
+        localStorage.setItem("savedRecipes", JSON.stringify(saved));
+        alert(`${data.title} added to Saved Recipes!`);
+      } else {
+        alert(`${data.title} is already in your Saved Recipes.`);
+      }
+    });
+  }
   const videoContainer = document.querySelector('.video-container');
 
     // Create and insert the video element
