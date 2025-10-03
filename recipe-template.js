@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Create and insert the video element
     if (data.video) {
         const videoElement = document.createElement('video');
-        videoElement.src = `../../${data.video}`;
+        videoElement.src = data.video;
         videoElement.poster = data.image;
         videoElement.setAttribute('controls', ''); // Adds playback controls
         videoElement.setAttribute('autoplay', ''); // Autoplays the video
