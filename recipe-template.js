@@ -14,6 +14,20 @@ document.addEventListener("DOMContentLoaded", () => {
     heroImg.src = data.image;
     heroImg.alt = data.title;
   }
+  const videoContainer = document.querySelector('.video-container');
+
+    // Create and insert the video element
+    if (data.video) {
+        const videoElement = document.createElement('video');
+        videoElement.src = `../../${data.video}`;
+        videoElement.poster = `../../${data.image}`;
+        videoElement.setAttribute('controls', ''); // Adds playback controls
+        videoElement.setAttribute('autoplay', ''); // Autoplays the video
+        videoElement.setAttribute('muted', ''); // Mutes the video for autoplay
+        videoElement.setAttribute('loop', ''); // Loops the video
+        videoElement.setAttribute('playsinline', ''); // Allows playback in iOS without fullscreen
+        videoContainer.appendChild(videoElement);
+    }
 
   // Insert tags
   const tagsContainer = document.querySelector(".recipe-tags");
