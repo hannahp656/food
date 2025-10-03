@@ -1,66 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Hannah's Recipes - Gallery</title>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-  <style>html{font-family: Montserrat, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, system-ui, -apple-system, sans-serif;}</style>
-  <script src="https://kit.fontawesome.com/76fcfe601b.js" crossorigin="anonymous"></script>
-</head>
+  <head>
+    <meta charset="UTF-8">
+    <title>Hannah's Recipes - Gallery</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>html{font-family: Montserrat, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, system-ui, -apple-system, sans-serif;}</style>
+    <script src="https://kit.fontawesome.com/76fcfe601b.js" crossorigin="anonymous"></script>
+  </head>
 
-<body>
-  <!-- navigation bar -->
-  <nav>
-    <div class="container">
-      <div class="brand">Hannah's Recipes</div>
-      <div class="links">
-        <a href="index.html">Home</a>
-        <a href="meal-planner.html">Meal Planner</a>
-        <a href="recipes.html">Recipes</a>
-      </div>
-    </div>
-  </nav>
-  <!-- hero section -->
-  <header class="hero">
-    <div class="container">
-      <h1>Meal Planner</h1>
-      <p class="subtitle">plan food for the week!</p>
-    </div>
-    <div class="planner-controls container">
-      <button id="generateList" class="btn btn--secondary">Generate List</button>
-      <button id="printPlan" class="btn">Print Plan</button>
-    </div>
-  </header>
-  <!-- main content -->
-  <main>
-    <div class="planner-layout container">
-      <section id="planner">
-        <div class="planner-actions">
-          <button id="clearAll" class="btn btn--secondary">Clear All</button>
-        </div>
-        <!-- Days will be injected here -->
-      </section>
-      <!-- saved recipes section -->
-      <aside id="savedRecipes" class="saved-recipes">
-        <h2>Saved Recipes</h2>
-        <div id="savedRecipesList" class="gallery"></div>
-      </aside>
-    </div>
-    <!-- overlay for adding recipe -->
-    <div id="overlay" class="overlay hidden">
-      <div class="overlay-content">
-        <h3>Add a Meal</h3>
-        <input type="text" id="recipeSearch" placeholder="Find a recipe...">
-        <ul id="searchResults"></ul>
-        <input type="text" id="customRecipe" placeholder="Or add your own...">
-        <div class="overlay-actions">
-          <button id="closeOverlay">Cancel</button>
+  <body>
+    <!-- navigation bar -->
+    <nav>
+      <div class="container">
+        <div class="brand"><a href="index.html" style="color:inherit;text-decoration:none">Hannah's Recipes</a></div>
+        <div class="links">
+          <a href="index.html">Home</a>
+          <a href="meal-planner.html">Meal Planner</a>
+          <a href="recipes.html">Recipes</a>
         </div>
       </div>
-    </div>
-  </main>
-  <!-- JavaScript for meal planner functionality -->
-  <script src="planner.js"></script>
-</body>
+    </nav>
+    <!-- hero section -->
+    <header class="hero">
+      <div class="container">
+        <h1>Meal Planner</h1>
+        <p class="subtitle">plan food for the week!</p>
+      </div>
+      <div class="planner-controls container">
+        <button id="generateList" class="btn btn--secondary">Generate List</button>
+        <button id="printPlan" class="btn">Print Plan</button>
+      </div>
+    </header>
+    <!-- main content -->
+    <main>
+      <div class="planner-layout container">
+        <section id="planner">
+          <div class="planner-actions">
+            <button id="clearAll" class="btn btn--secondary">Clear All</button>
+          </div>
+          <!-- JavaScript will inject days here -->
+        </section>
+        <!-- saved recipes section -->
+        <aside id="savedRecipes" class="saved-recipes">
+          <h2>Saved Recipes</h2>
+          <div id="savedRecipesList" class="gallery"></div>
+        </aside>
+      </div>
+      <!-- THIS NEEDS TO BE FIXED AND DESIGN NEEDS TO BE UPDATED - overlay for adding recipe -->
+      <div id="overlay" class="overlay hidden">
+        <div class="overlay-content">
+          <h3>Add a Meal</h3>
+          <input type="text" id="recipeSearch" placeholder="Find a recipe...">
+          <ul id="searchResults"></ul>
+          <input type="text" id="customRecipe" placeholder="Or add your own...">
+          <div class="overlay-actions">
+            <button id="closeOverlay">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </main>
+    <!-- JavaScript for meal planner functionality -->
+    <script src="planner.js"></script>
+  </body>
+</html>

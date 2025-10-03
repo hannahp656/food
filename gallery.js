@@ -1,12 +1,13 @@
+// ADD NEW RECIPE FILES HERE TO HAVE THEM APPEAR IN THE GALLERY
+// Format: "/food/recipes/recipe-filename.html",
 const recipeFiles = [
+
   "/food/recipes/recipe-sausage-fajita-pasta.html"
 
-  // Add new recipe files here as you create them
 ];
-
+// fetch each recipe file, parse out the #recipe-data JSON, and create a card in the gallery
 async function loadRecipes() {
   const gallery = document.getElementById("gallery");
-
   for (let file of recipeFiles) {
     try {
       const res = await fetch(file);
@@ -14,18 +15,14 @@ async function loadRecipes() {
         console.warn("Could not load", file);
         continue;
       }
-
       const text = await res.text();
       const doc = new DOMParser().parseFromString(text, "text/html");
       const dataEl = doc.querySelector("#recipe-data");
-
       if (!dataEl) {
         console.warn("No recipe-data found in", file);
         continue;
       }
-
       const data = JSON.parse(dataEl.textContent);
-
       const card = document.createElement("div");
       card.className = "recipe-card";
       card.innerHTML = `
@@ -44,5 +41,5 @@ async function loadRecipes() {
     }
   }
 }
-
+// Load recipes on page load
 loadRecipes();

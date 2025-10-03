@@ -1,140 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Hannah's Recipes - Home</title>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-  <style>html{font-family: Montserrat, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, system-ui, -apple-system, sans-serif;}</style>
-</head>
+  <head>
+    <meta charset="UTF-8">
+    <title>Hannah's Recipes - Home</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>html{font-family: Montserrat, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, system-ui, -apple-system, sans-serif;}</style>
+  </head>
 
-<body class="cute-home">
-  <!-- navigation bar -->
-  <nav>
-    <div class="container">
-      <div class="brand">Hannah's Recipes</div>
-      <div class="links">
-        <a href="index.html">Home</a>
-        <a href="meal-planner.html">Meal Planner</a>
-        <a href="recipes.html">Recipes</a>
+  <body class="cute-home">
+    <!-- navigation bar -->
+    <nav>
+      <div class="container">
+        <div class="brand"><a href="index.html" style="color:inherit;text-decoration:none">Hannah's Recipes</a></div>
+        <div class="links">
+          <a href="index.html">Home</a>
+          <a href="meal-planner.html">Meal Planner</a>
+          <a href="recipes.html">Recipes</a>
+        </div>
       </div>
-    </div>
-  </nav>
-  <!-- hero section -->
-  <header class="hero">
-    <div class="container">
-      <h1>Hannah's Recipes</h1>
-      <p class="subtitle">i stole these from the internet lol</p>
-      <div class="chips">
-        <span class="chip chip--accent">Under 30 minutes</span>
-        <span class="chip chip--soft">Prep & leave it</span>
-        <span class="chip chip--soft">New</span>
+    </nav>
+    <!-- hero section -->
+    <header class="hero">
+      <div class="container">
+        <h1>Hannah's Recipes</h1>
+        <p class="subtitle">i stole these from the internet lol</p>
+        <div class="chips">
+          <span class="chip chip--accent">these buttons</span>
+          <span class="chip chip--soft">don't do</span>
+          <span class="chip chip--soft">anything</span>
+        </div>
       </div>
-    </div>
-  </header>
-  <!-- body section -->
-  <div class="container split" style="margin-top:20px;display:flex;gap:24px;align-items:flex-start;">
-    <!-- left column random recipe generator -->
-    <div class="left-col" style="flex:0 0 420px;">
-      <div class="random-widget" id="randomWidget">
-        <img id="randomImage" src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80" alt="Random recipe">
-        <div class="meta">
-          <h4 id="randomTitle">Pick a recipe</h4>
-          <div class="tags" id="randomTags"></div>
-          <div class="controls" style="margin-top:8px">
-            <button class="btn" id="randomizeBtn">Randomize</button>
-            <a id="openRecipeBtn" class="btn btn--secondary" href="recipes.html">Open</a>
+    </header>
+    <!-- body section -->
+    <div class="container split" style="margin-top:20px;display:flex;gap:24px;align-items:flex-start;">
+      <!-- left column random recipe generator -->
+      <div class="left-col" style="flex:0 0 420px;">
+        <div class="random-widget" id="randomWidget">
+          <img id="randomImage" src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80" alt="Random recipe">
+          <div class="meta">
+            <h4 id="randomTitle">Pick a recipe</h4>
+            <div class="tags" id="randomTags"></div>
+            <div class="controls" style="margin-top:8px">
+              <button class="btn" id="randomizeBtn">Randomize</button>
+              <a id="openRecipeBtn" class="btn btn--secondary" href="recipes.html">Open</a>
+            </div>
           </div>
         </div>
       </div>
+      <!-- right column recipe gallery preview -->
+      <div class="right-col" style="flex:1;">
+        <main>
+          <section class="preview-section">
+            <h2>Recipe Gallery Preview</h2>
+            <p class="muted">A quick look at what's inside — click explore to see all recipes.</p>
+            <div class="preview-gallery" id="previewGallery" aria-live="polite">
+            </div>
+            <div style="margin-top:14px">
+              <a class="cta-btn" id="exploreBtn" href="recipes.html">Explore Recipe Gallery</a>
+            </div>
+          </section>
+        </main>
+      </div>
     </div>
-    <!-- right column recipe gallery preview -->
-    <div class="right-col" style="flex:1;">
-      <main>
-        <section class="preview-section">
-          <h2>Recipe Gallery Preview</h2>
-          <p class="muted">A quick look at what's inside — click explore to see all recipes.</p>
-          <div class="preview-gallery" id="previewGallery" aria-live="polite">
-          </div>
-          <div style="margin-top:14px">
-            <a class="cta-btn" id="exploreBtn" href="recipes.html">Explore Recipe Gallery</a>
-          </div>
-        </section>
-      </main>
-    </div>
-  </div>
-
-  
-  <script>
-    // Random recipe selector: fetch recipes.html, parse recipe-card entries
-    async function loadRecipesList() {
-      try {
-        const resp = await fetch('recipes.html');
-        const text = await resp.text();
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(text, 'text/html');
-        const cards = Array.from(doc.querySelectorAll('.recipe-card'));
-        return cards.map(c => ({
-          title: c.querySelector('h3') ? c.querySelector('h3').textContent.trim() : (c.dataset.title || 'Recipe'),
-          img: c.querySelector('img') ? c.querySelector('img').getAttribute('src') : '',
-          tags: Array.from(c.querySelectorAll('.tag')).map(t => t.textContent.trim()),
-          link: c.querySelector('a') ? c.querySelector('a').getAttribute('href') : '#'
-        }));
-      } catch (e) {
-        console.error('Failed to load recipes list', e);
-        return [];
+    <!-- THIS ALL NEEDS TO BE FIXED - JavaScript to handle random recipe and preview cards -->
+    <script>
+      // Random recipe selector: fetch recipes.html, parse recipe-card entries
+      async function loadRecipesList() {
+        try {
+          const resp = await fetch('recipes.html');
+          const text = await resp.text();
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(text, 'text/html');
+          const cards = Array.from(doc.querySelectorAll('.recipe-card'));
+          return cards.map(c => ({
+            title: c.querySelector('h3') ? c.querySelector('h3').textContent.trim() : (c.dataset.title || 'Recipe'),
+            img: c.querySelector('img') ? c.querySelector('img').getAttribute('src') : '',
+            tags: Array.from(c.querySelectorAll('.tag')).map(t => t.textContent.trim()),
+            link: c.querySelector('a') ? c.querySelector('a').getAttribute('href') : '#'
+          }));
+        } catch (e) {
+          console.error('Failed to load recipes list', e);
+          return [];
+        }
       }
-    }
-
-    let recipesCache = [];
-    async function pickRandom() {
-      if (!recipesCache.length) recipesCache = await loadRecipesList();
-      if (!recipesCache.length) return;
-      const idx = Math.floor(Math.random() * recipesCache.length);
-      const r = recipesCache[idx];
-      document.getElementById('randomImage').src = r.img || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80';
-      document.getElementById('randomTitle').textContent = r.title;
-      const tagsEl = document.getElementById('randomTags');
-      tagsEl.innerHTML = '';
-      r.tags.forEach(t => { const span = document.createElement('span'); span.className = 'tag'; span.textContent = t; tagsEl.appendChild(span); });
-      const open = document.getElementById('openRecipeBtn'); open.href = r.link;
-    }
-
-    // Render up to the first 4 recipes as preview cards in the right column
-    function renderPreviewCards(recipes) {
-      const container = document.getElementById('previewGallery');
-      container.innerHTML = '';
-      if (!recipes || !recipes.length) {
-        container.innerHTML = '<div class="muted">No preview available. Open the full gallery to see all recipes.</div>';
-        return;
+      let recipesCache = [];
+      async function pickRandom() {
+        if (!recipesCache.length) recipesCache = await loadRecipesList();
+        if (!recipesCache.length) return;
+        const idx = Math.floor(Math.random() * recipesCache.length);
+        const r = recipesCache[idx];
+        document.getElementById('randomImage').src = r.img || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80';
+        document.getElementById('randomTitle').textContent = r.title;
+        const tagsEl = document.getElementById('randomTags');
+        tagsEl.innerHTML = '';
+        r.tags.forEach(t => { const span = document.createElement('span'); span.className = 'tag'; span.textContent = t; tagsEl.appendChild(span); });
+        const open = document.getElementById('openRecipeBtn'); open.href = r.link;
       }
-      const slice = recipes.slice(0, 4);
-      slice.forEach(r => {
-        const card = document.createElement('div');
-        card.className = 'preview-card';
-        const img = document.createElement('img'); img.src = r.img || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80'; img.alt = r.title;
-        const body = document.createElement('div'); body.className = 'pc-body';
-        const h = document.createElement('h4'); h.textContent = r.title;
-        const tagWrap = document.createElement('div'); tagWrap.className = 'pc-tags';
-        (r.tags || []).slice(0,2).forEach(t => { const s = document.createElement('span'); s.className = 'tag'; s.textContent = t; tagWrap.appendChild(s); });
-        body.appendChild(h); body.appendChild(tagWrap);
-        card.appendChild(img); card.appendChild(body);
-        // make card clickable to open the recipe
-        card.addEventListener('click', () => { window.location.href = r.link || 'recipes.html'; });
-        container.appendChild(card);
+      // Render up to the first 4 recipes as preview cards in the right column
+      function renderPreviewCards(recipes) {
+        const container = document.getElementById('previewGallery');
+        container.innerHTML = '';
+        if (!recipes || !recipes.length) {
+          container.innerHTML = '<div class="muted">No preview available. Open the full gallery to see all recipes.</div>';
+          return;
+        }
+        const slice = recipes.slice(0, 4);
+        slice.forEach(r => {
+          const card = document.createElement('div');
+          card.className = 'preview-card';
+          const img = document.createElement('img'); img.src = r.img || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80'; img.alt = r.title;
+          const body = document.createElement('div'); body.className = 'pc-body';
+          const h = document.createElement('h4'); h.textContent = r.title;
+          const tagWrap = document.createElement('div'); tagWrap.className = 'pc-tags';
+          (r.tags || []).slice(0,2).forEach(t => { const s = document.createElement('span'); s.className = 'tag'; s.textContent = t; tagWrap.appendChild(s); });
+          body.appendChild(h); body.appendChild(tagWrap);
+          card.appendChild(img); card.appendChild(body);
+          card.addEventListener('click', () => { window.location.href = r.link || 'recipes.html'; });
+          container.appendChild(card);
+        });
+      }
+      document.addEventListener('DOMContentLoaded', function(){
+        document.getElementById('randomizeBtn').addEventListener('click', pickRandom);
+        (async ()=>{
+          recipesCache = await loadRecipesList();
+          renderPreviewCards(recipesCache);
+          pickRandom();
+        })();
       });
-    }
-
-    document.addEventListener('DOMContentLoaded', function(){
-      document.getElementById('randomizeBtn').addEventListener('click', pickRandom);
-      (async ()=>{
-        recipesCache = await loadRecipesList();
-        // render preview cards even if empty (fallback handled inside)
-        renderPreviewCards(recipesCache);
-        pickRandom();
-      })();
-    });
-  </script>
-</body>
+    </script>
+  </body>
 </html>
