@@ -448,3 +448,12 @@ footer{padding:36px 18px;text-align:center;color:var(--muted)}
   font-size: 1.1em;
   padding: 6px 12px;
 }
+
+.planner-actions,
+.saved-actions {
+  display: flex;
+  justify-content: flex-end; /* push buttons to right */
+  gap: 10px;
+  margin-bottom: 15px; /* space before content starts */
+}
+

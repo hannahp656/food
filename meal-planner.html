@@ -28,22 +28,23 @@
         <h1>Meal Planner</h1>
         <p class="subtitle">plan food for the week!</p>
       </div>
-      <div class="planner-controls container">
-        <!-- <button id="shoppingListBtn" class="btn">Generate Shopping List</button> -->
-        <button id="printPlan" class="btn">Print Plan</button>
-      </div>
     </header>
-    <!-- CHANGE UP CLEAR ALL BUTTON AND MAKE SURE BOTH COLUMNS ARE HORIZONTALLY ALIGNED - main content -->
     <main>
       <div class="planner-layout container">
+        <!-- planner column -->
         <section id="planner">
           <div class="planner-actions">
             <button id="clearAll" class="btn btn--secondary">Clear All</button>
+            <button id="printPlan" class="btn">Print Plan</button>
           </div>
           <!-- JavaScript will inject days here -->
         </section>
-        <!-- saved recipes section -->
+
+        <!-- saved recipes column -->
         <aside id="savedRecipes" class="saved-recipes">
+          <div class="saved-actions">
+            <button id="removeAllSaved" class="btn btn--secondary">Remove All Saved</button>
+          </div>
           <h2>Saved Recipes</h2>
           <div id="savedRecipesList" class="gallery"></div>
         </aside>

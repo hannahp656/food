@@ -275,4 +275,19 @@ document.addEventListener("DOMContentLoaded", () => {
       addMealItem(data.title, data.link, list.closest(".meal-box"));
     });
   });
+
+  // --- Remove all saved recipes ---
+document.getElementById("removeAllSaved").addEventListener("click", () => {
+  const savedList = document.getElementById("savedRecipesList");
+
+  if (savedList) {
+    savedList.innerHTML = ""; // clear DOM
+  }
+
+  // If you’re also saving to localStorage, clear that too
+  localStorage.removeItem("savedRecipes");
+
+  alert("All saved recipes removed.");
+});
+
 });
