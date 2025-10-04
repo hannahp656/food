@@ -360,10 +360,13 @@ async function generateShoppingList(recipeUrls) {
 document.getElementById("shoppingListBtn").addEventListener("click", async () => {
   const recipeUrls = [];
   document.querySelectorAll(".meal-list li a").forEach(a => {
-    if (a.href && a.href.includes("recipe-")) { 
-      recipeUrls.push(a.href);
+    const href = a.getAttribute("href"); // use relative path instead of absolute URL
+    if (href && href.includes("recipe-")) { 
+      recipeUrls.push(href);
     }
   });
+
+  console.log("Generating shopping list from URLs:", recipeUrls); // debug log
 
   if (recipeUrls.length) {
     await generateShoppingList(recipeUrls);
@@ -371,6 +374,7 @@ document.getElementById("shoppingListBtn").addEventListener("click", async () =>
     alert("No linked recipes in meal plan.");
   }
 });
+
 
 
 });
