@@ -188,7 +188,7 @@ document.addEventListener("DOMContentLoaded", () => {
       card.className = "recipe-card";
       card.draggable = true;
       card.dataset.index = index;
-      // build card content
+      // FIX WHATEVERS GOING ON WITH THE X - build card content
       card.innerHTML = `
         <img src="${recipe.image}" alt="${recipe.title}">
         <div class="content">
@@ -277,19 +277,100 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // CHANGE TO MAKE GENERATING SHOPPING LISTS WORK - fetch ingredients from a recipe URL (not currently used, but could be for future features)
-  async function fetchIngredients(recipeUrl) {
-    try {
-      const res = await fetch(recipeUrl);
-      const text = await res.text();
-      const doc = new DOMParser().parseFromString(text, "text/html");
-      // look for JSON metadata in recipe page
-      const dataEl = doc.querySelector("#recipe-data");
-      if (!dataEl) return [];
-      const data = JSON.parse(dataEl.textContent);
-      return data.ingredients || []; // expects ingredients array in metadata
-    } catch (e) {
-      console.error("Error fetching ingredients from", recipeUrl, e);
-      return [];
-    }
+  // --- Fetch ingredients from recipe page ---
+async function fetchIngredients(recipeUrl) {
+  try {
+    const res = await fetch(recipeUrl);
+    const text = await res.text();
+    const doc = new DOMParser().parseFromString(text, "text/html");
+    const dataEl = doc.querySelector("#recipe-data");
+    if (!dataEl) return [];
+    const data = JSON.parse(dataEl.textContent);
+    return data.ingredients || [];
+  } catch (e) {
+    console.error("Error fetching ingredients from", recipeUrl, e);
+    return [];
   }
+}
+
+// --- Parse ingredient into {ingredient, measure} ---
+function parseIngredient(line) {
+  let [beforeComma, afterComma] = line.split(/,(.+)/);
+  beforeComma = beforeComma ? beforeComma.trim() : "";
+  afterComma = afterComma ? afterComma.trim() : "";
+
+  const parts = beforeComma.split(" ");
+  let amount = "";
+  let unit = "";
+  const units = ["cup","cups","tbsp","tsp","teaspoon","teaspoons","tablespoon","tablespoons","g","kg","ml","l","oz","lb","pound","pounds","clove","cloves","slice","slices","can","cans","package","packages","breast","breasts"];
+  const descriptors = ["of","chopped","minced","diced","sliced","grated","shredded","fresh","ground"];
+
+  if (parts.length > 0) amount = parts.shift();
+  if (parts.length > 0 && units.includes(parts[0].toLowerCase())) {
+    unit = parts.shift();
+  }
+  while (parts.length && descriptors.includes(parts[0].toLowerCase())) {
+    parts.shift();
+  }
+
+  const ingredient = parts.join(" ");
+  let measure = "";
+  if (amount || unit) {
+    measure = [amount, unit].filter(Boolean).join(" ");
+  }
+  if (afterComma) {
+    measure += (measure ? ", " : "") + afterComma;
+  }
+  return { ingredient: ingredient.trim(), measure: measure.trim() };
+}
+
+// --- Generate shopping list page ---
+async function generateShoppingList(recipeUrls) {
+  const allIngredients = {};
+
+  // Collect ingredients
+  for (let url of recipeUrls) {
+    const ingredients = await fetchIngredients(url);
+    ingredients.forEach(line => {
+      const { ingredient, measure } = parseIngredient(line);
+      if (!ingredient) return;
+      if (!allIngredients[ingredient]) {
+        allIngredients[ingredient] = [];
+      }
+      if (measure) {
+        allIngredients[ingredient].push(measure);
+      }
+    });
+  }
+
+  // Prepare data object for persistence
+  const shoppingData = Object.entries(allIngredients).map(([ingredient, measures]) => ({
+    ingredient,
+    measures,
+    checked: false
+  }));
+
+  // Open shopping list page
+  const win = window.open("shopping-list.html", "_blank");
+  win.onload = () => {
+    win.initializeShoppingList(shoppingData);
+  };
+}
+// shopping list button
+document.getElementById("shoppingListBtn").addEventListener("click", async () => {
+  const recipeUrls = [];
+  document.querySelectorAll(".meal-list li a").forEach(a => {
+    if (a.href && a.href.includes("recipe-")) { 
+      recipeUrls.push(a.href);
+    }
+  });
+
+  if (recipeUrls.length) {
+    await generateShoppingList(recipeUrls);
+  } else {
+    alert("No linked recipes in meal plan.");
+  }
+});
+
+
 });
