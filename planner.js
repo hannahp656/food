@@ -350,58 +350,11 @@ async function generateShoppingList(recipeUrls) {
     checked: false
   }));
 
-  // Open shopping list page
-  const win = window.open("shopping-list.html", "_blank");
-  win.onload = () => {
-    win.initializeShoppingList(shoppingData);
-  };
-}
-// shopping list button
-document.getElementById("shoppingListBtn").addEventListener("click", async () => {
-  const recipeUrls = [];
-  document.querySelectorAll(".meal-list li a").forEach(a => {
-    const href = a.getAttribute("href");
-    if (href && href.includes("recipe-")) {
-      // Convert relative to absolute
-      const url = new URL(href, window.location.origin).href;
-      recipeUrls.push(url);
-    }
-  });
-
-  // Remove duplicates
-  const uniqueRecipeUrls = [...new Set(recipeUrls)];
-  if (!uniqueRecipeUrls.length) {
-    alert("No linked recipes in meal plan.");
-    return;
-  }
-
-  // Collect ingredients
-  const allIngredients = {};
-  for (let url of uniqueRecipeUrls) {
-    const ingredients = await fetchIngredients(url);
-    ingredients.forEach(line => {
-      const { ingredient, measure } = parseIngredient(line);
-      if (!ingredient) return;
-      if (!allIngredients[ingredient]) allIngredients[ingredient] = [];
-      if (measure) allIngredients[ingredient].push(measure);
-    });
-  }
-
-  // Prepare shopping list data
-  const shoppingData = Object.entries(allIngredients).map(([ingredient, measures]) => ({
-    ingredient,
-    measures,
-    checked: false
-  }));
-
-  // Save to localStorage
+  // ✅ Save to localStorage so shopping-list.html can load it
   localStorage.setItem("shoppingListData", JSON.stringify(shoppingData));
 
-  // Open new page
+  // Open shopping list page
   window.open("shopping-list.html", "_blank");
-});
-
-
-
+}
 
 });
