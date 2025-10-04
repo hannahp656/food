@@ -3,161 +3,137 @@
 <head>
   <meta charset="UTF-8">
   <title>Shopping List</title>
-  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Inter:wght@300;400;600,700&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: Montserrat, 'Segoe UI', Roboto, Arial, sans-serif;
-      background: #fafafa;
-      margin: 0;
+      font-family: Montserrat, sans-serif;
       padding: 20px;
+      background: #f8fbf6;
     }
-
     h1 {
       text-align: center;
-      margin-bottom: 20px;
+      color: #3a4d39;
     }
-
-    #controls {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-
-    button {
-      padding: 8px 14px;
-      font-size: 14px;
-      cursor: pointer;
-      border: none;
-      border-radius: 4px;
-      background: #333;
-      color: #fff;
-      transition: background 0.2s;
-    }
-
-    button:hover {
-      background: #555;
-    }
-
-    #shoppingList {
+    ul {
       list-style: none;
       padding: 0;
-      margin: 0 auto;
-      max-width: 500px;
+      margin: 20px 0;
     }
-
-    #shoppingList li {
+    li.shopping-item {
       background: #fff;
-      border: 1px solid #ddd;
+      padding: 10px 14px;
       margin-bottom: 8px;
-      padding: 10px 12px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
       display: flex;
       align-items: center;
-      gap: 10px;
-      border-radius: 4px;
+      gap: 12px;
       cursor: grab;
     }
-
-    #shoppingList li.dragging {
+    li.shopping-item.dragging {
       opacity: 0.5;
     }
-
-    #shoppingList input[type="checkbox"] {
+    input[type="checkbox"] {
       transform: scale(1.2);
-      cursor: pointer;
     }
-
-    .checked span {
-      text-decoration: line-through;
-      color: #777;
+    .measures {
+      color: #555;
     }
   </style>
 </head>
 <body>
   <h1>Shopping List</h1>
-
-  <div id="controls">
-    <button id="clearListBtn">Clear List</button>
-    <button onclick="window.print()">Print</button>
-  </div>
-
-  <ul id="shoppingList"></ul>
+  <ul id="shoppingListContainer"></ul>
 
   <script>
-    const listEl = document.getElementById("shoppingList");
-    const clearBtn = document.getElementById("clearListBtn");
+  document.addEventListener("DOMContentLoaded", () => {
+    const container = document.getElementById("shoppingListContainer");
+    let shoppingList = JSON.parse(localStorage.getItem("shoppingListData") || "[]");
 
-    // Load from localStorage
-    let listData = JSON.parse(localStorage.getItem("shoppingListData")) || [];
-
-    function renderList() {
-      listEl.innerHTML = "";
-      listData.forEach((item, index) => {
+    function renderShoppingList() {
+      container.innerHTML = "";
+      shoppingList.forEach((item, index) => {
         const li = document.createElement("li");
+        li.className = "shopping-item";
         li.draggable = true;
-        if (item.checked) li.classList.add("checked");
+        li.dataset.index = index;
 
-        li.innerHTML = `
-          <input type="checkbox" ${item.checked ? "checked" : ""} data-index="${index}">
-          <span>${item.text}</span>
-        `;
-
-        // checkbox toggle
-        li.querySelector("input").addEventListener("change", (e) => {
-          listData[index].checked = e.target.checked;
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = item.checked;
+        checkbox.addEventListener("change", () => {
+          shoppingList[index].checked = checkbox.checked;
           saveList();
-          renderList();
         });
 
-        listEl.appendChild(li);
+        const text = document.createTextNode(`${item.ingredient} - `);
+        const measuresSpan = document.createElement("span");
+        measuresSpan.className = "measures";
+        measuresSpan.textContent = item.measures.join(", ");
+
+        li.appendChild(checkbox);
+        li.appendChild(text);
+        li.appendChild(measuresSpan);
+
+        container.appendChild(li);
       });
-      enableDragAndDrop();
     }
 
     function saveList() {
-      localStorage.setItem("shoppingListData", JSON.stringify(listData));
+      localStorage.setItem("shoppingListData", JSON.stringify(shoppingList));
     }
 
-    // Drag & Drop sorting
-    function enableDragAndDrop() {
-      const items = listEl.querySelectorAll("li");
-      let dragSrcEl = null;
-
-      items.forEach((item, i) => {
-        item.addEventListener("dragstart", () => {
-          dragSrcEl = i;
-          item.classList.add("dragging");
-        });
-        item.addEventListener("dragend", () => {
-          item.classList.remove("dragging");
-        });
-        item.addEventListener("dragover", (e) => {
-          e.preventDefault();
-        });
-        item.addEventListener("drop", (e) => {
-          e.preventDefault();
-          const dropIndex = Array.from(listEl.children).indexOf(item);
-          if (dragSrcEl !== null && dropIndex !== dragSrcEl) {
-            const moved = listData.splice(dragSrcEl, 1)[0];
-            listData.splice(dropIndex, 0, moved);
-            saveList();
-            renderList();
-          }
-        });
-      });
-    }
-
-    // Clear button
-    clearBtn.addEventListener("click", () => {
-      if (confirm("Clear the shopping list?")) {
-        localStorage.removeItem("shoppingListData");
-        listData = [];
-        renderList();
+    // Drag-and-drop
+    let draggedIndex = null;
+    container.addEventListener("dragstart", e => {
+      if (e.target.classList.contains("shopping-item")) {
+        draggedIndex = parseInt(e.target.dataset.index);
+        e.target.classList.add("dragging");
+      }
+    });
+    container.addEventListener("dragend", e => {
+      if (e.target.classList.contains("shopping-item")) {
+        e.target.classList.remove("dragging");
+      }
+    });
+    container.addEventListener("dragover", e => {
+      e.preventDefault();
+      const afterElement = getDragAfterElement(container, e.clientY);
+      const dragging = container.querySelector(".dragging");
+      if (!dragging) return;
+      if (afterElement == null) {
+        container.appendChild(dragging);
+      } else {
+        container.insertBefore(dragging, afterElement);
       }
     });
 
-    // Initial render
-    renderList();
+    function getDragAfterElement(container, y) {
+      const draggableElements = [...container.querySelectorAll(".shopping-item:not(.dragging)")];
+      return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        if (offset < 0 && offset > closest.offset) {
+          return { offset: offset, element: child };
+        } else {
+          return closest;
+        }
+      }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    // Update the shoppingList order on drop
+    container.addEventListener("drop", () => {
+      shoppingList = [...container.querySelectorAll(".shopping-item")].map(li => {
+        const index = parseInt(li.dataset.index);
+        return shoppingList[index];
+      });
+      // Reset dataset.index
+      container.querySelectorAll(".shopping-item").forEach((li, idx) => li.dataset.index = idx);
+      saveList();
+    });
+
+    renderShoppingList();
+  });
   </script>
 </body>
 </html>
