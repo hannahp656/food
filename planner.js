@@ -360,11 +360,13 @@ async function generateShoppingList(recipeUrls) {
 document.getElementById("shoppingListBtn").addEventListener("click", async () => {
   const recipeUrls = [];
   document.querySelectorAll(".meal-list li a").forEach(a => {
-    const href = a.getAttribute("href"); // use relative path instead of absolute URL
-    if (href && href.includes("recipe-")) { 
-      recipeUrls.push(href);
-    }
-  });
+  const href = a.getAttribute("href");
+  console.log("Recipe link found:", href);
+  if (href && href.includes("recipe-")) {
+    recipeUrls.push(href);
+  }
+});
+console.log("All recipe URLs:", recipeUrls);
 
   console.log("Generating shopping list from URLs:", recipeUrls); // debug log
 
