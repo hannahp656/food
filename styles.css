@@ -461,41 +461,40 @@ footer{padding:36px 18px;text-align:center;color:var(--muted)}
 
 .tab-label {
   display: inline-block;
-  padding: 10px 20px;
-  margin-right: 2px;
-  background: #f2f6f0; /* light green/white background */
+  padding: 8px 24px;
+  margin-right: 6px;
+  border-radius: 8px;
+  background: #e6f0e6; /* light green background for inactive */
   color: #3a4d39; /* dark green text */
   font-weight: 600;
   cursor: pointer;
-  border-radius: 8px 8px 0 0;
-  transition: background 0.2s;
+  transition: background 0.2s, color 0.2s;
+  border: 1px solid transparent;
 }
 
 .tab-label:hover {
-  background: #e1ebdb;
+  background: #d9e3d9;
+}
+
+input#tab1:checked + label[for="tab1"],
+input#tab2:checked + label[for="tab2"] {
+  background: #7a9d54; /* active tab darker green */
+  color: #ffffff;
+  border-color: #7a9d54;
 }
 
 .tab-content {
   display: none;
+  margin-top: 16px;
   padding: 20px;
-  background: #f8fbf6; /* match print page background */
+  background: #f8fbf6; /* match print page bg */
+  border-radius: 10px;
   border: 1px solid #d9e3cf;
-  border-top: none;
-  border-radius: 0 0 10px 10px;
 }
 
-/* Show content when radio is checked */
-#tab1:checked ~ label[for="tab1"] {
-  background: #ffffff;
-  color: #3a4d39;
-}
-
-#tab2:checked ~ label[for="tab2"] {
-  background: #ffffff;
-  color: #3a4d39;
-}
-
+/* Show content when radio checked */
 #tab1:checked ~ #content1,
 #tab2:checked ~ #content2 {
   display: block;
 }
+
