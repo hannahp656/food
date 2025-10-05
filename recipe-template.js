@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
     heroImg.src = data.cover;
     heroImg.alt = data.title;
   }
-  // setup save button
+  // WORK ON THIS SO IT CHANGES ONCE SMTH HAS BEEN SAVED - setup save button
   const saveBtn = document.getElementById("saveRecipeBtn");
   if (saveBtn) {
     saveBtn.addEventListener("click", () => {
@@ -42,19 +42,38 @@ document.addEventListener("DOMContentLoaded", () => {
     }).join("");
   }
 
-  // insert video if available
+  // CHANGE THIS SO IT AUTOPLAYS AND ALSO CREATE NICER PLAYBACK FEATURES - insert video if available
   const videoContainer = document.querySelector('.video-container');
+
   if (data.video) {
-      const videoElement = document.createElement('video');
-      videoElement.src = data.video;
-      videoElement.poster = data.cover;
-      videoElement.setAttribute('controls', ''); // Adds playback controls
-      videoElement.setAttribute('autoplay', ''); // Autoplays the video
-      videoElement.setAttribute('muted', ''); // Mutes the video for autoplay
-      videoElement.setAttribute('loop', ''); // Loops the video
-      videoElement.setAttribute('playsinline', ''); // Allows playback in iOS without fullscreen
-      videoContainer.appendChild(videoElement);
+    // Create video element
+    const videoElement = document.createElement('video');
+    videoElement.src = data.video;
+    videoElement.poster = data.cover;
+    videoElement.setAttribute('controls', ''); // Optional: keep controls after play
+    videoElement.setAttribute('playsinline', ''); // iOS inline playback
+    videoElement.style.width = '100%'; // make it responsive
+    videoElement.style.display = 'block';
+
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'video-overlay';
+    
+    const playButton = document.createElement('div');
+    playButton.className = 'play-button';
+    overlay.appendChild(playButton);
+
+    // Click overlay to play video
+    overlay.addEventListener('click', () => {
+      videoElement.play();
+      overlay.style.display = 'none'; // hide overlay once video starts
+    });
+
+    // Add video and overlay to container
+    videoContainer.appendChild(videoElement);
+    videoContainer.appendChild(overlay);
   }
+
 
   // insert ingredients
   const ingredientTags = []; // store actual ingredient phrases

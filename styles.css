@@ -495,3 +495,38 @@ footer{padding:36px 18px;text-align:center;color:var(--muted)}
 .tab-content.active {
   display: block;
 }
+
+.video-container {
+  position: relative;
+  max-width: 600px; /* adjust as needed */
+}
+
+.video-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.3); /* semi-transparent overlay */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.video-overlay:hover {
+  background: rgba(0,0,0,0.5);
+}
+
+.play-button {
+  width: 60px;
+  height: 60px;
+  background: rgba(255,255,255,0.8);
+  clip-path: polygon(20% 15%, 80% 50%, 20% 85%);
+  transition: transform 0.2s;
+}
+
+.video-overlay:hover .play-button {
+  transform: scale(1.1);
+}
