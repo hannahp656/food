@@ -449,52 +449,49 @@ footer{padding:36px 18px;text-align:center;color:var(--muted)}
   padding: 6px 12px;
 }
 .tabs-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.tabs {
   display: flex;
-  flex-direction: column;
-  margin-top: 20px;
+  border-bottom: 2px solid #dce3e0; /* subtle line under tabs */
+  margin-bottom: 20px;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 10px 20px;
   font-family: Montserrat, sans-serif;
-}
-
-.tabs-container input[type="radio"] {
-  display: none;
-}
-
-.tab-label {
-  display: inline-block;
-  padding: 8px 24px;
-  margin-right: 6px;
-  border-radius: 8px;
-  background: #e6f0e6; /* light green background for inactive */
-  color: #3a4d39; /* dark green text */
   font-weight: 600;
+  font-size: 16px;
+  color: #7a9d54; /* inactive color */
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-  border: 1px solid transparent;
+  position: relative;
+  transition: color 0.3s;
 }
 
-.tab-label:hover {
-  background: #d9e3d9;
+.tab-btn.active {
+  color: #3a4d39; /* active tab color */
 }
 
-input#tab1:checked + label[for="tab1"],
-input#tab2:checked + label[for="tab2"] {
-  background: #7a9d54; /* active tab darker green */
-  color: #ffffff;
-  border-color: #7a9d54;
+.tab-btn.active::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: #3a4d39; /* active underline */
+  border-radius: 3px 3px 0 0;
 }
 
 .tab-content {
   display: none;
-  margin-top: 16px;
-  padding: 20px;
-  background: #f8fbf6; /* match print page bg */
-  border-radius: 10px;
-  border: 1px solid #d9e3cf;
 }
 
-/* Show content when radio checked */
-#tab1:checked ~ #content1,
-#tab2:checked ~ #content2 {
+.tab-content.active {
   display: block;
 }
-

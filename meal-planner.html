@@ -34,11 +34,12 @@
     </header>
     <main>
       <div class="tabs-container">
-        <input type="radio" id="tab1" name="tabs" checked />
-        <label for="tab1" class="tab-label">Meal Planner</label>
-        <input type="radio" id="tab2" name="tabs" />
-        <label for="tab2" class="tab-label">Shopping List</label>
-        <div class="tab-content" id="content1">
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="content1">Meal Plan</button>
+          <button class="tab-btn" data-tab="content2">Shopping List</button>
+        </div>
+
+        <div class="tab-content active" id="content1">
           <!-- Meal planner content goes here -->
           <div class="planner-layout container">
             <section id="planner">
@@ -50,7 +51,9 @@
             </aside>
           </div>
         </div>
+
         <div class="tab-content" id="content2">
+          <!-- Shopping list content will go here later -->
           <h2>Shopping List</h2>
           <p>Will be generated here later.</p>
         </div>
