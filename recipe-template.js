@@ -150,27 +150,57 @@ document.addEventListener("DOMContentLoaded", () => {
   // insert instructions
   const stepsList = document.querySelector(".instructions-list");
   if (stepsList && data.instructions) {
-    stepsList.innerHTML = data.instructions.map(step => {
+    stepsList.innerHTML = data.instructions.map((step, index) => {
       if (typeof step === "string") {
+        // look ahead: is the next step an image?
+        const next = data.instructions[index + 1];
         let stepText = step;
+
         ingredientTags
           .sort((a, b) => b.length - a.length)
           .forEach(ingredient => {
             const regex = new RegExp(`\\b${ingredient.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}\\b`, "gi");
             stepText = stepText.replace(regex, `<strong>${ingredient}</strong>`);
           });
+
+        // if the next item is an image, attach toggle arrow and container
+        if (next && typeof next === "object" && next.image) {
+          const id = `img-${Math.random().toString(36).substr(2, 9)}`;
+          return `
+            <li>
+              ${stepText}
+              <button class="img-toggle" data-target="${id}">
+                <i class="fa-solid fa-angle-right"></i>
+              </button>
+              <div id="${id}" class="instruction-img hidden">
+                <img src="${next.image}" alt="Instruction image">
+              </div>
+            </li>
+          `;
+        }
+
         return `<li>${stepText}</li>`;
-      } else if (step.image) {
-        // Collapsible image block
-        const id = `img-${Math.random().toString(36).substr(2, 9)}`;
-        return `
-          <li class="instruction-image">
-            <details>
-              <summary><i class="fa-solid fa-angle-right"></i> View Image</summary>
-              <img src="${step.image}" alt="Instruction step image" style="max-width:100%;margin-top:8px;">
-            </details>
-          </li>`;
       }
+
+      // if it's an image object, skip (it’s handled by the previous string step)
+      return "";
     }).join("");
+
+    // add toggle behavior
+    stepsList.querySelectorAll(".img-toggle").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const targetId = btn.dataset.target;
+        const target = document.getElementById(targetId);
+        const icon = btn.querySelector("i");
+
+        if (target.classList.contains("hidden")) {
+          target.classList.remove("hidden");
+          icon.style.transform = "rotate(90deg)";
+        } else {
+          target.classList.add("hidden");
+          icon.style.transform = "rotate(0deg)";
+        }
+      });
+    });
   }
 });

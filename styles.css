@@ -569,3 +569,29 @@ footer{padding:36px 18px;text-align:center;color:var(--muted)}
   border-radius: 4px;
   max-width: 100%;
 }
+.instructions-list .img-toggle {
+  border: none;
+  background: none;
+  cursor: pointer;
+  margin-left: 8px;
+  padding: 0;
+}
+
+.instructions-list .img-toggle i {
+  transition: transform 0.2s ease;
+}
+
+.instructions-list .instruction-img {
+  margin-top: 8px;
+}
+
+.instructions-list .instruction-img.hidden {
+  display: none;
+}
+
+.instructions-list .instruction-img img {
+  max-width: 100%;
+  border-radius: 4px;
+  display: block;
+}
+
