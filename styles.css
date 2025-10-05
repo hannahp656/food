@@ -530,3 +530,42 @@ footer{padding:36px 18px;text-align:center;color:var(--muted)}
 .video-overlay:hover .play-button {
   transform: scale(1.1);
 }
+
+/* Collapsible instruction images */
+.instructions-list details {
+  margin: 8px 0;
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fafafa;
+  cursor: pointer;
+}
+
+.instructions-list summary {
+  list-style: none; /* remove default triangle */
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.instructions-list summary::-webkit-details-marker {
+  display: none; /* remove marker in Safari/Chrome */
+}
+
+/* arrow icon */
+.instructions-list summary i {
+  transition: transform 0.2s ease;
+}
+
+/* rotate arrow when open */
+.instructions-list details[open] summary i {
+  transform: rotate(90deg);
+}
+
+.instructions-list img {
+  display: block;
+  margin-top: 10px;
+  border-radius: 4px;
+  max-width: 100%;
+}

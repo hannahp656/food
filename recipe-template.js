@@ -15,6 +15,14 @@ document.addEventListener("DOMContentLoaded", () => {
     heroImg.src = data.cover;
     heroImg.alt = data.title;
   }
+  // setup "view original recipe" button
+  const viewBtn = document.getElementById("viewOriginalBtn");
+  if (viewBtn && data.original) {
+    viewBtn.style.display = "inline-block";
+    viewBtn.addEventListener("click", () => {
+      window.open(data.original, "_blank");
+    });
+  }
   // WORK ON THIS SO IT CHANGES ONCE SMTH HAS BEEN SAVED - setup save button
   const saveBtn = document.getElementById("saveRecipeBtn");
   if (saveBtn) {
@@ -34,46 +42,53 @@ document.addEventListener("DOMContentLoaded", () => {
   // insert tags
   const recipeTags = document.querySelector(".recipe-tags");
   if (recipeTags && data.tags) {
-    recipeTags.innerHTML = data.tags.map(tag => {
+    const firstLine = data.tags.slice(0, 3).map(tag => {
       if (/\bmin\b|\bhour\b/i.test(tag)) {
         return `<span class="chip chip--soft"><i class="fa-regular fa-clock"></i> ${tag}</span>`;
       }
       return `<span class="chip chip--soft">${tag}</span>`;
     }).join("");
+
+    const secondLine = data.tags.slice(3).map(tag => {
+      return `<span class="chip chip--soft">${tag}</span>`;
+    }).join("");
+
+    recipeTags.innerHTML = `<div>${firstLine}</div>${secondLine ? `<div>${secondLine}</div>` : ""}`;
   }
 
-  // CHANGE THIS SO IT AUTOPLAYS AND ALSO CREATE NICER PLAYBACK FEATURES - insert video if available
+  // insert video if available, cover image if not
   const videoContainer = document.querySelector('.video-container');
-
   if (data.video) {
-    // Create video element
     const videoElement = document.createElement('video');
     videoElement.src = data.video;
     videoElement.poster = data.cover;
-    videoElement.setAttribute('controls', ''); // Optional: keep controls after play
-    videoElement.setAttribute('playsinline', ''); // iOS inline playback
-    videoElement.style.width = '100%'; // make it responsive
+    videoElement.setAttribute('controls', '');
+    videoElement.setAttribute('playsinline', '');
+    videoElement.style.width = '100%';
     videoElement.style.display = 'block';
 
-    // Create overlay
     const overlay = document.createElement('div');
     overlay.className = 'video-overlay';
-    
     const playButton = document.createElement('div');
     playButton.className = 'play-button';
     overlay.appendChild(playButton);
 
-    // Click overlay to play video
     overlay.addEventListener('click', () => {
       videoElement.play();
-      overlay.style.display = 'none'; // hide overlay once video starts
+      overlay.style.display = 'none';
     });
 
-    // Add video and overlay to container
     videoContainer.appendChild(videoElement);
     videoContainer.appendChild(overlay);
+  } else if (data.cover) {
+    // fallback: just show static image
+    const img = document.createElement('img');
+    img.src = data.cover;
+    img.alt = data.title;
+    img.style.width = '100%';
+    img.style.display = 'block';
+    videoContainer.appendChild(img);
   }
-
 
   // insert ingredients
   const ingredientTags = []; // store actual ingredient phrases
@@ -136,16 +151,26 @@ document.addEventListener("DOMContentLoaded", () => {
   const stepsList = document.querySelector(".instructions-list");
   if (stepsList && data.instructions) {
     stepsList.innerHTML = data.instructions.map(step => {
-      let stepText = step;
-      // sort ingredientTags by length descending to avoid partial matches
-      ingredientTags
-        .sort((a, b) => b.length - a.length)
-        .forEach(ingredient => {
-          // use regex to match whole words or phrases, case-insensitive
-          const regex = new RegExp(`\\b${ingredient.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}\\b`, "gi");
-          stepText = stepText.replace(regex, `<strong>${ingredient}</strong>`);
-        });
-      return `<li>${stepText}</li>`;
+      if (typeof step === "string") {
+        let stepText = step;
+        ingredientTags
+          .sort((a, b) => b.length - a.length)
+          .forEach(ingredient => {
+            const regex = new RegExp(`\\b${ingredient.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}\\b`, "gi");
+            stepText = stepText.replace(regex, `<strong>${ingredient}</strong>`);
+          });
+        return `<li>${stepText}</li>`;
+      } else if (step.image) {
+        // Collapsible image block
+        const id = `img-${Math.random().toString(36).substr(2, 9)}`;
+        return `
+          <li class="instruction-image">
+            <details>
+              <summary><i class="fa-solid fa-angle-right"></i> View Image</summary>
+              <img src="${step.image}" alt="Instruction step image" style="max-width:100%;margin-top:8px;">
+            </details>
+          </li>`;
+      }
     }).join("");
   }
 });
