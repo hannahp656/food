@@ -617,3 +617,19 @@ footer{padding:36px 18px;text-align:center;color:var(--muted)}
   display: flex;
   gap: 8px;
 }
+.left-col {
+  flex: 1 1 100%;
+  max-width: 420px;
+}
+.right-col {
+  flex: 1 1 100%;
+}
+@media (max-width: 768px) {
+  .container.split {
+    flex-direction: column;
+  }
+  .left-col,
+  .right-col {
+    max-width: 100%;
+  }
+}
