@@ -605,6 +605,7 @@ footer{padding:36px 18px;text-align:center;color:var(--muted)}
   display: flex;
   flex-wrap: wrap; /* allow wrapping within each line if needed */
   gap: 6px;
+      justify-content: center;
 }
 .hero .top-row {
   display: flex;
