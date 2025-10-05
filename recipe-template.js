@@ -26,16 +26,40 @@ document.addEventListener("DOMContentLoaded", () => {
   // WORK ON THIS SO IT CHANGES ONCE SMTH HAS BEEN SAVED - setup save button
   const saveBtn = document.getElementById("saveRecipeBtn");
   if (saveBtn) {
+    const icon = saveBtn.querySelector("i");
+
+    function updateBookmarkIcon(isSaved) {
+      if (isSaved) {
+        icon.classList.remove("fa-regular");
+        icon.classList.add("fa-solid");
+      } else {
+        icon.classList.remove("fa-solid");
+        icon.classList.add("fa-regular");
+      }
+    }
+
+    // load saved recipes
+    let saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
+
+    // check if current recipe is saved
+    let isSaved = saved.some(r => r.link === data.link);
+    updateBookmarkIcon(isSaved);
+
+    // click handler
     saveBtn.addEventListener("click", () => {
-      // get existing saved recipes
-      const saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
-      // Check if already saved (avoid duplicates)
-      if (!saved.some(r => r.link === data.link)) {
+      saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
+      isSaved = saved.some(r => r.link === data.link);
+
+      if (isSaved) {
+        // remove from saved
+        saved = saved.filter(r => r.link !== data.link);
+        localStorage.setItem("savedRecipes", JSON.stringify(saved));
+        updateBookmarkIcon(false);
+      } else {
+        // add to saved
         saved.push(data);
         localStorage.setItem("savedRecipes", JSON.stringify(saved));
-        alert(`${data.title} added to Saved Recipes!`);
-      } else {
-        alert(`${data.title} is already in your Saved Recipes.`);
+        updateBookmarkIcon(true);
       }
     });
   }
