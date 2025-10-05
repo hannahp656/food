@@ -26,7 +26,6 @@ document.addEventListener("DOMContentLoaded", () => {
           <h3>${meal.charAt(0).toUpperCase() + meal.slice(1)}</h3>
           <div class="controls">
             <button class="add-btn">+</button>
-            <button class="edit-btn">✎</button>
           </div>
         </div>
         <ul class="meal-list"></ul>
@@ -50,13 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
       searchResults.innerHTML = "";
     });
   });
-  // edit button -> toggle edit mode
-  document.querySelectorAll(".edit-btn").forEach(btn => {
-    btn.addEventListener("click", e => {
-      const box = e.target.closest(".meal-box");
-      box.classList.toggle("editing");
-    });
-  });
+
   // close overlay
   closeOverlay.addEventListener("click", () => overlay.classList.add("hidden"));
 
@@ -170,14 +163,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // clear all button
-  document.getElementById("clearAll").addEventListener("click", () => {
-    if (confirm("Are you sure you want to clear the entire meal plan?")) {
-      localStorage.removeItem("mealPlan");
-      document.querySelectorAll(".meal-list").forEach(list => list.innerHTML = "");
-    }
-  });
-
   // render saved recipes
   function loadSavedRecipes() {
     const container = document.getElementById("savedRecipesList");
@@ -275,19 +260,4 @@ document.addEventListener("DOMContentLoaded", () => {
       addMealItem(data.title, data.link, list.closest(".meal-box"));
     });
   });
-
-  // --- Remove all saved recipes ---
-document.getElementById("removeAllSaved").addEventListener("click", () => {
-  const savedList = document.getElementById("savedRecipesList");
-
-  if (savedList) {
-    savedList.innerHTML = ""; // clear DOM
-  }
-
-  // If you’re also saving to localStorage, clear that too
-  localStorage.removeItem("savedRecipes");
-
-  alert("All saved recipes removed.");
-});
-
 });
