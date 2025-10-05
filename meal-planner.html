@@ -33,17 +33,29 @@
       </div>
     </header>
     <main>
-      <div class="planner-layout container">
-        <!-- planner column -->
-        <section id="planner">
-          <!-- JavaScript will inject days here -->
-        </section>
-
-        <!-- saved recipes column -->
-        <aside id="savedRecipes" class="saved-recipes">
-          <h2>Saved Recipes</h2>
-          <div id="savedRecipesList" class="gallery"></div>
-        </aside>
+      <div class="tabs-container">
+        <!-- Radio buttons for tabs -->
+        <input type="radio" id="tab1" name="tabs" checked />
+        <label for="tab1" class="tab-label">Meal Planner</label>
+        <input type="radio" id="tab2" name="tabs" />
+        <label for="tab2" class="tab-label">Shopping List</label>
+        <!-- Tab 1 content: meal plan + saved recipes -->
+        <div class="tab-content" id="content1">
+          <div class="planner-layout container">
+            <section id="planner">
+              <!-- JavaScript will inject days here -->
+            </section>
+            <aside id="savedRecipes" class="saved-recipes">
+              <h2>Saved Recipes</h2>
+              <div id="savedRecipesList" class="gallery"></div>
+            </aside>
+          </div>
+        </div>
+        <!-- Tab 2 content: shopping list (currently empty) -->
+        <div class="tab-content" id="content2">
+          <h2>Shopping List</h2>
+          <p>Will be generated here later.</p>
+        </div>
       </div>
       <!-- THIS NEEDS TO BE FIXED AND DESIGN NEEDS TO BE UPDATED - overlay for adding recipe -->
       <div id="overlay" class="overlay hidden">
