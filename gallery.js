@@ -36,11 +36,14 @@ async function loadRecipes() {
         </div>
       `;
       gallery.appendChild(card);
+      // Make whole card clickable
+      card.addEventListener("click", () => {
+        window.location.href = data.link;
+      });
     } catch (err) {
       console.error("Error loading recipe:", file, err);
     }
   }
 }
 // Load recipes on page load
-
 loadRecipes();

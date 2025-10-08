@@ -178,7 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <img src="${recipe.image}" alt="${recipe.title}">
         <div class="content">
           <h3>${recipe.title}</h3>
-          <div class="card-tags">${recipe.tags.map(tag => `<span class="tag">${tag}</span>`).join("")}</div>
+          <div class="card-tags">${recipe.tags.map(tag => `<span class="chip chip--soft">${tag}</span>`).join("")}</div>
           <a href="${recipe.link}" target="_blank">View Recipe</a>
           <button class="delete-saved">✕</button>
         </div>
