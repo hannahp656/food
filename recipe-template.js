@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
       window.open(data.original, "_blank");
     });
   }
-  // WORK ON THIS SO IT CHANGES ONCE SMTH HAS BEEN SAVED - setup save button
+  // setup save button
   const saveBtn = document.getElementById("saveRecipeBtn");
   if (saveBtn) {
     const icon = saveBtn.querySelector("i");

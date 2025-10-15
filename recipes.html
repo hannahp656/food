@@ -30,7 +30,7 @@
     </header>
     <!-- filter bar -->
     <div class="filter-bar">
-      <input type="text" id="searchInput" placeholder="Search by ingredient...">
+      <!--<input type="text" id="searchInput" placeholder="Search by ingredient...">
       <select id="categoryFilter">
         <option value="">All Categories</option>
         <option value="full meal">Full Meal</option>
@@ -40,7 +40,40 @@
         <option value="dessert">Dessert</option>
       </select>
       <input type="number" id="timeFilter" placeholder="Max Time (min)" min="1" style="width:120px;">
-      <input type="number" id="servingsFilter" placeholder="Servings" min="1" style="width:100px;">
+      <input type="number" id="servingsFilter" placeholder="Servings" min="1" style="width:100px;">-->
+      <!-- new search + filters UI -->
+      <div class="search-bar">
+        <input type="text" id="titleSearch" placeholder="Search recipes by title...">
+        <button id="openFiltersBtn" class="button button--secondary">
+          <i class="fa-solid fa-sliders"></i> Filters
+        </button>
+      </div>
+
+      <!-- sidebar for filters -->
+      <div id="filterSidebar" class="filter-sidebar hidden">
+        <div class="filter-header">
+          <h2>Filters</h2>
+          <button id="closeFiltersBtn" class="close-btn">&times;</button>
+        </div>
+
+        <div class="filter-section">
+          <h3>Ingredients</h3>
+          <div class="ingredient-filter">
+            <input type="text" id="ingredientSearch" placeholder="Search ingredients...">
+            <ul id="ingredientSuggestions"></ul>
+            <div id="selectedIngredients" class="selected-tags"></div>
+          </div>
+        </div>
+
+        <div class="filter-actions">
+          <button id="applyFiltersBtn" class="button">Apply Filters</button>
+          <button id="clearFiltersBtn" class="button button--secondary">Clear Filters</button>
+        </div>
+      </div>
+
+      <!-- overlay when sidebar is open -->
+      <div id="overlay" class="overlay hidden"></div>
+
     </div>
     <!-- gallery container -->
     <main>
