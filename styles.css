@@ -380,7 +380,7 @@ nav .links{display:flex;gap:12px;align-items:center}
 /*collapsable ingredients*/
 summary::marker {content: none;}
 summary {cursor: pointer;}
-details summary::after {
+/*details summary::after {
     display: inline-block;
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
@@ -388,8 +388,23 @@ details summary::after {
     content: '\f077';
     margin-left: 5px;
 }
-details[open] summary::after {content: '\f078';}
+details[open] summary::after {content: '\f078';}*/
+/* Match instruction toggle arrow */
+.ingredients summary i {
+  margin-left: 6px;
+  transition: transform 0.2s ease;
+}
 
+/* Rotate arrow when open */
+.ingredients[open] summary i {
+  transform: rotate(90deg);
+}
+.ingredients summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
 .ingredients h3{
   color: #3a4d39;
   font-family: Montserrat, Inter, sans-serif;
