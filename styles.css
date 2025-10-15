@@ -390,16 +390,16 @@ summary {cursor: pointer;}
 }
 details[open] summary::after {content: '\f078';}*/
 /* Match instruction toggle arrow */
-.ingredients summary i {
+.ingredients .details summary i {
   margin-left: 6px;
   transition: transform 0.2s ease;
 }
 
 /* Rotate arrow when open */
-.ingredients[open] summary i {
+.ingredients .details[open] summary i {
   transform: rotate(90deg);
 }
-.ingredients summary {
+.ingredients .details summary {
   display: flex;
   align-items: center;
   gap: 6px;
