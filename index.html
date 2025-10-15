@@ -16,8 +16,8 @@
       <div class="container">
         <div class="brand"><a href="index.html" style="color:inherit;text-decoration:none">Hannah's Recipes</a></div>
         <div class="links">
-          <a href="meal-planner.html">Meal Planner</a>
-          <a href="recipes.html">Recipes</a>
+          <a class="button button--nav" href="meal-planner.html">Meal Planner</a>
+          <a class="button button--nav" href="recipes.html">Recipes</a>
         </div>
       </div>
     </nav>
@@ -26,10 +26,12 @@
       <div class="container">
         <h1>Hannah's Recipes</h1>
         <p class="subtitle">i stole these from the internet lol</p>
-        <div class="chips">
-          <span class="chip chip--accent">these buttons</span>
-          <span class="chip chip--soft">don't do</span>
-          <span class="chip chip--soft">anything</span>
+        <div class="tags">
+          <div>
+            <span class="tag">these buttons</span>
+            <span class="tag">don't do</span>
+            <span class="tag">anything</span>
+          </div>
         </div>
       </div>
     </header>
@@ -43,8 +45,8 @@
             <h4 id="randomTitle">Pick a recipe</h4>
             <div class="tags" id="randomTags"></div>
             <div class="controls" style="margin-top:8px">
-              <button class="btn" id="randomizeBtn">Randomize</button>
-              <a id="openRecipeBtn" class="btn btn--secondary" href="recipes.html">Open</a>
+              <button class="button" id="randomizeBtn">Randomize</button>
+              <a id="openRecipeBtn" class="button button--secondary" href="recipes.html">Open</a>
             </div>
           </div>
         </div>
@@ -58,7 +60,7 @@
             <div class="preview-gallery" id="previewGallery" aria-live="polite">
             </div>
             <div style="margin-top:14px">
-              <a class="cta-btn" id="exploreBtn" href="recipes.html">Explore Recipe Gallery</a>
+              <a class="button" id="exploreBtn" href="recipes.html">Explore Recipe Gallery</a>
             </div>
           </section>
         </main>
@@ -130,5 +132,8 @@
         })();
       });
     </script>
+    <footer>
+      oooo look its a footer
+    </footer>
   </body>
 </html>

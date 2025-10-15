@@ -21,27 +21,29 @@ body{
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
 }
+.container{
+  max-width:var(--max-width);
+  margin:0 auto;
+  padding:0 18px
+}
 
-/* Utility */
-.container{max-width:var(--max-width);margin:0 auto;padding:0 18px}
-
-/* Footer spacing */
-footer{padding:36px 18px;text-align:center;color:var(--muted)}
+/* Footer */
+footer{
+  padding:36px 18px;
+  text-align:center;
+  color:var(--muted)
+}
 
 /* Navigation Bar */
 nav{background:var(--accent);color: #fff;padding:12px 20px;box-shadow:var(--shadow);}
-nav .container{max-width:var(--max-width);margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+nav .container{display:flex;align-items:center;justify-content:space-between;gap:12px}
 nav .brand{font-family:Montserrat, Inter; font-size:1.6rem; color:#fff; position:relative; display:inline-block; padding:4px 6px}
 nav .links{display:flex;gap:12px;align-items:center}
-nav .links a{color:var(--accent-2);text-decoration:none;font-weight:700;padding:8px 14px;border-radius:999px;background:#fff;box-shadow:0 6px 18px rgba(36,46,28,0.06);border:1px solid rgba(36,46,28,0.04);transition:transform .14s ease,box-shadow .14s ease}
-nav .links a:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(36,46,28,0.12)}
 @media (max-width:720px){
   nav .container{flex-direction:column;gap:6px;padding:10px}
   nav .links{order:2}
   nav .brand{order:1}
 }
-
-/*.hero .top-row {display: flex;justify-content: space-between;align-items: center;}*/
 
 /* Hero */
 .hero{
@@ -49,19 +51,16 @@ nav .links a:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(36,46,
   background:linear-gradient(180deg, #fff 0%, #fff 60%);
 }
 .hero .container{
-  max-width:var(--max-width);
-  margin:0 auto;
   text-align:center;
   position:relative;
   padding:36px 18px 10px 18px;
 }
-@media (max-width:720px){header.hero.recipe-hero .container{text-align:center}}
 .hero h1{ /* title */
   font-family:Montserrat, Inter;
   font-size:3rem;
   margin:0;
   color:var(--accent-2);
-  position:relative
+  position:relative;
 }
 @media (max-width:600px){.hero h1{font-size:1.9rem}}
 @media (max-width:720px){.hero h1{font-size:2.2rem}}
@@ -72,66 +71,95 @@ nav .links a:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(36,46,
   height:8px;
   border-radius:6px;
   background:var(--accent);
-  margin:12px auto 0;
+  margin:15px auto 0;
   opacity:0.95
 }
-/* possibly combine into previous */header.hero.recipe-hero h1 { margin: 20px auto 8px auto; display:block; margin-left:auto !important; margin-right:auto !important; text-align:center !important; max-width:900px;}
-/* possibly combine into previous */header.hero.recipe-hero h1::after { margin-top:20px !important; }
 .hero p{ /* subtitle */
   color:var(--muted);
   margin-top:15px
 }
-/*chips, tags, buttons*/
-.btn{background:var(--accent);color:#fff;padding:8px 12px;border-radius:8px;border:none;font-weight:600;cursor:pointer; font-size: 1.05em; text-decoration:none;}
-.btn--secondary{background:#eef6ea;color:var(--accent-2);border:1px solid rgba(58,77,57,0.06)}
-/* CTA button - currently only used on home page gallery preview, but could replace the styles for recipe card a href, print plan, etc */
-.cta-btn{
+
+/* BUTTONS */
+.button { /* default button, green square button */
   display:inline-block;
-  background:#7a9d54;
+  background:var(--accent);
   color:#fff;
-  padding:10px 16px;
-  border-radius:12px;
+  padding:9px 15px;
+  border-radius:10px;
+  border: none;
+  font-size: 1.05em;
   font-weight:600;
   text-decoration:none;
-  transition:transform .14s ease,box-shadow .14s ease,opacity .12s ease;
+  transition:transform .14s ease,box-shadow .14s ease,opacity .12s ease; /*maybe take out ease for nav links*/
+  cursor:pointer;
 }
-.cta-btn:hover{transform:translateY(-4px);box-shadow:0 9px 20px rgba(58,77,57,0.2);opacity:0.98}
-.cta-btn:active{transform:translateY(-1px)}
-.cta-btn:focus{outline:3px solid rgba(122,157,84,0.18);outline-offset:3px}
-.hero .chips{ /* container for chips on the home page, maybe remove this entirely */
+.button--secondary { /* light green square button */
+  background:#eef6ea;
+  color:var(--accent-2);
+  border:1px solid rgba(58,77,57,0.06)
+}
+.button--nav{ /* white pill button */
+  background:#fff;
+  color:var(--accent-2);
+  border-radius:999px;
+  box-shadow:0 6px 18px rgba(36,46,28,0.06);
+  border:1px solid rgba(36,46,28,0.04);
+}
+.button:hover{
+  transform:translateY(-3px);
+  box-shadow:0 9px 20px rgba(58,77,57,0.2);
+  opacity:0.98
+}
+.button:active{
+  transform:translateY(-1px)
+}
+.button:focus{
+  outline:3px solid rgba(122,157,84,0.18);
+  outline-offset:3px
+}
+
+/* TAGS */
+.tags{ /*container for tags in hero*/
   display:flex;
+  flex-wrap:wrap;
   gap:8px;
   justify-content:center;
-  margin-top:12px
-}
-.chip{padding:6px 10px;border-radius:999px;font-weight:700;font-size:.85rem;transition:transform .18s ease, box-shadow .18s ease }
-.chip--accent{background:var(--accent);color:white}
-.chip--soft{background:#f2fbf0;color:var(--accent-2);border:1px solid #e6f3df}
-.chip:hover{transform:translateY(-4px) scale(1.03);box-shadow:0 10px 30px rgba(36,46,28,0.12)}
-.recipe-tags { /* tags on the recipe pages */
-  margin-top:26px !important;
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-bottom: 1.5em;
+  margin-top:25px;
+  margin-bottom: .5em;
   flex-direction: column;
 }
-.recipe-tags > div { /* tags on the recipe pages */
+.tags > div { /* tags within div in hero */
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
   justify-content: center;
 }
+.card-tags{ /*tags within recipe cards*/
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:10px
+}
+.tag{
+  padding:6px 10px;
+  border-radius:999px;
+  font-weight:700;
+  font-size:.85rem;
+  transition:transform .18s ease, box-shadow .18s ease;
+  background:#f2fbf0;
+  color:var(--accent-2);
+  border:1px solid #e6f3df
+}
+.tag--accent{
+  background:var(--accent);
+  color:white
+}
+.tag:hover{
+  transform:translateY(-4px) scale(1.03);
+  box-shadow:0 10px 30px rgba(36,46,28,0.12)
+}
 
-/* GALLERY PAGE */
-.filter-bar{max-width:var(--max-width);margin:18px auto;display:flex;gap:12px;align-items:center;justify-content:center;padding:12px}
-.filter-bar input,.filter-bar select{padding:10px 12px;border-radius:10px;border:1px solid #e6eae2;background:#fff;min-width:160px}
-.filter-bar small{color:var(--muted);display:block;margin-top:6px}
-@media (max-width:600px){.filter-bar{flex-direction:column}}
-
-.gallery{max-width:var(--max-width);margin:10px auto 60px auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;padding:0 18px}
-
+/* RECIPE CARDS */
 .recipe-card{cursor: pointer;position:relative;background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);border:1px solid #eef3e8;transition:transform .18s ease,box-shadow .18s ease}
 .recipe-card::after{content:'';position:absolute;left:12px;right:12px;top:12px;bottom:12px;border-radius:10px;opacity:0;transition:opacity .18s ease,transform .18s ease;pointer-events:none}
 .recipe-card:hover{transform:translateY(-6px);box-shadow:0 14px 40px rgba(36,46,28,0.12)}
@@ -143,8 +171,13 @@ nav .links a:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(36,46,
 .recipe-card .content a:hover{background:var(--accent);color:#fff;transform:translateY(-3px)}
 .recipe-card img{width:100%;height:160px;object-fit:cover;display:block}
 .recipe-card h3{margin:0;font-size:1.05rem;color:var(--accent-2)}
-.card-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-/*.tag{background:var(--soft);color:var(--accent-2);padding:6px 10px;border-radius:999px;font-weight:600;font-size:.82rem}*/
+
+/* GALLERY PAGE */
+.filter-bar{max-width:var(--max-width);margin:18px auto;display:flex;gap:12px;align-items:center;justify-content:center;padding:12px}
+.filter-bar input,.filter-bar select{padding:10px 12px;border-radius:10px;border:1px solid #e6eae2;background:#fff;min-width:160px}
+.filter-bar small{color:var(--muted);display:block;margin-top:6px}
+@media (max-width:600px){.filter-bar{flex-direction:column}}
+.gallery{max-width:var(--max-width);margin:10px auto 60px auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;padding:0 18px}
 
 /* HOME PAGE */
 @media (max-width:840px){.split{flex-direction:column}.left-col{flex:1 1 auto}.right-col{flex:1 1 auto}}
@@ -157,7 +190,7 @@ nav .links a:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(36,46,
 .random-widget .tags .tag{background:var(--soft);color:var(--accent-2);padding:6px 8px;border-radius:999px;font-size:.78rem}
 .random-widget .controls{display:flex;gap:8px;margin-top:12px}
 @media (max-width:900px){.random-widget{max-width:100%}}
-/* preview gallery widget */
+/* preview gallery widget - NEED TO WORK ON THIS */
 .preview-section{background:var(--card);padding:18px;border-radius:12px;box-shadow:var(--shadow)}
 .preview-section h2{margin:0 0 6px 0;color:var(--accent-2)}
 .preview-section .muted{color:var(--muted);margin:0 0 12px 0}
@@ -172,7 +205,6 @@ nav .links a:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(36,46,
   .preview-gallery{flex-direction:row;overflow:auto;padding-bottom:6px}
   .preview-card{width:120px}
 }
-
 
 /* MEAL PLANNER PAGE */
 /*Top Row on Meal Planner Page*/
@@ -255,35 +287,21 @@ nav .links a:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(36,46,
 .saved-recipes h2 {margin-top: 0;color: var(--accent-2);}
 .saved-recipes .gallery {display: flex;flex-direction: column;gap: 14px;}
 .saved-recipes .recipe-card {width: 100%;position: relative;}
-.meal-list.drag-over {background: rgba(122,157,84,0.08);border-radius: 8px;}
+.meal-list .drag-over {background: rgba(122,157,84,0.08);border-radius: 8px;}
 .saved-recipes .delete-saved {background: crimson;color: #fff;border: none;border-radius: 50%;width: 22px;height: 22px;cursor: pointer;font-size: 0.9em;font-weight: bold;position: absolute;top: 8px;right: 8px;}
 
-@media (max-width: 900px) {
-  .planner-layout {flex-direction: column;}
+@media (max-width: 720px) {
+  .planner-layout {flex-direction: column;align-items: normal;}
   #planner, .saved-recipes {flex: 1 1 100%;}
 }
 
-
-    /*.tag {
-      background: #7a9d54;
-      color: #fff;
-      border-radius: 16px;
-      padding: 0.3em 1em;
-      font-size: 0.95em;
-      font-weight: bold;
-      margin: 0.1em 0;
-      display: inline-block;
-      letter-spacing: 1px;
-    }*/
-
 /* RECIPE PAGE */
-
 /*Top Row on Recipe Pages*/
 .recipe-hero .top-row {display: flex;justify-content: space-between;align-items: center;margin-bottom: 12px;position: relative;}
 .recipe-hero .top-row #saveRecipeBtn {font-size: 1.1em;padding: 6px 12px;}
 .back-link {
   position: static;
-  margin: 0;
+  margin: 0; 
   transform: none;
   display: inline-flex;
   align-items: center;
@@ -292,13 +310,9 @@ nav .links a:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(36,46,
   text-decoration: none;
   font-weight: bold;
   font-size: 1.1em;
-  margin-bottom: 1.2em;
-  margin-left: 1em;
   transition: color 0.2s;
 }
 .back-link:hover {color: #3a4d39;text-decoration: underline;}
-@media (max-width:720px){.back-link{position:static;margin-bottom:8px;display:inline-flex}}
-@media (max-width: 800px) {.back-link {margin-left: 0.5em;}}
 
 .recipe-container {
     display: flex;
@@ -342,7 +356,7 @@ nav .links a:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(36,46,
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.3); /* semi-transparent overlay */
+  background: rgba(0,0,0,0.3);
   display: flex;
   justify-content: center;
   align-items: center;

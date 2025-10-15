@@ -30,7 +30,7 @@ async function loadRecipes() {
         <div class="content">
           <h3>${data.title}</h3>
           <div class="card-tags">
-            ${data.tags.map(tag => `<span class="chip chip--soft">${tag}</span>`).join("")}
+            ${data.tags.map(tag => `<span class="tag">${tag}</span>`).join("")}
           </div>
           <a href="${data.link}">View Recipe</a>
         </div>

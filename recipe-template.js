@@ -64,17 +64,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
   // insert tags
-  const recipeTags = document.querySelector(".recipe-tags");
+  const recipeTags = document.querySelector(".tags");
   if (recipeTags && data.tags) {
     const firstLine = data.tags.slice(0, 3).map(tag => {
       if (/\bmin\b|\bhour\b/i.test(tag)) {
-        return `<span class="chip chip--soft"><i class="fa-regular fa-clock"></i> ${tag}</span>`;
+        return `<span class="tag"><i class="fa-regular fa-clock"></i> ${tag}</span>`;
       }
-      return `<span class="chip chip--soft">${tag}</span>`;
+      return `<span class="tag">${tag}</span>`;
     }).join("");
 
     const secondLine = data.tags.slice(3).map(tag => {
-      return `<span class="chip chip--soft">${tag}</span>`;
+      return `<span class="tag">${tag}</span>`;
     }).join("");
 
     recipeTags.innerHTML = `<div>${firstLine}</div>${secondLine ? `<div>${secondLine}</div>` : ""}`;
