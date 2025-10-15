@@ -169,6 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
       html += `</li>`;
       return html;
     }).join("");
+    data.cleanedIngredients = ingredientTags;
   }
 
   // insert instructions

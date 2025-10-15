@@ -26,10 +26,12 @@ async function loadRecipes() {
       data.file = file;
 
       // Keep track of ingredients (lowercased for matching)
-      if (data.ingredients && Array.isArray(data.ingredients)) {
-        data.ingredientsLower = data.ingredients.map(i => i.toLowerCase());
+      const sourceIngredients = data.cleanedIngredients || data.ingredients || [];
+      if (Array.isArray(sourceIngredients)) {
+        data.ingredientsLower = sourceIngredients.map(i => i.toLowerCase());
         allIngredients.push(...data.ingredientsLower);
       }
+
 
       allRecipes.push(data);
     } catch (err) {
