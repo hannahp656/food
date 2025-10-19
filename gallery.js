@@ -1,5 +1,6 @@
 // ADD NEW RECIPE FILES HERE TO HAVE THEM APPEAR IN THE GALLERY
 const recipeFiles = [
+  "/food/recipes/recipe-crunchy-beef-tacos.html",
   "/food/recipes/recipe-sausage-fajita-pasta.html"
 ];
 
