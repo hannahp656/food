@@ -617,3 +617,39 @@ li {
 /*.hidden {
   display: none !important;
 }*/
+/* Sidebar filter details (accordion) */
+.filter-sidebar details summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  color: var(--accent-2);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.filter-sidebar details summary i {
+  transition: transform 0.2s ease;
+}
+
+.filter-sidebar details[open] summary i {
+  transform: rotate(90deg);
+}
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-left: 12px;
+  margin-bottom: 10px;
+}
+
+.checkbox-group label {
+  color: var(--accent-2);
+  font-size: 0.95em;
+}
+
+#timeSlider {
+  width: 100%;
+  accent-color: var(--accent);
+}

@@ -54,6 +54,57 @@
           </div>
         </div>
 
+        <!-- NEW expandable filter groups -->
+        <div class="filter-section">
+          <details>
+            <summary><h3>Meal</h3><i class="fa-solid fa-chevron-right"></i></summary>
+            <div class="checkbox-group">
+              <label><input type="checkbox" class="meal-filter" value="Breakfast"> Breakfast</label>
+              <label><input type="checkbox" class="meal-filter" value="Lunch"> Lunch</label>
+              <label><input type="checkbox" class="meal-filter" value="Dinner"> Dinner</label>
+              <label><input type="checkbox" class="meal-filter" value="Dessert"> Dessert</label>
+            </div>
+          </details>
+        </div>
+
+        <div class="filter-section">
+          <details>
+            <summary><h3>Type</h3><i class="fa-solid fa-chevron-right"></i></summary>
+            <div class="checkbox-group">
+              <label><input type="checkbox" class="type-filter" value="Full Meal"> Full Meal</label>
+              <label><input type="checkbox" class="type-filter" value="Side Dish"> Side Dish</label>
+              <label><input type="checkbox" class="type-filter" value="Entree"> Entree</label>
+            </div>
+          </details>
+        </div>
+
+        <div class="filter-section">
+          <details>
+            <summary><h3>Cuisine</h3><i class="fa-solid fa-chevron-right"></i></summary>
+            <div class="checkbox-group">
+              <label><input type="checkbox" class="cuisine-filter" value="American"> American</label>
+              <label><input type="checkbox" class="cuisine-filter" value="Mexican"> Mexican</label>
+              <label><input type="checkbox" class="cuisine-filter" value="Greek"> Greek</label>
+              <label><input type="checkbox" class="cuisine-filter" value="Chinese"> Chinese</label>
+              <label><input type="checkbox" class="cuisine-filter" value="Japanese"> Japanese</label>
+              <label><input type="checkbox" class="cuisine-filter" value="Korean"> Korean</label>
+              <label><input type="checkbox" class="cuisine-filter" value="Thai"> Thai</label>
+            </div>
+          </details>
+        </div>
+
+        <div class="filter-section">
+          <h3>Time</h3>
+          <input type="range" id="timeSlider" min="0" max="120" step="15" value="120">
+          <small>Show recipes ≤ <span id="timeLabel">120</span> min</small>
+        </div>
+
+        <div class="filter-section">
+          <label>
+            <input type="checkbox" id="leftoverCheckbox"> Leftover-Safe?
+          </label>
+        </div>
+
         <div class="filter-actions">
           <button id="applyFiltersBtn" class="button">Apply Filters</button>
           <button id="clearFiltersBtn" class="button button--secondary">Clear Filters</button>

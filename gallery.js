@@ -90,6 +90,23 @@ function setupSearchAndFilters() {
   const selectedContainer = document.getElementById("selectedIngredients");
   const applyBtn = document.getElementById("applyFiltersBtn");
   const clearBtn = document.getElementById("clearFiltersBtn");
+    // --- NEW FILTER ELEMENTS ---
+  const mealBoxes = document.querySelectorAll(".meal-filter");
+  const typeBoxes = document.querySelectorAll(".type-filter");
+  const cuisineBoxes = document.querySelectorAll(".cuisine-filter");
+  const timeSlider = document.getElementById("timeSlider");
+  const timeLabel = document.getElementById("timeLabel");
+  const leftoverCheckbox = document.getElementById("leftoverCheckbox");
+
+  // update time label as user slides
+  timeSlider.addEventListener("input", () => {
+    timeLabel.textContent = timeSlider.value;
+  });
+
+  // Apply filters when slider or leftover changes
+  timeSlider.addEventListener("change", applyFilters);
+  leftoverCheckbox.addEventListener("change", applyFilters);
+
 
   // --- Title search ---
   titleSearch.addEventListener("input", () => applyFilters());
@@ -170,17 +187,45 @@ function setupSearchAndFilters() {
 // --- Apply filtering logic ---
 function applyFilters() {
   const titleQuery = document.getElementById("titleSearch").value.toLowerCase().trim();
+  const timeLimit = parseInt(document.getElementById("timeSlider").value);
+  const leftoverOnly = document.getElementById("leftoverCheckbox").checked;
+
+  // collect selected checkboxes
+  const selectedMeals = [...document.querySelectorAll(".meal-filter:checked")].map(el => el.value.toLowerCase());
+  const selectedTypes = [...document.querySelectorAll(".type-filter:checked")].map(el => el.value.toLowerCase());
+  const selectedCuisines = [...document.querySelectorAll(".cuisine-filter:checked")].map(el => el.value.toLowerCase());
 
   filteredRecipes = allRecipes.filter(r => {
     const matchesTitle = r.title.toLowerCase().includes(titleQuery);
     const matchesIngredients = selectedIngredients.every(ing =>
       r.ingredientsLower && r.ingredientsLower.some(i => i.includes(ing))
     );
-    return matchesTitle && matchesIngredients;
+
+    // time filtering
+    const recipeTime = r.time ? parseInt(r.time) : 999;
+    const matchesTime = recipeTime <= timeLimit;
+
+    // tag-based filtering
+    const tags = r.tags.map(t => t.toLowerCase());
+    const matchesMeal = selectedMeals.length === 0 || selectedMeals.some(m => tags.includes(m));
+    const matchesType = selectedTypes.length === 0 || selectedTypes.some(t => tags.includes(t));
+    const matchesCuisine = selectedCuisines.length === 0 || selectedCuisines.some(c => tags.includes(c));
+    const matchesLeftover = !leftoverOnly || tags.includes("leftover-safe");
+
+    return (
+      matchesTitle &&
+      matchesIngredients &&
+      matchesTime &&
+      matchesMeal &&
+      matchesType &&
+      matchesCuisine &&
+      matchesLeftover
+    );
   });
 
   renderGallery();
 }
+
 
 // Load everything
 loadRecipes();
