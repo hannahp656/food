@@ -228,8 +228,19 @@ function formatTimeLabel(minutes) {
   if (minutes < 60) return `${minutes} min`;
   const hours = minutes / 60;
   if (hours === 1) return "1 hour";
-  return `${hours.toFixed(2).replace(/\.00$/, "").replace(/\.25$/, ".25").replace(/\.50$/, ".5").replace(/\.75$/, ".75")} hours`;
+  if (hours % 1 === 0.5) return `${hours} hours`; // e.g. 1.5 -> "1.5 hours"
+  // For quarter-hour increments
+  const fractionalHours = {
+    0.25: "¼",
+    0.5: "½",
+    0.75: "¾"
+  };
+  const whole = Math.floor(hours);
+  const fraction = hours - whole;
+  const fracLabel = fractionalHours[fraction] || "";
+  return `${whole}${fracLabel ? " " + fracLabel : ""} hours`;
 }
+
 
 // --- Apply filtering logic ---
 function applyFilters() {
