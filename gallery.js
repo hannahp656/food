@@ -102,8 +102,10 @@ function setupSearchAndFilters() {
   if (timeSlider && timeLabel) {
     // update time label as user slides
     timeSlider.addEventListener("input", () => {
-      timeLabel.textContent = timeSlider.value;
+      const value = parseInt(timeSlider.value, 10);
+      timeLabel.textContent = formatTimeLabel(value);
     });
+
 
     // Apply filters when slider changes
     timeSlider.addEventListener("change", applyFilters);
@@ -220,6 +222,13 @@ function setupSearchAndFilters() {
       applyFilters();
     });
   }
+}
+function formatTimeLabel(minutes) {
+  if (minutes === 0) return "0 min";
+  if (minutes < 60) return `${minutes} min`;
+  const hours = minutes / 60;
+  if (hours === 1) return "1 hour";
+  return `${hours.toFixed(2).replace(/\.00$/, "").replace(/\.25$/, ".25").replace(/\.50$/, ".5").replace(/\.75$/, ".75")} hours`;
 }
 
 // --- Apply filtering logic ---
