@@ -684,9 +684,6 @@ li {
   margin-top: 4px;
 }
 
-#timeTicks option::after {
-  content: attr(label);
-}
 .time-filter {
   margin-top: 10px;
 }
@@ -718,6 +715,3 @@ li {
   margin-top: 4px;
 }
 
-#timeTicks option::after {
-  content: attr(label);
-}
