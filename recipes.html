@@ -97,33 +97,47 @@
         <div class="filter-section time-filter">
           <div class="time-header">
             <h3>Time</h3>
-            <span class="time-max">Max: <span id="timeLabel">2 hours</span></span>
-
+            <span class="time-max">Max: <span id="timeLabel">120</span></span>
           </div>
 
-          <input
-            type="range"
-            id="timeSlider"
-            min="0"
-            max="120"
-            step="15"
-            value="120"
-            list="timeTicks"
-          >
+          <div class="slider-wrap">
+            <input
+              type="range"
+              id="timeSlider"
+              min="0"
+              max="120"
+              step="15"
+              value="120"
+            >
+            <!-- visual tick marks container (optional thin marks) -->
+            <div class="tick-marks" aria-hidden="true">
+              <!-- 9 small marks at 0,15,30,...,120 -->
+              <span style="left:0%"></span>
+              <span style="left:8.333%"></span>
+              <span style="left:16.666%"></span>
+              <span style="left:25%"></span>
+              <span style="left:33.333%"></span>
+              <span style="left:41.666%"></span>
+              <span style="left:50%"></span>
+              <span style="left:58.333%"></span>
+              <span style="left:66.666%"></span>
+              <span style="left:75%"></span>
+              <span style="left:83.333%"></span>
+              <span style="left:91.666%"></span>
+              <span style="left:100%"></span>
+            </div>
+          </div>
 
-          <!-- tick marks every 15 min, labels every 30 min -->
-          <datalist id="timeTicks">
-            <option value="0"   label="0"></option>
-            <option value="15"></option>
-            <option value="30"  label="30 min"></option>
-            <option value="45"></option>
-            <option value="60"  label="1 hr"></option>
-            <option value="75"></option>
-            <option value="90"  label="1.5 hr"></option>
-            <option value="105"></option>
-            <option value="120" label="2 hr"></option>
-          </datalist>
+          <!-- label row: we position these exactly under ticks using percentages -->
+          <div class="tick-labels" aria-hidden="true">
+            <span style="left:0%">0</span>
+            <span style="left:25%">30 min</span>
+            <span style="left:50%">1 hr</span>
+            <span style="left:75%">1.5 hr</span>
+            <span style="left:100%">2 hr</span>
+          </div>
         </div>
+
 
 
 

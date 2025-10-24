@@ -715,3 +715,83 @@ li {
   margin-top: 4px;
 }
 
+/* wrapper to hold the slider and optional small marks */
+.slider-wrap {
+  position: relative;
+  width: 100%;
+  padding-bottom: 12px; /* space for small marks */
+}
+
+/* style the native range slider */
+#timeSlider {
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 6px;
+  background: linear-gradient(to right, #e6f3df 0%, #e6f3df 100%);
+  outline: none;
+  margin: 0;
+}
+
+/* thumb styles (keeps it visible) */
+#timeSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  border: 3px solid var(--accent);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  margin-top: -6px; /* center the thumb on track */
+}
+#timeSlider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  border: 3px solid var(--accent);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+/* small tick marks every 15 minutes (visual only) */
+.tick-marks {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% - 6px); /* slightly below the track */
+  height: 8px;
+  pointer-events: none;
+}
+.tick-marks span {
+  position: absolute;
+  width: 1px;
+  height: 8px;
+  background: rgba(0,0,0,0.08);
+  transform: translateX(-50%);
+}
+
+/* labels row - absolute positioned children centered on their left positions */
+.tick-labels {
+  position: relative;
+  width: 100%;
+  margin-top: 6px;
+  height: 20px;
+  font-size: 0.82rem;
+  color: var(--muted);
+  user-select: none;
+}
+.tick-labels span {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+/* responsive: reduce font on very small screens */
+@media (max-width: 420px) {
+  .tick-labels { font-size: 0.72rem; }
+  #timeSlider::-webkit-slider-thumb { width: 14px; height: 14px; margin-top: -5px; }
+  #timeSlider::-moz-range-thumb { width: 14px; height: 14px; }
+}
