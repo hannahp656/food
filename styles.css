@@ -653,3 +653,71 @@ li {
   width: 100%;
   accent-color: var(--accent);
 }
+.time-filter {
+  margin-top: 10px;
+}
+
+.time-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+  color: var(--accent-2);
+}
+
+.time-max {
+  font-size: 0.9em;
+  color: var(--muted);
+}
+
+#timeSlider {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+/* Tick mark labels under slider */
+#timeTicks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8em;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+#timeTicks option::after {
+  content: attr(label);
+}
+.time-filter {
+  margin-top: 10px;
+}
+
+.time-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+  color: var(--accent-2);
+}
+
+.time-max {
+  font-size: 0.9em;
+  color: var(--muted);
+}
+
+#timeSlider {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+/* Align labels visually below the slider */
+#timeTicks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8em;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+#timeTicks option::after {
+  content: attr(label);
+}

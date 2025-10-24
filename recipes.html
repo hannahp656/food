@@ -94,11 +94,37 @@
           </details>
         </div>
 
-        <div class="filter-section">
-          <h3>Time</h3>
-          <input type="range" id="timeSlider" min="0" max="120" step="15" value="120">
-          <small>Show recipes ≤ <span id="timeLabel">120</span> min</small>
+        <div class="filter-section time-filter">
+          <div class="time-header">
+            <h3>Time</h3>
+            <span class="time-max">Max: <span id="timeLabel">120</span> min</span>
+          </div>
+
+          <input
+            type="range"
+            id="timeSlider"
+            min="0"
+            max="120"
+            step="15"
+            value="120"
+            list="timeTicks"
+          >
+
+          <!-- tick marks every 15 min, labels every 30 min -->
+          <datalist id="timeTicks">
+            <option value="0"   label="0"></option>
+            <option value="15"></option>
+            <option value="30"  label="30 min"></option>
+            <option value="45"></option>
+            <option value="60"  label="1 hr"></option>
+            <option value="75"></option>
+            <option value="90"  label="1.5 hr"></option>
+            <option value="105"></option>
+            <option value="120" label="2 hr"></option>
+          </datalist>
         </div>
+
+
 
         <div class="filter-section">
           <label>
