@@ -6,28 +6,42 @@ const inputDir = "./data/recipes";
 const outputDir = "./recipes";
 const galleryPath = "./gallery.js"; // 👈 Path to your gallery script
 
-// helper: clean messy ingredient text
 function cleanIngredient(line) {
-  let [beforeComma] = line.split(/,(.+)/);
-  beforeComma = beforeComma.trim();
-  const parts = beforeComma.split(" ");
+  if (!line) return "";
+
+  // Split at comma to separate descriptors
+  const [beforeComma] = line.split(/,(.+)/);
+  const parts = beforeComma.trim().split(/\s+/);
+
   const units = [
     "cup","cups","tbsp","tsp","teaspoon","teaspoons","tablespoon","tablespoons",
     "g","kg","ml","l","oz","lb","pound","pounds","clove","cloves","slice","slices",
-    "can","cans","package","packages","breast","breasts"
+    "can","cans","package","packages","breast","breasts","pinch","handful","dash"
   ];
-  const descriptors = ["of","chopped","minced","diced","sliced","grated","shredded","fresh","ground","finely"];
-  const amountWords = ["pinch","handful","dash","slice","clove","teaspoon","tablespoon"];
 
-  function looksLikeAmount(word) {
-    return /^\d+([\/\.]\d+)?$/.test(word) || amountWords.includes(word.toLowerCase());
+  let amount = "";
+  let unit = "";
+  let ingredientParts = [];
+
+  // --- detect amount (supports "2", "1/2", "2 3/4")
+  if (parts.length > 0 && /^(\d+([\/\.]\d+)?|\d+\s+\d+\/\d+)$/.test(parts[0])) {
+    amount = parts.shift();
+    // Handle two-part fraction like "2 3/4"
+    if (parts.length && /^\d+\/\d+$/.test(parts[0])) {
+      amount += " " + parts.shift();
+    }
   }
 
-  if (parts.length && looksLikeAmount(parts[0])) parts.shift();
-  if (parts.length && units.includes(parts[0].toLowerCase())) parts.shift();
+  // --- detect unit
+  if (parts.length > 0 && units.includes(parts[0].toLowerCase())) {
+    unit = parts.shift();
+  }
 
-  const filtered = parts.filter(w => !descriptors.includes(w.toLowerCase()));
-  return filtered.join(" ");
+  // --- remaining words = ingredient
+  ingredientParts = parts;
+
+  const ingredient = ingredientParts.join(" ").trim();
+  return ingredient;
 }
 
 // ensure output directory exists

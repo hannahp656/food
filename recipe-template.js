@@ -47,39 +47,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // click handler
     saveBtn.addEventListener("click", () => {
-      let saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
-      const isSaved = saved.some(r => r.link === data.link);
+      saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
+      isSaved = saved.some(r => r.link === data.link);
 
       if (isSaved) {
-        // 🔹 Remove from saved
+        // remove from saved
         saved = saved.filter(r => r.link !== data.link);
         localStorage.setItem("savedRecipes", JSON.stringify(saved));
         updateBookmarkIcon(false);
       } else {
-        // 🔹 Add to saved (with scaling if applicable)
-        const recipeToSave = { ...data };
-
-        // if user adjusted servings, update tags + ingredients
-        if (data.adjustedServings) {
-          // update "X servings" tag if one exists
-          recipeToSave.tags = (data.tags || []).map(tag =>
-            /servings/i.test(tag)
-              ? `${data.adjustedServings} servings`
-              : tag
-          );
-
-          // if scaled ingredients exist, store them too
-          if (data.scaledIngredients && data.scaledIngredients.length > 0) {
-            recipeToSave.ingredients = data.scaledIngredients;
-          }
-        }
-
-        saved.push(recipeToSave);
+        // add to saved
+        saved.push(data);
         localStorage.setItem("savedRecipes", JSON.stringify(saved));
         updateBookmarkIcon(true);
       }
     });
-
   }
   // insert tags
   const recipeTags = document.querySelector(".tags");
@@ -136,112 +118,59 @@ document.addEventListener("DOMContentLoaded", () => {
   const ingredientTags = []; // store actual ingredient phrases
   const ingList = document.querySelector(".ingredients-list");
   if (ingList && data.ingredients) {
-    const units = [
-      "cup","cups","tbsp","tsp","teaspoon","teaspoons","tablespoon","tablespoons",
-      "g","kg","ml","l","oz","lb","pound","pounds","clove","cloves","slice","slices",
-      "can","cans","package","packages","breast","breasts"
-    ];
+    const units = ["cup","cups","tbsp","tsp","teaspoon","teaspoons","tablespoon","tablespoons","g","kg","ml","l","oz","lb","pound","pounds","clove","cloves","slice","slices","can","cans","package","packages","breast","breasts"];
     const descriptors = ["of","chopped","minced","diced","sliced","grated","shredded","fresh","ground","finely"];
     const amountWords = ["pinch","handful","dash","slice","clove","teaspoon","tablespoon"];
-
     // function to check if a word looks like an amount (number, fraction, or common words)
     function looksLikeAmount(word) {
       return /^\d+([\/\.]\d+)?$/.test(word) || amountWords.includes(word.toLowerCase());
     }
-
-    // ✅ define the rendering function
-    function renderIngredients(scale = 1) {
-      ingList.innerHTML = data.ingredients.map(line => {
-        // split trailing notes after comma
-        let [beforeComma, afterComma] = line.split(/,(.+)/);
-        beforeComma = beforeComma.trim();
-        afterComma = afterComma ? afterComma.trim() : "";
-
-        // split by spaces to analyze parts
-        const parts = beforeComma.split(" ");
-        let amount = "";
-        let unit = "";
-        const leadingDescriptors = [];
-
-        // detect amount
-        if (parts.length && looksLikeAmount(parts[0])) amount = parts.shift();
-
-        // detect unit
-        if (parts.length && units.includes(parts[0].toLowerCase())) unit = parts.shift();
-
-        // separate descriptors anywhere in the remaining parts
-        const ingredientWords = [];
-        parts.forEach(word => {
-          if (descriptors.includes(word.toLowerCase())) {
-            leadingDescriptors.push(word);
-          } else {
-            ingredientWords.push(word);
-          }
-        });
-
-        const ingredient = ingredientWords.join(" ");
-
-        // scale numeric amounts
-        if (amount) {
-          const numericValue = parseFloat(amount);
-          if (!isNaN(numericValue)) {
-            amount = (numericValue * scale).toFixed(2).replace(/\.00$/, "");
-          } else if (amount.includes("/")) {
-            // handle fractions like 1/2
-            const [num, denom] = amount.split("/");
-            if (denom) {
-              const frac = parseFloat(num) / parseFloat(denom);
-              amount = (frac * scale).toFixed(2).replace(/\.00$/, "");
-            }
-          }
+    // parse each ingredient line
+    ingList.innerHTML = data.ingredients.map(line => {
+      // split trailing notes after comma
+      let [beforeComma, afterComma] = line.split(/,(.+)/); 
+      beforeComma = beforeComma.trim();
+      afterComma = afterComma ? afterComma.trim() : "";
+      // split by spaces to analyze parts
+      const parts = beforeComma.split(" ");
+      let amount = "";
+      let unit = "";
+      const leadingDescriptors = [];
+      // detect amount
+      if (parts.length && looksLikeAmount(parts[0])) amount = parts.shift();
+      // detect unit
+      if (parts.length && units.includes(parts[0].toLowerCase())) unit = parts.shift();
+      // separate descriptors anywhere in the remaining parts
+      const ingredientWords = [];
+      parts.forEach(word => {
+        if (descriptors.includes(word.toLowerCase())) {
+          leadingDescriptors.push(word);
+        } else {
+          ingredientWords.push(word);
         }
-
-        // build HTML
-        let html = `<li>`;
-        if (amount) html += amount + " ";
-        if (unit) html += unit + " ";
-        if (leadingDescriptors.length) html += leadingDescriptors.join(" ") + " ";
-        if (ingredient) html += `<span class="ingredient-tag">${ingredient}</span>`;
-        if (afterComma) html += `, ${afterComma}`;
-        html += `</li>`;
-        return html;
-      }).join("");
-    }
-
-    // ✅ call it once initially
-    renderIngredients();
-    // --- Servings scaling control ---
-    const servingsInput = document.getElementById("servingsInput");
-    if (servingsInput) {
-      // detect base servings from data.tags (e.g., "4 servings")
-      const servingTag = (data.tags || []).find(t => /servings/i.test(t));
-      let baseServings = 1;
-      if (servingTag) {
-        const match = servingTag.match(/\d+/);
-        if (match) baseServings = parseInt(match[0]);
-      }
-
-      // set input to base servings on load
-      servingsInput.value = baseServings;
-
-      // whenever user changes servings, re-render scaled ingredients
-      servingsInput.addEventListener("input", () => {
-        const newServings = parseFloat(servingsInput.value);
-        const scale = newServings / baseServings;
-        renderIngredients(scale);
-
-        // store scaled values in data for saving
-        data.adjustedServings = newServings;
-        data.scaledIngredients = Array.from(document.querySelectorAll(".ingredients-list li"))
-          .map(li => li.textContent.trim());
       });
-    }
-
-
-    // save cleaned list for other uses
-    data.cleanedIngredients = ingredientTags;
+      // remaining words are the ingredient
+      const ingredient = ingredientWords.join(" ");
+      // keep track of ingredient for highlighting in instructions
+      if (ingredient) ingredientTags.push(ingredient);
+      // CHECK IF I NEED THIS AND SPLIT TRAILING NOTES STUFF ABOVE - handle trailing descriptors after the comma
+      let trailing = "";
+      if (afterComma) {
+        // WHAT DOES THIS DO??? - Optionally, you could split afterComma and filter descriptors if needed
+        trailing = ", " + afterComma.trim();
+      }
+      // build HTML
+      let html = `<li>`;
+      if (amount) html += amount + " ";
+      if (unit) html += unit + " ";
+      if (leadingDescriptors.length) html += leadingDescriptors.join(" ") + " ";
+      if (ingredient) html += `<span class="ingredient-tag">${ingredient}</span>`;
+      html += trailing;
+      html += `</li>`;
+      return html;
+    }).join("");
+    //data.cleanedIngredients = ingredientTags;
   }
-
 
   // insert instructions
   const stepsList = document.querySelector(".instructions-list");

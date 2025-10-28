@@ -174,7 +174,7 @@ nav .links{display:flex;gap:12px;align-items:center}
 
 /* GALLERY PAGE */
 .filter-bar{max-width:var(--max-width);margin:18px auto;display:flex;gap:12px;align-items:center;justify-content:center;padding:12px}
-.filter-bar input,.filter-bar select{padding:10px 12px;border-radius:10px;border:1px solid #e6eae2;background:#fff/*;min-width:160px*/}
+.filter-bar input,.filter-bar select{padding:10px 12px;border-radius:10px;border:1px solid #e6eae2;background:#fff;min-width:160px}
 .filter-bar small{color:var(--muted);display:block;margin-top:6px}
 @media (max-width:600px){.filter-bar{flex-direction:column}}
 .gallery{max-width:var(--max-width);margin:10px auto 60px auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;padding:0 18px}
@@ -424,22 +424,7 @@ li {
   margin: 0 0.2em;
   display: inline-block;
 }
-.servings-control {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 8px 0 12px 0;
-  font-weight: 500;
-}
 
-.servings-control input {
-  width: 70px;
-  padding: 4px 6px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  text-align: center;
-  font-size: 1rem;
-}
 /* Collapsible instruction images */
 .instructions-list details {
   margin: 8px 0;
@@ -632,101 +617,3 @@ li {
 /*.hidden {
   display: none !important;
 }*/
-/* Sidebar filter details (accordion) */
-.filter-sidebar details summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
-  color: var(--accent-2);
-  font-weight: 600;
-  margin-bottom: 6px;
-}
-
-.filter-sidebar details summary i {
-  transition: transform 0.2s ease;
-}
-
-.filter-sidebar details[open] summary i {
-  transform: rotate(90deg);
-}
-
-.checkbox-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-left: 12px;
-  margin-bottom: 10px;
-}
-
-.checkbox-group label {
-  color: var(--accent-2);
-  font-size: 0.95em;
-}
-
-#timeSlider {
-  width: 100%;
-  accent-color: var(--accent);
-}
-.time-filter {
-  margin-top: 10px;
-}
-
-.time-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 4px;
-  color: var(--accent-2);
-}
-
-.time-max {
-  font-size: 0.9em;
-  color: var(--muted);
-}
-
-#timeSlider {
-  width: 100%;
-  accent-color: var(--accent);
-}
-
-/* Tick mark labels under slider */
-#timeTicks {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.8em;
-  color: var(--muted);
-  margin-top: 4px;
-}
-
-.time-filter {
-  margin-top: 10px;
-}
-
-.time-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 4px;
-  color: var(--accent-2);
-}
-
-.time-max {
-  font-size: 0.9em;
-  color: var(--muted);
-}
-
-#timeSlider {
-  width: 100%;
-  accent-color: var(--accent);
-}
-
-/* Align labels visually below the slider */
-#timeTicks {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.8em;
-  color: var(--muted);
-  margin-top: 4px;
-}
-

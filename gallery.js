@@ -1,7 +1,6 @@
 // ADD NEW RECIPE FILES HERE TO HAVE THEM APPEAR IN THE GALLERY
 const recipeFiles = [
   "/food/recipes/recipe-baby-carrots.html",
-  "/food/recipes/recipe-bacon-fritatta.html",
   "/food/recipes/recipe-breakfast-potatoes.html",
   "/food/recipes/recipe-cereal.html",
   "/food/recipes/recipe-crunchy-beef-tacos.html",
