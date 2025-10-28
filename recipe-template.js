@@ -5,16 +5,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // set document title
   document.title = `${data.title} - Hannah's Recipes`;
-  
+
   // insert title
   const h1 = document.querySelector("header.hero h1");
   if (h1) h1.textContent = data.title;
-  // CHECK AND SEE WHAT HAPPENS IF I DELETE THIS - insert hero image (if your hero has one)
+
+  // insert hero image
   const heroImg = document.querySelector("header.hero img");
   if (heroImg && data.cover) {
     heroImg.src = data.cover;
     heroImg.alt = data.title;
   }
+
   // setup "view original recipe" button
   const viewBtn = document.getElementById("viewOriginalBtn");
   if (viewBtn && data.original) {
@@ -23,6 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
       window.open(data.original, "_blank");
     });
   }
+
   // setup save button
   const saveBtn = document.getElementById("saveRecipeBtn");
   if (saveBtn) {
@@ -51,18 +54,17 @@ document.addEventListener("DOMContentLoaded", () => {
       isSaved = saved.some(r => r.link === data.link);
 
       if (isSaved) {
-        // remove from saved
         saved = saved.filter(r => r.link !== data.link);
         localStorage.setItem("savedRecipes", JSON.stringify(saved));
         updateBookmarkIcon(false);
       } else {
-        // add to saved
         saved.push(data);
         localStorage.setItem("savedRecipes", JSON.stringify(saved));
         updateBookmarkIcon(true);
       }
     });
   }
+
   // insert tags
   const recipeTags = document.querySelector(".tags");
   if (recipeTags && data.tags) {
@@ -80,96 +82,46 @@ document.addEventListener("DOMContentLoaded", () => {
     recipeTags.innerHTML = `<div>${firstLine}</div>${secondLine ? `<div>${secondLine}</div>` : ""}`;
   }
 
-  // insert video if available, cover image if not
-  const videoContainer = document.querySelector('.video-container');
+  // insert video if available
+  const videoContainer = document.querySelector(".video-container");
   if (data.video) {
-    const videoElement = document.createElement('video');
+    const videoElement = document.createElement("video");
     videoElement.src = data.video;
     videoElement.poster = data.cover;
-    videoElement.setAttribute('controls', '');
-    videoElement.setAttribute('playsinline', '');
-    videoElement.style.width = '100%';
-    videoElement.style.display = 'block';
+    videoElement.setAttribute("controls", "");
+    videoElement.setAttribute("playsinline", "");
+    videoElement.style.width = "100%";
+    videoElement.style.display = "block";
 
-    const overlay = document.createElement('div');
-    overlay.className = 'video-overlay';
-    const playButton = document.createElement('div');
-    playButton.className = 'play-button';
+    const overlay = document.createElement("div");
+    overlay.className = "video-overlay";
+    const playButton = document.createElement("div");
+    playButton.className = "play-button";
     overlay.appendChild(playButton);
 
-    overlay.addEventListener('click', () => {
+    overlay.addEventListener("click", () => {
       videoElement.play();
-      overlay.style.display = 'none';
+      overlay.style.display = "none";
     });
 
     videoContainer.appendChild(videoElement);
     videoContainer.appendChild(overlay);
   } else if (data.cover) {
-    // fallback: just show static image
-    const img = document.createElement('img');
+    const img = document.createElement("img");
     img.src = data.cover;
     img.alt = data.title;
-    img.style.width = '100%';
-    img.style.display = 'block';
+    img.style.width = "100%";
+    img.style.display = "block";
     videoContainer.appendChild(img);
   }
 
-  // insert ingredients
-  const ingredientTags = []; // store actual ingredient phrases
+  // ✅ simplified ingredient list + cleaned tags for bolding
+  const ingredientTags = data.cleanedIngredients || [];
   const ingList = document.querySelector(".ingredients-list");
   if (ingList && data.ingredients) {
-    const units = ["cup","cups","tbsp","tsp","teaspoon","teaspoons","tablespoon","tablespoons","g","kg","ml","l","oz","lb","pound","pounds","clove","cloves","slice","slices","can","cans","package","packages","breast","breasts"];
-    const descriptors = ["of","chopped","minced","diced","sliced","grated","shredded","fresh","ground","finely"];
-    const amountWords = ["pinch","handful","dash","slice","clove","teaspoon","tablespoon"];
-    // function to check if a word looks like an amount (number, fraction, or common words)
-    function looksLikeAmount(word) {
-      return /^\d+([\/\.]\d+)?$/.test(word) || amountWords.includes(word.toLowerCase());
-    }
-    // parse each ingredient line
-    ingList.innerHTML = data.ingredients.map(line => {
-      // split trailing notes after comma
-      let [beforeComma, afterComma] = line.split(/,(.+)/); 
-      beforeComma = beforeComma.trim();
-      afterComma = afterComma ? afterComma.trim() : "";
-      // split by spaces to analyze parts
-      const parts = beforeComma.split(" ");
-      let amount = "";
-      let unit = "";
-      const leadingDescriptors = [];
-      // detect amount
-      if (parts.length && looksLikeAmount(parts[0])) amount = parts.shift();
-      // detect unit
-      if (parts.length && units.includes(parts[0].toLowerCase())) unit = parts.shift();
-      // separate descriptors anywhere in the remaining parts
-      const ingredientWords = [];
-      parts.forEach(word => {
-        if (descriptors.includes(word.toLowerCase())) {
-          leadingDescriptors.push(word);
-        } else {
-          ingredientWords.push(word);
-        }
-      });
-      // remaining words are the ingredient
-      const ingredient = ingredientWords.join(" ");
-      // keep track of ingredient for highlighting in instructions
-      if (ingredient) ingredientTags.push(ingredient);
-      // CHECK IF I NEED THIS AND SPLIT TRAILING NOTES STUFF ABOVE - handle trailing descriptors after the comma
-      let trailing = "";
-      if (afterComma) {
-        // WHAT DOES THIS DO??? - Optionally, you could split afterComma and filter descriptors if needed
-        trailing = ", " + afterComma.trim();
-      }
-      // build HTML
-      let html = `<li>`;
-      if (amount) html += amount + " ";
-      if (unit) html += unit + " ";
-      if (leadingDescriptors.length) html += leadingDescriptors.join(" ") + " ";
-      if (ingredient) html += `<span class="ingredient-tag">${ingredient}</span>`;
-      html += trailing;
-      html += `</li>`;
-      return html;
-    }).join("");
-    //data.cleanedIngredients = ingredientTags;
+    ingList.innerHTML = data.ingredients
+      .map(line => `<li>${line}</li>`)
+      .join("");
   }
 
   // insert instructions
@@ -177,18 +129,18 @@ document.addEventListener("DOMContentLoaded", () => {
   if (stepsList && data.instructions) {
     stepsList.innerHTML = data.instructions.map((step, index) => {
       if (typeof step === "string") {
-        // look ahead: is the next step an image?
         const next = data.instructions[index + 1];
         let stepText = step;
 
+        // ✅ bold known ingredients
         ingredientTags
           .sort((a, b) => b.length - a.length)
           .forEach(ingredient => {
-            const regex = new RegExp(`\\b${ingredient.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}\\b`, "gi");
+            const regex = new RegExp(`\\b${ingredient.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")}\\b`, "gi");
             stepText = stepText.replace(regex, `<strong>${ingredient}</strong>`);
           });
 
-        // if the next item is an image, attach toggle arrow and container
+        // check if next step is an image
         if (next && typeof next === "object" && next.image) {
           const id = `img-${Math.random().toString(36).substr(2, 9)}`;
           return `
@@ -207,7 +159,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return `<li>${stepText}</li>`;
       }
 
-      // if it's an image object, skip (it’s handled by the previous string step)
       return "";
     }).join("");
 
