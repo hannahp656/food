@@ -41,14 +41,10 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // load saved recipes
     let saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
-
-    // check if current recipe is saved
     let isSaved = saved.some(r => r.link === data.link);
     updateBookmarkIcon(isSaved);
 
-    // click handler
     saveBtn.addEventListener("click", () => {
       saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
       isSaved = saved.some(r => r.link === data.link);
@@ -115,16 +111,25 @@ document.addEventListener("DOMContentLoaded", () => {
     videoContainer.appendChild(img);
   }
 
-  // ✅ simplified ingredient list + cleaned tags for bolding
+  // ✅ simplified ingredient list with ingredient tags restored
   const ingredientTags = data.cleanedIngredients || [];
   const ingList = document.querySelector(".ingredients-list");
+
   if (ingList && data.ingredients) {
-    ingList.innerHTML = data.ingredients
-      .map(line => `<li>${line}</li>`)
-      .join("");
+    ingList.innerHTML = data.ingredients.map(line => {
+      let displayLine = line;
+      for (const ingr of ingredientTags.sort((a, b) => b.length - a.length)) {
+        const regex = new RegExp(`\\b${ingr.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")}\\b`, "i");
+        if (regex.test(displayLine)) {
+          displayLine = displayLine.replace(regex, `<span class="ingredient-tag">${ingr}</span>`);
+          break;
+        }
+      }
+      return `<li>${displayLine}</li>`;
+    }).join("");
   }
 
-  // insert instructions
+  // insert instructions (with bolded ingredients + image toggles)
   const stepsList = document.querySelector(".instructions-list");
   if (stepsList && data.instructions) {
     stepsList.innerHTML = data.instructions.map((step, index) => {
@@ -132,7 +137,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const next = data.instructions[index + 1];
         let stepText = step;
 
-        // ✅ bold known ingredients
         ingredientTags
           .sort((a, b) => b.length - a.length)
           .forEach(ingredient => {
@@ -140,7 +144,6 @@ document.addEventListener("DOMContentLoaded", () => {
             stepText = stepText.replace(regex, `<strong>${ingredient}</strong>`);
           });
 
-        // check if next step is an image
         if (next && typeof next === "object" && next.image) {
           const id = `img-${Math.random().toString(36).substr(2, 9)}`;
           return `
@@ -162,7 +165,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return "";
     }).join("");
 
-    // add toggle behavior
     stepsList.querySelectorAll(".img-toggle").forEach(btn => {
       btn.addEventListener("click", () => {
         const targetId = btn.dataset.target;
