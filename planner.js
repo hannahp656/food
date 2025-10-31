@@ -1,172 +1,392 @@
-// planner.js
 document.addEventListener("DOMContentLoaded", () => {
-  const tabs = document.querySelectorAll(".tab");
-  const contents = document.querySelectorAll(".tab-content");
+  const days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+  const meals = ["breakfast","lunch","dinner"];
+  const overlay = document.getElementById("overlay");
+  const closeOverlay = document.getElementById("closeOverlay");
+  const recipeSearch = document.getElementById("recipeSearch");
+  const searchResults = document.getElementById("searchResults");
+  const customRecipe = document.getElementById("customRecipe");
+  let activeMealBox = null;
 
-  tabs.forEach(tab => {
-    tab.addEventListener("click", () => {
-      tabs.forEach(t => t.classList.remove("active"));
-      contents.forEach(c => c.classList.remove("active"));
-      tab.classList.add("active");
-      document.getElementById(tab.dataset.target).classList.add("active");
+  // build planner
+  const planner = document.getElementById("planner");
+  days.forEach(day => {
+    const section = document.createElement("div");
+    section.className = "day";
+    section.innerHTML = `<h2>${day}</h2><div class="meals"></div>`;
+    const mealsContainer = section.querySelector(".meals");
+    // create meal boxes
+    meals.forEach(meal => {
+      const box = document.createElement("div");
+      box.className = "meal-box";
+      box.dataset.day = day.toLowerCase();
+      box.dataset.meal = meal;
+      box.innerHTML = `
+        <div class="meal-header">
+          <h3>${meal.charAt(0).toUpperCase() + meal.slice(1)}</h3>
+          <div class="controls">
+            <button class="add-btn">+</button>
+          </div>
+        </div>
+        <ul class="meal-list"></ul>
+      `;
+      mealsContainer.appendChild(box);
+    });
+    // append day section???
+    planner.appendChild(section);
+  });
+
+  // load saved data
+  loadMeals();
+
+  // add button -> open overlay
+  document.querySelectorAll(".add-btn").forEach(btn => {
+    btn.addEventListener("click", e => {
+      activeMealBox = e.target.closest(".meal-box");
+      overlay.classList.remove("hidden");
+      recipeSearch.value = "";
+      customRecipe.value = "";
+      searchResults.innerHTML = "";
     });
   });
 
-  const mealPlanContainer = document.getElementById("mealPlanContainer");
-  const shoppingListEl = document.getElementById("shoppingListItems");
+  // close overlay
+  closeOverlay.addEventListener("click", () => overlay.classList.add("hidden"));
 
-  // --- Meal Plan data ---
-  let mealPlan = JSON.parse(localStorage.getItem("mealPlan") || "{}");
-
-  function saveMealPlan() {
-    localStorage.setItem("mealPlan", JSON.stringify(mealPlan));
-    updateShoppingList();
-  }
-
-  function renderMealPlan() {
-    mealPlanContainer.innerHTML = "";
-    Object.entries(mealPlan).forEach(([day, meals]) => {
-      const dayDiv = document.createElement("div");
-      dayDiv.className = "meal-day";
-      dayDiv.innerHTML = `<h3>${day}</h3>`;
-      Object.entries(meals).forEach(([mealType, recipes]) => {
-        const section = document.createElement("div");
-        section.className = "meal-section";
-        section.innerHTML = `<h4>${mealType}</h4>`;
-        recipes.forEach(recipe => {
-          const card = document.createElement("div");
-          card.className = "meal-card";
-          card.innerHTML = `
-            <img src="${recipe.image}" alt="${recipe.title}">
-            <div class="meal-info">
-              <p>${recipe.title}</p>
-              <button class="remove">Remove</button>
-            </div>
-          `;
-          card.querySelector(".remove").addEventListener("click", () => {
-            mealPlan[day][mealType] = mealPlan[day][mealType].filter(r => r.link !== recipe.link);
-            saveMealPlan();
-            renderMealPlan();
-          });
-          section.appendChild(card);
+  // search recipes
+  recipeSearch.addEventListener("input", async () => {
+    const query = recipeSearch.value.toLowerCase();
+    searchResults.innerHTML = "";
+    if (!query) return;
+    // fetch recipes.html and parse for matching titles
+    const res = await fetch("recipes.html");
+    const text = await res.text();
+    const doc = new DOMParser().parseFromString(text, "text/html");
+    const cards = doc.querySelectorAll(".recipe-card");
+    // filter cards by title match
+    cards.forEach(card => {
+      const title = card.querySelector("h3").textContent;
+      const link = card.querySelector("a").getAttribute("href");
+      if (title.toLowerCase().includes(query)) {
+        const li = document.createElement("li");
+        li.textContent = title;
+        li.addEventListener("click", () => {
+          addMealItem(title, link);
+          overlay.classList.add("hidden");
         });
-        dayDiv.appendChild(section);
+        searchResults.appendChild(li);
+      }
+    });
+  });
+  // add custom recipe
+  customRecipe.addEventListener("keypress", e => {
+    if (e.key === "Enter" && customRecipe.value.trim()) {
+      addMealItem(customRecipe.value.trim(), null);
+      overlay.classList.add("hidden");
+    }
+  });
+
+  // add meal item to list
+  function addMealItem(title, link, targetBox = activeMealBox) {
+    if (!targetBox) return;
+    const li = document.createElement("li");
+    // if link provided, make title a link
+    if (link) {
+      const a = document.createElement("a");
+      a.href = link;
+      a.textContent = title;
+      li.appendChild(a);
+    } else {
+      li.textContent = title;
+    }
+    // add delete button
+    const del = document.createElement("button");
+    del.textContent = "✕";
+    del.className = "delete-btn";
+    del.addEventListener("click", () => {
+      li.remove();
+      saveMeals();
+    });
+    li.appendChild(del);
+    // append to list
+    targetBox.querySelector(".meal-list").appendChild(li);
+    saveMeals();
+  }
+
+  // save/load to localStorage
+  function saveMeals() {
+    const data = {};
+    document.querySelectorAll(".meal-box").forEach(box => {
+      const day = box.dataset.day;
+      const meal = box.dataset.meal;
+      if (!data[day]) data[day] = {};
+      data[day][meal] = [];
+      box.querySelectorAll("li").forEach(li => {
+        const a = li.querySelector("a");
+        data[day][meal].push({
+          title: a ? a.textContent : li.childNodes[0].textContent,
+          link: a ? a.href : null
+        });
       });
-      mealPlanContainer.appendChild(dayDiv);
+    });
+    localStorage.setItem("mealPlan", JSON.stringify(data));
+  }
+  function loadMeals() {
+    const data = JSON.parse(localStorage.getItem("mealPlan") || "{}");
+    Object.keys(data).forEach(day => {
+      Object.keys(data[day]).forEach(meal => {
+        const box = document.querySelector(`.meal-box[data-day="${day}"][data-meal="${meal}"]`);
+        if (box) {
+          const list = box.querySelector(".meal-list");
+          data[day][meal].forEach(item => {
+            const li = document.createElement("li");
+            if (item.link) {
+              const a = document.createElement("a");
+              a.href = item.link;
+              a.textContent = item.title;
+              li.appendChild(a);
+            } else {
+              li.textContent = item.title;
+            }
+            const del = document.createElement("button");
+            del.textContent = "✕";
+            del.className = "delete-btn";
+            del.addEventListener("click", () => {
+              li.remove();
+              saveMeals();
+            });
+            li.appendChild(del);
+            list.appendChild(li);
+          });
+        }
+      });
     });
   }
 
-  renderMealPlan();
+  // render saved recipes
+  function loadSavedRecipes() {
+    const container = document.getElementById("savedRecipesList");
+    container.innerHTML = "";
+    const saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
+    saved.forEach((recipe, index) => {
+      const card = document.createElement("div");
+      card.className = "recipe-card";
+      card.draggable = true;
+      card.dataset.index = index;
+      // FIX WHATEVERS GOING ON WITH THE X - build card content
+      card.innerHTML = `
+        <img src="${recipe.image}" alt="${recipe.title}">
+        <div class="content">
+          <h3>${recipe.title}</h3>
+          <div class="card-tags">${recipe.tags.map(tag => `<span class="tag">${tag}</span>`).join("")}</div>
+          <a href="${recipe.link}" target="_blank">View Recipe</a>
+          <button class="delete-saved">✕</button>
+        </div>
+      `;
+      // drag start
+      card.addEventListener("dragstart", e => {
+        e.dataTransfer.setData("application/json", JSON.stringify(recipe));
+      });
+      // delete saved recipe
+      card.querySelector(".delete-saved").addEventListener("click", () => {
+        let updated = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
+        updated.splice(index, 1);
+        localStorage.setItem("savedRecipes", JSON.stringify(updated));
+        loadSavedRecipes();
+      });
+      // append card
+      container.appendChild(card);
+    });
+  }
+  loadSavedRecipes();
 
-  // === SHOPPING LIST ===
-  function updateShoppingList() {
-    const plan = JSON.parse(localStorage.getItem("mealPlan") || "{}");
-    const ingredientsMap = {};
-    const recipePromises = [];
-
-    Object.values(plan).forEach(meals =>
-      Object.values(meals).forEach(items =>
-        items.forEach(item => {
+  // print meal plan
+  document.getElementById("printPlan").addEventListener("click", () => {
+    const data = JSON.parse(localStorage.getItem("mealPlan") || "{}");
+    let html = `
+      <html>
+        <head>
+          <title>Printable Meal Plan</title>
+          <style>
+            body { font-family: Montserrat, sans-serif; padding: 20px; background: #f8fbf6; }
+            h1 { text-align: center; color: #3a4d39; }
+            .day { margin-bottom: 24px; background: #fff; padding: 16px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+            .day h2 { margin: 0 0 10px; color: #7a9d54; }
+            .meal { margin-bottom: 8px; }
+            .meal h3 { margin: 0 0 6px; color: #3a4d39; }
+            ul { list-style: none; padding: 0; margin: 0 0 12px; }
+            li { margin: 4px 0; }
+            a { color: #7a9d54; text-decoration: none; }
+            a:hover { text-decoration: underline; }
+          </style>
+        </head>
+        <body>
+          <h1>Weekly Meal Plan</h1>
+    `;
+    Object.keys(data).forEach(day => {
+      html += `<div class="day"><h2>${day.charAt(0).toUpperCase() + day.slice(1)}</h2>`;
+      Object.keys(data[day]).forEach(meal => {
+        html += `<div class="meal"><h3>${meal.charAt(0).toUpperCase() + meal.slice(1)}</h3><ul>`;
+        data[day][meal].forEach(item => {
           if (item.link) {
-            recipePromises.push(
-              fetch(item.link)
-                .then(res => res.text())
-                .then(html => {
-                  const doc = new DOMParser().parseFromString(html, "text/html");
-                  const data = JSON.parse(doc.querySelector("#recipe-data").textContent);
-                  if (data.parsedIngredients) {
-                    data.parsedIngredients.forEach(({ ingredient, amount, unit }) => {
-                      if (!ingredient) return;
-                      if (!ingredientsMap[ingredient]) ingredientsMap[ingredient] = [];
-                      const desc = [amount, unit].filter(Boolean).join(" ");
-                      if (desc) ingredientsMap[ingredient].push(desc);
-                    });
-                  }
-                })
-            );
+            html += `<li><a href="${item.link}" target="_blank">${item.title}</a></li>`;
+          } else {
+            html += `<li>${item.title}</li>`;
           }
-        })
-      )
-    );
-
-    Promise.all(recipePromises).then(() => {
-      renderShoppingList(ingredientsMap);
-      localStorage.setItem("shoppingList", JSON.stringify(ingredientsMap));
+        });
+        html += `</ul></div>`;
+      });
+      html += `</div>`;
     });
-  }
+    html += `</body></html>`;
+    const newTab = window.open();
+    newTab.document.write(html);
+    newTab.document.close();
+  });
 
-  function renderShoppingList(map) {
-    shoppingListEl.innerHTML = "";
-    Object.entries(map).forEach(([ingredient, amounts]) => {
-      const li = document.createElement("li");
-      li.draggable = true;
-      li.innerHTML = `
-        <input type="checkbox" class="check">
-        <span class="item-text" contenteditable="true">${ingredient}, ${amounts.join(", ")}</span>
+  // make meal lists droppable
+  document.querySelectorAll(".meal-list").forEach(list => {
+    list.addEventListener("dragover", e => {
+      e.preventDefault();
+      list.style.background = "rgba(122,157,84,0.08)";
+    });
+    list.addEventListener("dragleave", () => {
+      list.style.background = "";
+    });
+    list.addEventListener("drop", e => {
+      e.preventDefault();
+      list.style.background = "";
+      const data = JSON.parse(e.dataTransfer.getData("application/json"));
+      addMealItem(data.title, data.link, list.closest(".meal-box"));
+    });
+  });
+
+  document.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      // deactivate all tabs and content
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+
+      // activate clicked tab and corresponding content
+      btn.classList.add("active");
+      const tabId = btn.dataset.tab;
+      document.getElementById(tabId).classList.add("active");
+    });
+  });
+// === SHOPPING LIST ===
+const shoppingListEl = document.getElementById("shoppingListItems");
+
+// recompute shopping list whenever plan changes
+function updateShoppingList() {
+  const plan = JSON.parse(localStorage.getItem("mealPlan") || "{}");
+  const ingredientsMap = {};
+
+  const recipePromises = [];
+
+  Object.values(plan).forEach(meals =>
+    Object.values(meals).forEach(items =>
+      items.forEach(item => {
+        if (item.link) {
+          recipePromises.push(fetch(item.link)
+            .then(res => res.text())
+            .then(html => {
+              const doc = new DOMParser().parseFromString(html, "text/html");
+              const data = JSON.parse(doc.querySelector("#recipe-data").textContent);
+              if (data.parsedIngredients) {
+                data.parsedIngredients.forEach(({ ingredient, amount, unit }) => {
+                  if (!ingredient) return;
+                  if (!ingredientsMap[ingredient]) ingredientsMap[ingredient] = [];
+                  const desc = [amount, unit].filter(Boolean).join(" ");
+                  if (desc) ingredientsMap[ingredient].push(desc);
+                });
+              }
+            })
+          );
+        }
+      })
+    )
+  );
+
+  Promise.all(recipePromises).then(() => {
+    renderShoppingList(ingredientsMap);
+    localStorage.setItem("shoppingList", JSON.stringify(ingredientsMap));
+  });
+}
+
+function renderShoppingList(map) {
+  shoppingListEl.innerHTML = "";
+  Object.entries(map).forEach(([ingredient, amounts]) => {
+    const li = document.createElement("li");
+    li.draggable = true;
+    li.innerHTML = `
+      <input type="checkbox" class="check">
+      <span class="item-text" contenteditable="true">${ingredient}, ${amounts.join(", ")}</span>
+      <button class="up">↑</button>
+      <button class="down">↓</button>
+    `;
+    shoppingListEl.appendChild(li);
+  });
+  addShoppingListHandlers();
+}
+
+function addShoppingListHandlers() {
+  shoppingListEl.querySelectorAll("li").forEach(li => {
+    const checkbox = li.querySelector(".check");
+    const up = li.querySelector(".up");
+    const down = li.querySelector(".down");
+
+    checkbox.addEventListener("change", () => {
+      li.classList.toggle("checked", checkbox.checked);
+      if (checkbox.checked) {
+        shoppingListEl.appendChild(li); // move to bottom
+      } else {
+        shoppingListEl.insertBefore(li, shoppingListEl.firstChild);
+      }
+      saveShoppingListState();
+    });
+
+    up.addEventListener("click", () => {
+      const prev = li.previousElementSibling;
+      if (prev) shoppingListEl.insertBefore(li, prev);
+      saveShoppingListState();
+    });
+    down.addEventListener("click", () => {
+      const next = li.nextElementSibling;
+      if (next) shoppingListEl.insertBefore(next, li);
+      saveShoppingListState();
+    });
+
+    li.querySelector(".item-text").addEventListener("input", saveShoppingListState);
+  });
+}
+
+function saveShoppingListState() {
+  const data = [];
+  shoppingListEl.querySelectorAll("li").forEach(li => {
+    data.push({
+      text: li.querySelector(".item-text").textContent,
+      checked: li.querySelector(".check").checked
+    });
+  });
+  localStorage.setItem("shoppingListManual", JSON.stringify(data));
+}
+
+// load manual state on page load
+(function loadShoppingList() {
+  const saved = JSON.parse(localStorage.getItem("shoppingListManual") || "[]");
+  if (saved.length) {
+    shoppingListEl.innerHTML = saved
+      .map(i => `<li ${i.checked ? 'class="checked"' : ''}>
+        <input type="checkbox" class="check" ${i.checked ? 'checked' : ''}>
+        <span class="item-text" contenteditable="true">${i.text}</span>
         <button class="up">↑</button>
         <button class="down">↓</button>
-      `;
-      shoppingListEl.appendChild(li);
-    });
+      </li>`)
+      .join("");
     addShoppingListHandlers();
+  } else {
+    updateShoppingList();
   }
+})();
 
-  function addShoppingListHandlers() {
-    shoppingListEl.querySelectorAll("li").forEach(li => {
-      const checkbox = li.querySelector(".check");
-      const up = li.querySelector(".up");
-      const down = li.querySelector(".down");
-
-      checkbox.addEventListener("change", () => {
-        li.classList.toggle("checked", checkbox.checked);
-        if (checkbox.checked) {
-          shoppingListEl.appendChild(li);
-        } else {
-          shoppingListEl.insertBefore(li, shoppingListEl.firstChild);
-        }
-        saveShoppingListState();
-      });
-
-      up.addEventListener("click", () => {
-        const prev = li.previousElementSibling;
-        if (prev) shoppingListEl.insertBefore(li, prev);
-        saveShoppingListState();
-      });
-      down.addEventListener("click", () => {
-        const next = li.nextElementSibling;
-        if (next) shoppingListEl.insertBefore(next, li);
-        saveShoppingListState();
-      });
-
-      li.querySelector(".item-text").addEventListener("input", saveShoppingListState);
-    });
-  }
-
-  function saveShoppingListState() {
-    const data = [];
-    shoppingListEl.querySelectorAll("li").forEach(li => {
-      data.push({
-        text: li.querySelector(".item-text").textContent,
-        checked: li.querySelector(".check").checked
-      });
-    });
-    localStorage.setItem("shoppingListManual", JSON.stringify(data));
-  }
-
-  (function loadShoppingList() {
-    const saved = JSON.parse(localStorage.getItem("shoppingListManual") || "[]");
-    if (saved.length) {
-      shoppingListEl.innerHTML = saved
-        .map(i => `<li ${i.checked ? 'class="checked"' : ''}>
-          <input type="checkbox" class="check" ${i.checked ? 'checked' : ''}>
-          <span class="item-text" contenteditable="true">${i.text}</span>
-          <button class="up">↑</button>
-          <button class="down">↓</button>
-        </li>`)
-        .join("");
-      addShoppingListHandlers();
-    } else {
-      updateShoppingList();
-    }
-  })();
 });
