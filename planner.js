@@ -39,6 +39,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // load saved data
   loadMeals();
 
+  // build shopping list after initial load
+  updateShoppingList();
+
   // add button -> open overlay
   document.querySelectorAll(".add-btn").forEach(btn => {
     btn.addEventListener("click", e => {
@@ -130,6 +133,8 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
     localStorage.setItem("mealPlan", JSON.stringify(data));
+    // regenerate shopping list whenever meal plan changes
+    updateShoppingList();
   }
   function loadMeals() {
     const data = JSON.parse(localStorage.getItem("mealPlan") || "{}");
@@ -161,7 +166,252 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
     });
+    // after loading meals, rebuild shopping list
+    updateShoppingList();
   }
+
+  // ----- Shopping list functionality -----
+  const shoppingContainer = document.getElementById('content2');
+  // create shopping list UI if not present
+  function ensureShoppingUI() {
+    const existing = document.getElementById('shoppingListContainer');
+    if (existing) return existing;
+    const container = document.createElement('div');
+    container.id = 'shoppingListContainer';
+    container.className = 'container shopping-list-container';
+    container.innerHTML = `
+      <div class="shopping-actions" style="margin-bottom:12px;">
+        <button id="clearChecked" class="button">Clear Checked</button>
+        <button id="saveShoppingOrder" class="button button--secondary">Save Order</button>
+      </div>
+      <ul id="shoppingList" class="shopping-list"></ul>
+    `;
+    shoppingContainer.innerHTML = '';
+    shoppingContainer.appendChild(container);
+    return container;
+  }
+
+  // Storage for user modifications (order, checked state, edited names)
+  const SHOPPING_KEY = 'shoppingState_v1';
+  let shoppingState = JSON.parse(localStorage.getItem(SHOPPING_KEY) || '{}');
+
+  function saveShoppingState() {
+    localStorage.setItem(SHOPPING_KEY, JSON.stringify(shoppingState));
+  }
+
+  // simple ingredient parser: returns {name, amountUnit}
+  function parseIngredient(line) {
+    if (!line) return { name: line || '', amountUnit: '' };
+    // split at comma to remove descriptors
+    const [beforeComma] = line.split(/,(.+)/);
+    const parts = beforeComma.trim().split(/\s+/);
+
+    // amount detection: numbers, fractions like 1/2 or 2 1/2
+    let amount = '';
+    let unit = '';
+    let idx = 0;
+    if (/^(\d+([\/\.]\d+)?|\d+\s+\d+\/\d+)$/.test(parts[0])) {
+      amount = parts[0]; idx = 1;
+      if (parts[1] && /^\d+\/\d+$/.test(parts[1])) { amount += ' ' + parts[1]; idx = 2; }
+    }
+    const units = ["cup","cups","tbsp","tbs","tsp","teaspoon","teaspoons","tablespoon","tablespoons","g","kg","ml","l","oz","lb","pound","pounds","clove","cloves","slice","slices","can","cans","package","packages","breast","breasts","pinch","handful","dash"];
+    if (parts[idx] && units.includes(parts[idx].toLowerCase())) { unit = parts[idx]; idx += 1; }
+
+    const name = parts.slice(idx).join(' ').trim() || beforeComma.trim();
+    const amountUnit = [amount, unit].filter(Boolean).join(' ').trim();
+    return { name: name.toLowerCase(), displayName: name, amountUnit };
+  }
+
+  // Aggregate ingredients: returns Map keyed by normalized name -> {name, displayName, amounts:Set}
+  async function aggregateIngredientsFromMealPlan() {
+    const data = JSON.parse(localStorage.getItem('mealPlan') || '{}');
+    const recipeCache = {}; // cache fetched recipe data by link
+    const aggregated = new Map();
+
+    const fetchRecipeJSON = async (href) => {
+      if (!href) return null;
+      if (recipeCache[href]) return recipeCache[href];
+      try {
+        const res = await fetch(href);
+        if (!res.ok) return null;
+        const text = await res.text();
+        const doc = new DOMParser().parseFromString(text, 'text/html');
+        const dataEl = doc.querySelector('#recipe-data');
+        if (!dataEl) return null;
+        const json = JSON.parse(dataEl.textContent);
+        recipeCache[href] = json;
+        return json;
+      } catch (err) {
+        console.warn('Failed to fetch recipe', href, err);
+        return null;
+      }
+    };
+
+    // iterate mealPlan structure
+    for (const day of Object.keys(data)) {
+      for (const meal of Object.keys(data[day])) {
+        for (const item of data[day][meal]) {
+          if (item.link) {
+            const json = await fetchRecipeJSON(item.link);
+            if (json && Array.isArray(json.ingredients)) {
+              for (const line of json.ingredients) {
+                const parsed = parseIngredient(line);
+                const key = parsed.name || parsed.displayName || line;
+                if (!aggregated.has(key)) aggregated.set(key, { displayName: parsed.displayName || key, amounts: new Map() });
+                const entry = aggregated.get(key);
+                const am = parsed.amountUnit || line.trim();
+                if (am) entry.amounts.set(am, (entry.amounts.get(am) || 0) + 1);
+              }
+            }
+          } else {
+            // custom recipe or text-only item: treat entire text as one ingredient line
+            const parsed = parseIngredient(item.title || '');
+            const key = parsed.name || parsed.displayName || item.title;
+            if (!aggregated.has(key)) aggregated.set(key, { displayName: parsed.displayName || key, amounts: new Map() });
+            const entry = aggregated.get(key);
+            const am = parsed.amountUnit || '';
+            if (am) entry.amounts.set(am, (entry.amounts.get(am) || 0) + 1);
+          }
+        }
+      }
+    }
+
+    return aggregated;
+  }
+
+  // Render shopping list from aggregated map, preserving saved order and checked state
+  async function updateShoppingList() {
+    const ui = ensureShoppingUI();
+    const listEl = document.getElementById('shoppingList');
+    listEl.innerHTML = '<li style="color:var(--muted)">Updating shopping list...</li>';
+    const aggregated = await aggregateIngredientsFromMealPlan();
+
+    // build array of items
+    const items = [];
+    for (const [key, v] of aggregated.entries()) {
+      const amounts = Array.from(v.amounts.keys());
+      // format: if one amount -> name, amount ; if multiple -> name, amount1, amount2
+      items.push({ key, name: v.displayName, amounts });
+    }
+
+    // sort by saved order if exists
+    const savedOrder = shoppingState.order || [];
+    const ordered = [];
+    const remaining = [];
+    items.forEach(it => {
+      if (savedOrder.includes(it.key)) ordered.push(it);
+      else remaining.push(it);
+    });
+    const finalList = [...ordered, ...remaining];
+
+    // render
+    listEl.innerHTML = '';
+    finalList.forEach(it => {
+      const li = document.createElement('li');
+      li.className = 'shopping-item';
+      li.draggable = true;
+      li.dataset.key = it.key;
+      const checked = shoppingState.checked && shoppingState.checked[it.key];
+      li.innerHTML = `
+        <label class="shopping-line">
+          <input type="checkbox" class="shopping-checkbox" ${checked ? 'checked' : ''}>
+          <span class="item-name" contenteditable="true">${escapeHtml(it.name)}</span>
+          <span class="item-amounts">${it.amounts.map(a => escapeHtml(a)).join(', ')}</span>
+        </label>
+        <button class="drag-handle" title="Drag to reorder">☰</button>
+      `;
+      if (checked) {
+        li.classList.add('checked');
+        li.style.opacity = '0.6';
+        li.style.textDecoration = 'line-through';
+      }
+      listEl.appendChild(li);
+    });
+
+    attachShoppingHandlers();
+  }
+
+  function escapeHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function attachShoppingHandlers() {
+    const listEl = document.getElementById('shoppingList');
+    // drag reorder
+    let dragSrc = null;
+    listEl.querySelectorAll('.shopping-item').forEach(li => {
+      li.addEventListener('dragstart', e => { dragSrc = li; li.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; });
+      li.addEventListener('dragend', () => { if (dragSrc) dragSrc.classList.remove('dragging'); dragSrc = null; saveOrderFromDOM(); });
+      li.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
+      li.addEventListener('drop', e => {
+        e.preventDefault();
+        if (dragSrc && dragSrc !== li) {
+          li.parentNode.insertBefore(dragSrc, li.nextSibling);
+        }
+      });
+    });
+
+    // checkboxes
+    listEl.querySelectorAll('.shopping-checkbox').forEach(cb => {
+      cb.addEventListener('change', e => {
+        const li = e.target.closest('.shopping-item');
+        const key = li.dataset.key;
+        shoppingState.checked = shoppingState.checked || {};
+        shoppingState.checked[key] = e.target.checked;
+        if (e.target.checked) {
+          li.classList.add('checked');
+          li.style.opacity = '0.6';
+          li.style.textDecoration = 'line-through';
+          // move to bottom
+          li.parentNode.appendChild(li);
+        } else {
+          li.classList.remove('checked');
+          li.style.opacity = '';
+          li.style.textDecoration = '';
+          // move to top region (before first checked)
+          const firstChecked = Array.from(li.parentNode.querySelectorAll('.shopping-item.checked'))[0];
+          if (firstChecked) li.parentNode.insertBefore(li, firstChecked);
+          else li.parentNode.insertBefore(li, li.parentNode.firstChild);
+        }
+        saveShoppingState();
+        saveOrderFromDOM();
+      });
+    });
+
+    // editable names
+    listEl.querySelectorAll('.item-name').forEach(span => {
+      span.addEventListener('blur', e => {
+        const li = e.target.closest('.shopping-item');
+        const key = li.dataset.key;
+        shoppingState.edits = shoppingState.edits || {};
+        shoppingState.edits[key] = e.target.textContent.trim();
+        saveShoppingState();
+      });
+      // commit on Enter
+      span.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); span.blur(); } });
+    });
+
+    // clear checked
+    const clearBtn = document.getElementById('clearChecked');
+    if (clearBtn) clearBtn.addEventListener('click', () => {
+      shoppingState.checked = {};
+      saveShoppingState();
+      // remove checked items from DOM
+      const list = document.getElementById('shoppingList');
+      Array.from(list.querySelectorAll('.shopping-item.checked')).forEach(li => li.remove());
+      saveOrderFromDOM();
+    });
+
+    const saveOrderBtn = document.getElementById('saveShoppingOrder');
+    if (saveOrderBtn) saveOrderBtn.addEventListener('click', saveOrderFromDOM);
+  }
+
+  function saveOrderFromDOM() {
+    const list = document.getElementById('shoppingList');
+    if (!list) return;
+    const order = Array.from(list.querySelectorAll('.shopping-item')).map(li => li.dataset.key);
+    shoppingState.order = order;
+    saveShoppingState();
+  }
+
 
   // render saved recipes
   function loadSavedRecipes() {
