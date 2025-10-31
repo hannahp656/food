@@ -4,12 +4,11 @@ import path from "path";
 
 const inputDir = "./data/recipes";
 const outputDir = "./recipes";
-const galleryPath = "./gallery.js"; // 👈 Path to your gallery script
+const galleryPath = "./gallery.js";
 
-function cleanIngredient(line) {
-  if (!line) return "";
-
-  // Split at comma to separate descriptors
+// --- Parse ingredient into amount, unit, and ingredient name ---
+function parseIngredient(line) {
+  if (!line) return null;
   const [beforeComma] = line.split(/,(.+)/);
   const parts = beforeComma.trim().split(/\s+/);
 
@@ -23,25 +22,19 @@ function cleanIngredient(line) {
   let unit = "";
   let ingredientParts = [];
 
-  // --- detect amount (supports "2", "1/2", "2 3/4")
+  // detect amount (supports "2", "1/2", "2 3/4")
   if (parts.length > 0 && /^(\d+([\/\.]\d+)?|\d+\s+\d+\/\d+)$/.test(parts[0])) {
     amount = parts.shift();
-    // Handle two-part fraction like "2 3/4"
-    if (parts.length && /^\d+\/\d+$/.test(parts[0])) {
-      amount += " " + parts.shift();
-    }
+    if (parts.length && /^\d+\/\d+$/.test(parts[0])) amount += " " + parts.shift();
   }
 
-  // --- detect unit
+  // detect unit
   if (parts.length > 0 && units.includes(parts[0].toLowerCase())) {
     unit = parts.shift();
   }
 
-  // --- remaining words = ingredient
-  ingredientParts = parts;
-
-  const ingredient = ingredientParts.join(" ").trim();
-  return ingredient;
+  const ingredient = parts.join(" ").trim();
+  return { ingredient, amount, unit };
 }
 
 // ensure output directory exists
@@ -53,14 +46,15 @@ const templateHTML = fs.readFileSync("./recipe-template.html", "utf8");
 // read all recipe JSONs
 const files = fs.readdirSync(inputDir).filter(f => f.endsWith(".json"));
 
-const builtRecipes = []; // 👈 keep track of what we build
+const builtRecipes = [];
 
 for (const file of files) {
   const jsonPath = path.join(inputDir, file);
   const recipeData = JSON.parse(fs.readFileSync(jsonPath, "utf8"));
 
-  // add cleaned ingredients
-  recipeData.cleanedIngredients = recipeData.ingredients.map(cleanIngredient);
+  // add parsed + cleaned ingredients
+  recipeData.parsedIngredients = recipeData.ingredients.map(parseIngredient);
+  recipeData.cleanedIngredients = recipeData.parsedIngredients.map(i => i.ingredient);
 
   // inject JSON into template
   const outputHTML = templateHTML.replace(
@@ -74,27 +68,17 @@ ${JSON.stringify(recipeData, null, 2)}
   const outputPath = path.join(outputDir, outputName);
   fs.writeFileSync(outputPath, outputHTML, "utf8");
 
-  // store the web path version (for gallery.js)
   builtRecipes.push(`/food/recipes/${outputName}`);
-
   console.log(`✅ Built ${outputName}`);
 }
 
 console.log("🎉 All recipes built!");
 
-// 🧩 NEW STEP: Auto-update gallery.js
+// 🧩 Auto-update gallery.js
 try {
   let galleryContent = fs.readFileSync(galleryPath, "utf8");
-
-  // Replace the recipeFiles array dynamically
   const newArray = `const recipeFiles = [\n  ${builtRecipes.map(r => `"${r}"`).join(",\n  ")}\n];`;
-
-  // Find and replace the old array definition
-  galleryContent = galleryContent.replace(
-    /const recipeFiles = \[[\s\S]*?\];/,
-    newArray
-  );
-
+  galleryContent = galleryContent.replace(/const recipeFiles = \[[\s\S]*?\];/, newArray);
   fs.writeFileSync(galleryPath, galleryContent, "utf8");
   console.log("🧠 Updated gallery.js with new recipe list!");
 } catch (err) {
