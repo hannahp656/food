@@ -91,7 +91,7 @@ function renderGallery() {
       icon.classList.toggle("fa-solid", isSaved);
       icon.classList.toggle("fa-regular", !isSaved);
       saveRecipeBtn.addEventListener("click", e => {
-        e.stopPropagation();
+        //e.stopPropagation();
         saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
         isSaved = saved.some(r => r.link === data.link);
         if (isSaved) {
@@ -106,9 +106,9 @@ function renderGallery() {
         localStorage.setItem("savedRecipes", JSON.stringify(saved));
       });
     }
-    card.addEventListener("click", () => {
-      window.location.href = data.link;
-    });
+    //card.addEventListener("click", () => {
+    //  window.location.href = data.link;
+    //});
     gallery.appendChild(card);
   });
 }
