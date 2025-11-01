@@ -9,20 +9,18 @@ const recipeFiles = [
   "/food/recipes/recipe-granny-smith-apple.html",
   "/food/recipes/recipe-moms-meatballs.html",
   "/food/recipes/recipe-peanut-butter-waffle.html",
-  "/food/recipes/recipe-shanghai-scallion-oil-noodles-and-pork.html",
-  "/food/recipes/recipe-example.html"
+  "/food/recipes/recipe-shanghai-scallion-oil-noodles-and-pork.html"
 ];
 
-let allRecipes = [];
-let filteredRecipes = [];
-let allIngredients = [];
-let selectedIngredients = [];
+let allRecipes = [];          // Store all recipe data
+let filteredRecipes = [];     // Store filtered view
+let allIngredients = [];      // Store all unique ingredients
+let selectedIngredients = []; // Ingredients selected for filtering
 
 // load all recipes
 async function loadRecipes() {
   const gallery = document.getElementById("gallery");
   gallery.innerHTML = "";
-
   for (let file of recipeFiles) {
     try {
       const res = await fetch(file);
@@ -31,48 +29,51 @@ async function loadRecipes() {
       const doc = new DOMParser().parseFromString(text, "text/html");
       const dataEl = doc.querySelector("#recipe-data");
       if (!dataEl) continue;
-
-      const data = JSON.parse(dataEl.textContent);
+      const data = JSON.parse(dataEl.textContent); // get recipe JSON
       data.file = file;
-
-      const parsed = data.parsedIngredients || [];
+      const parsed = data.parsedIngredients || []; // get parsed ingredients
       data.ingredientsLower = parsed.map(obj => obj.ingredient.toLowerCase());
       allIngredients.push(...data.ingredientsLower);
-
+//      if (Array.isArray(parsed) && parsed.length > 0) {
+//        // Use the 'ingredient' field from each parsed ingredient
+//        data.ingredientsLower = parsed.map(obj => obj.ingredient.toLowerCase());
+//        allIngredients.push(...data.ingredientsLower);
+//      } else {
+//        // fallback to original ingredients
+//        const sourceIngredients = data.ingredients || [];
+//        data.ingredientsLower = sourceIngredients.map(i => i.toLowerCase());
+//        allIngredients.push(...data.ingredientsLower);
+//      }
       allRecipes.push(data);
     } catch (err) {
       console.error("Error loading recipe:", file, err);
     }
   }
-
-  allIngredients = [...new Set(allIngredients)].sort();
+  allIngredients = [...new Set(allIngredients)].sort(); // delete duplicate ingredients
   filteredRecipes = [...allRecipes];
   renderGallery();
   setupSearchAndFilters();
 }
 
-// render gallery cards
+
+
+// function to render gallery cards
 function renderGallery() {
   const gallery = document.getElementById("gallery");
   gallery.innerHTML = "";
-
   if (filteredRecipes.length === 0) {
     gallery.innerHTML = "<p style='text-align:center;color:var(--muted)'>No recipes found.</p>";
     return;
   }
-
-  const saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
-
+  const saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]"); //new
   filteredRecipes.forEach(data => {
-    const isSaved = saved.some(r => r.link === data.link);
-
+    const isSaved = saved.some(r => r.link === data.link); //new
     const card = document.createElement("div");
     card.className = "recipe-card";
-
     card.innerHTML = `
       <div style="position:relative;">
         <img src="${data.image}" alt="${data.title}">
-        <button class="save-btn" style="position:absolute;top:12px;right:12px;z-index:2;">
+        <button id="saveRecipeBtn" class="button button--secondary" style="position:absolute;top:12px;right:12px;z-index:2;">
           <i class="fa-${isSaved ? "solid" : "regular"} fa-bookmark"></i>
         </button>
       </div>
@@ -81,44 +82,49 @@ function renderGallery() {
         <div class="card-tags">
           ${data.tags.map(tag => `<span class="tag">${tag}</span>`).join("")}
         </div>
+        <a href="${data.link}">View Recipe</a>
       </div>
     `;
-
-    // clicking anywhere else goes to the recipe
+    // clicking anywhere else goes to the recipe - new
     card.addEventListener("click", e => {
       if (!e.target.closest(".save-btn")) {
         window.location.href = data.link;
       }
     });
-
-    // save button toggle
-    const saveBtn = card.querySelector(".save-btn");
-    const icon = saveBtn.querySelector("i");
-
-    saveBtn.addEventListener("click", e => {
-      e.stopPropagation(); // stop from opening recipe page
-
+    const saveRecipeBtn = card.querySelector(".saveRecipeBtn");
+    const icon = saveBtn.querySelector("i"); //new
+    //if (saveRecipeBtn) {
+    saveRecipeBtn.addEventListener("click", e => { // new
+      e.stopPropagation(); // stop from opening recipe page - new
       let saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
-      const isAlreadySaved = saved.some(r => r.link === data.link);
-
-      if (isAlreadySaved) {
-        saved = saved.filter(r => r.link !== data.link);
-        icon.classList.remove("fa-solid");
-        icon.classList.add("fa-regular");
-      } else {
-        saved.push(data);
-        icon.classList.remove("fa-regular");
-        icon.classList.add("fa-solid");
-      }
-
-      localStorage.setItem("savedRecipes", JSON.stringify(saved));
+      let isSaved = saved.some(r => r.link === data.link);
+      const icon = saveRecipeBtn.querySelector("i");
+      icon.classList.toggle("fa-solid", isSaved);
+      icon.classList.toggle("fa-regular", !isSaved);
+      saveRecipeBtn.addEventListener("click", e => {
+        e.stopPropagation();
+        saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]"); //maybe do let saved
+        isSaved = saved.some(r => r.link === data.link); // maybe do const is Saved
+        if (isSaved) {
+          saved = saved.filter(r => r.link !== data.link);
+          icon.classList.remove("fa-solid");
+          icon.classList.add("fa-regular");
+        } else {
+          saved.push(data);
+          icon.classList.remove("fa-regular");
+          icon.classList.add("fa-solid");
+        }
+        localStorage.setItem("savedRecipes", JSON.stringify(saved));
+      });
+    //}
+    //card.addEventListener("click", () => {
+    //  window.location.href = data.link;
     });
-
     gallery.appendChild(card);
   });
 }
 
-// filtering + search logic (unchanged except reset fix)
+// function to set up search and filters
 function setupSearchAndFilters() {
   const titleSearch = document.getElementById("titleSearch");
   const openBtn = document.getElementById("openFiltersBtn");
@@ -136,38 +142,36 @@ function setupSearchAndFilters() {
   const leftoverCheckbox = document.getElementById("leftoverCheckbox");
   const applyBtn = document.getElementById("applyFiltersBtn");
   const clearBtn = document.getElementById("clearFiltersBtn");
-
+  // time slider setup
   if (timeSlider && timeLabel) {
-    timeSlider.addEventListener("input", () => {
+    timeSlider.addEventListener("input", () => { // update time label as user slides
       const value = parseInt(timeSlider.value, 10);
-      timeLabel.textContent = `Max: ${formatTimeLabel(value)}`;
+      timeLabel.textContent = formatTimeLabel(value);
     });
-    timeSlider.addEventListener("change", applyFilters);
+    timeSlider.addEventListener("change", applyFilters);  // apply filters when slider changes
   }
-
+  // leftover checkbox setup
   if (leftoverCheckbox) leftoverCheckbox.addEventListener("change", applyFilters);
-
+  // when any of the checkboxes change, reapply filters
   document.querySelectorAll(".meal-filter, .type-filter, .cuisine-filter").forEach(box => {
     box.addEventListener("change", applyFilters);
   });
-
+  // title search setup
   if (titleSearch) titleSearch.addEventListener("input", () => applyFilters());
-
+  // sidebar open/close
   if (openBtn) {
     openBtn.addEventListener("click", () => {
       sidebar.classList.add("active");
       overlay.classList.remove("hidden");
     });
   }
-
   if (closeBtn) closeBtn.addEventListener("click", closeSidebar);
   overlay.addEventListener("click", closeSidebar);
-
   function closeSidebar() {
     sidebar.classList.remove("active");
     overlay.classList.add("hidden");
   }
-
+  // ingredient search and filter
   if (ingredientSearch) {
     ingredientSearch.addEventListener("input", e => {
       const query = e.target.value.toLowerCase().trim();
@@ -185,8 +189,7 @@ function setupSearchAndFilters() {
       ingredientSuggestions.style.display = "block";
     });
   }
-
-  if (ingredientSuggestions) {
+  if (ingredientSuggestions) {  // clicking a suggestion to add an ingredient filter
     ingredientSuggestions.addEventListener("click", e => {
       if (e.target.tagName === "LI") {
         const ing = e.target.textContent;
@@ -198,14 +201,14 @@ function setupSearchAndFilters() {
       }
     });
   }
-
-  function renderSelectedIngredients() {
-    selectedContainer.innerHTML = selectedIngredients
-      .map(ing => `<span class="tag">${ing}<button data-ing="${ing}" title="Remove">&times;</button></span>`)
-      .join("");
+  function renderSelectedIngredients() {  // render selected ingredient filters
+    selectedContainer.innerHTML = selectedIngredients.map(ing => `
+      <span class="tag">${ing}
+        <button data-ing="${ing}" title="Remove">&times;</button>
+      </span>
+    `).join("");
   }
-
-  selectedContainer.addEventListener("click", e => {
+  selectedContainer.addEventListener("click", e => {  // remove selected ingredient filter when clicking its "x" button
     if (e.target.tagName === "BUTTON") {
       const ing = e.target.dataset.ing;
       selectedIngredients = selectedIngredients.filter(i => i !== ing);
@@ -213,43 +216,50 @@ function setupSearchAndFilters() {
       applyFilters();
     }
   });
-
+  // apply filters
   if (applyBtn) {
     applyBtn.addEventListener("click", () => {
       applyFilters();
       closeSidebar();
     });
   }
-
+  // clear filters
   if (clearBtn) {
     clearBtn.addEventListener("click", () => {
-      if (titleSearch) titleSearch.value = "";
-      selectedIngredients = [];
+      if (titleSearch) titleSearch.value = "";  // Reset title
+      selectedIngredients = []; // Reset ingredient inputs & tags
       if (ingredientSearch) ingredientSearch.value = "";
       if (selectedContainer) selectedContainer.innerHTML = "";
-      document.querySelectorAll(".meal-filter, .type-filter, .cuisine-filter").forEach(box => (box.checked = false));
-      if (leftoverCheckbox) leftoverCheckbox.checked = false;
-      if (timeSlider) {
+      document.querySelectorAll(".meal-filter, .type-filter, .cuisine-filter").forEach(box => box.checked = false); // Reset checkboxes
+      if (leftoverCheckbox) leftoverCheckbox.checked = false; // Reset leftover checkbox
+      if (timeSlider) { // Reset time slider to max (120) and label
         timeSlider.value = 120;
-        if (timeLabel) timeLabel.textContent = `Max: ${formatTimeLabel(120)}`;
+        if (timeLabel) timeLabel.textContent = "120";
       }
-      applyFilters();
+      applyFilters(); // Reapply filters and keep sidebar open so user can continue selecting
     });
   }
 }
 
-// same as before
+// function to format time label
 function formatTimeLabel(minutes) {
   if (minutes === 0) return "0 min";
   if (minutes < 60) return `${minutes} min`;
   const hours = minutes / 60;
-  const fractionalHours = { 0.25: "¼", 0.5: "½", 0.75: "¾" };
+  if (hours === 1) return "1 hour";
+  if (hours % 1 === 0.5) return `${hours} hours`; // e.g. 1.5 -> "1.5 hours"
+  const fractionalHours = {
+    0.25: "¼",
+    0.5: "½",
+    0.75: "¾"
+  };
   const whole = Math.floor(hours);
   const fraction = hours - whole;
   const fracLabel = fractionalHours[fraction] || "";
   return `${whole}${fracLabel ? " " + fracLabel : ""} hours`;
 }
 
+// function to apply filters
 function applyFilters() {
   const titleEl = document.getElementById("titleSearch");
   const titleQuery = titleEl ? titleEl.value.toLowerCase().trim() : "";
@@ -260,17 +270,23 @@ function applyFilters() {
   const selectedMeals = [...document.querySelectorAll(".meal-filter:checked")].map(el => el.value.toLowerCase());
   const selectedTypes = [...document.querySelectorAll(".type-filter:checked")].map(el => el.value.toLowerCase());
   const selectedCuisines = [...document.querySelectorAll(".cuisine-filter:checked")].map(el => el.value.toLowerCase());
-
+  // filter recipes
   filteredRecipes = allRecipes.filter(r => {
     const matchesTitle = r.title.toLowerCase().includes(titleQuery);
     const matchesIngredients = selectedIngredients.every(ing =>
       r.ingredientsLower && r.ingredientsLower.some(i => i.includes(ing))
     );
+    // time filtering — use r.time if present (try numbers inside tags as fallback)
     let recipeTime = 999;
-    const timeTag = (r.tags || []).find(t => /\b\d+\s*min\b/i.test(t));
-    if (timeTag) {
-      const num = parseInt(timeTag.match(/(\d+)\s*min/i)[1], 10);
-      if (!isNaN(num)) recipeTime = num;
+    if (r.time) {
+      const t = parseInt(r.time, 10);
+      if (!isNaN(t)) recipeTime = t;
+    } else {
+      const timeTag = (r.tags || []).find(t => /\b\d+\s*min\b/i.test(t));
+      if (timeTag) {
+        const num = parseInt(timeTag.match(/(\d+)\s*min/i)[1], 10);
+        if (!isNaN(num)) recipeTime = num;
+      }
     }
     const matchesTime = recipeTime <= timeLimit;
     const tags = (r.tags || []).map(t => t.toLowerCase());
@@ -278,11 +294,19 @@ function applyFilters() {
     const matchesType = selectedTypes.length === 0 || selectedTypes.some(t => tags.includes(t));
     const matchesCuisine = selectedCuisines.length === 0 || selectedCuisines.some(c => tags.includes(c));
     const matchesLeftover = !leftoverOnly || tags.includes("leftover-safe");
-    return matchesTitle && matchesIngredients && matchesTime && matchesMeal && matchesType && matchesCuisine && matchesLeftover;
+    // return filtered result
+    return (
+      matchesTitle &&
+      matchesIngredients &&
+      matchesTime &&
+      matchesMeal &&
+      matchesType &&
+      matchesCuisine &&
+      matchesLeftover
+    );
   });
-
   renderGallery();
 }
 
-// start everything
+// Load everything
 loadRecipes();
