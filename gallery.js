@@ -69,10 +69,12 @@ function renderGallery() {
     const card = document.createElement("div");
     card.className = "recipe-card";
     card.innerHTML = `
-      <img src="${data.image}" alt="${data.title}">
-      <button id="saveRecipeBtn" class="button button--secondary">
+      <div style="position:relative;">
+        <img src="${data.image}" alt="${data.title}">
+        <button id="saveRecipeBtn" class="button button--secondary" style="position:absolute;top:12px;right:12px;z-index:2;">
           <i class="fa-regular fa-bookmark"></i>
-      </button>
+        </button>
+      </div>
       <div class="content">
         <h3>${data.title}</h3>
         <div class="card-tags">
