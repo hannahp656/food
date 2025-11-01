@@ -273,5 +273,14 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById(tabId).classList.add("active");
     });
   });
+    // 🔄 Keep saved recipes in sync across tabs and pages
+  window.addEventListener("storage", (e) => {
+    if (e.key === "savedRecipes") loadSavedRecipes();
+  });
+
+  // 🔔 Also listen for custom same-tab updates
+  window.addEventListener("savedRecipesUpdated", () => {
+    loadSavedRecipes();
+  });
 
 });

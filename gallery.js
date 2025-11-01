@@ -68,10 +68,11 @@ function renderGallery() {
   filteredRecipes.forEach(data => {
     const card = document.createElement("div");
     card.className = "recipe-card";
+
     card.innerHTML = `
       <div style="position:relative;">
         <img src="${data.image}" alt="${data.title}">
-        <button id="saveRecipeBtn" class="button button--secondary" style="position:absolute;top:12px;right:12px;z-index:2;">
+        <button class="saveRecipeBtn button button--secondary" style="position:absolute;top:12px;right:12px;z-index:2;">
           <i class="fa-regular fa-bookmark"></i>
         </button>
       </div>
@@ -83,63 +84,63 @@ function renderGallery() {
         <a href="${data.link}">View Recipe</a>
       </div>
     `;
-    const saveBtn = document.getElementById("saveRecipeBtn");
-    if (saveBtn) {
-      const icon = saveBtn.querySelector("i");
-      function updateBookmarkIcon(isSaved) {
-        if (isSaved) {
-          icon.classList.remove("fa-regular");
-          icon.classList.add("fa-solid");
-        } else {
-          icon.classList.remove("fa-solid");
-          icon.classList.add("fa-regular");
-        }
+
+    // clicking elsewhere on card goes to recipe page
+    card.addEventListener("click", e => {
+      // if click happened inside the save button, ignore navigation
+      if (!e.target.closest(".saveRecipeBtn")) {
+        window.location.href = data.link;
+      }
+    });
+
+    // find the card's save button (scoped to this card)
+    const saveBtn = card.querySelector(".saveRecipeBtn");
+    const icon = saveBtn.querySelector("i");
+
+    // initialize icon from localStorage
+    let saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
+    const currentlySaved = saved.some(r => r.link === data.link);
+    icon.classList.toggle("fa-solid", currentlySaved);
+    icon.classList.toggle("fa-regular", !currentlySaved);
+
+    // toggle save on click (stop propagation so card click doesn't fire)
+    saveBtn.addEventListener("click", e => {
+      e.stopPropagation();
+
+      saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
+      const isSaved = saved.some(r => r.link === data.link);
+
+      if (isSaved) {
+        saved = saved.filter(r => r.link !== data.link);
+        icon.classList.remove("fa-solid");
+        icon.classList.add("fa-regular");
+      } else {
+        // Save a copy (avoid keeping DOM nodes or circular refs)
+        const toSave = {
+          title: data.title,
+          link: data.link,
+          image: data.image,
+          tags: data.tags,
+          // if you want scaled ingredients etc., they should already be in data
+          ingredients: data.ingredients || [],
+          parsedIngredients: data.parsedIngredients || []
+        };
+        saved.push(toSave);
+        icon.classList.remove("fa-regular");
+        icon.classList.add("fa-solid");
       }
 
-      let saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
-      let isSaved = saved.some(r => r.link === data.link);
-      updateBookmarkIcon(isSaved);
+      localStorage.setItem("savedRecipes", JSON.stringify(saved));
 
-      saveBtn.addEventListener("click", () => {
-        saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
-        isSaved = saved.some(r => r.link === data.link);
+      // notify other open pages (recipe page, planner) to update immediately
+      // (storage event fires in other tabs, but not in the same tab, so we also dispatch a custom event)
+      window.dispatchEvent(new CustomEvent("savedRecipesUpdated", { detail: { saved } }));
+    });
 
-        if (isSaved) {
-          saved = saved.filter(r => r.link !== data.link);
-          localStorage.setItem("savedRecipes", JSON.stringify(saved));
-          updateBookmarkIcon(false);
-        } else {
-          saved.push(data);
-          localStorage.setItem("savedRecipes", JSON.stringify(saved));
-          updateBookmarkIcon(true);
-        }
-      });
-      //let saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
-      //let isSaved = saved.some(r => r.link === data.link);
-      //const icon = saveBtn.querySelector("i");
-      //icon.classList.toggle("fa-solid", isSaved);
-      //icon.classList.toggle("fa-regular", !isSaved);
-      //saveBtn.addEventListener("click", e => {
-        //e.stopPropagation();
-        //saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
-        //isSaved = saved.some(r => r.link === data.link);
-        //if (isSaved) {
-          //saved = saved.filter(r => r.link !== data.link);
-          //icon.classList.remove("fa-solid");
-          //icon.classList.add("fa-regular");
-        //} else {
-          //saved.push(data);
-          //icon.classList.remove("fa-regular");
-          //icon.classList.add("fa-solid");
-        //}
-        //localStorage.setItem("savedRecipes", JSON.stringify(saved));
-      //});
-    }
-    //card.addEventListener("click", () => {
-    //  window.location.href = data.link;
-    //});
     gallery.appendChild(card);
   });
+
+
 }
 
 

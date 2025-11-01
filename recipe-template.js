@@ -59,6 +59,23 @@ document.addEventListener("DOMContentLoaded", () => {
         updateBookmarkIcon(true);
       }
     });
+    // Keep the icon in sync if savedRecipes changes elsewhere - new
+    function syncBookmarkIcon() {
+      const saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
+      const isSavedNow = saved.some(r => r.link === data.link);
+      updateBookmarkIcon(isSavedNow);
+    }
+
+    // storage event (fires in other tabs/windows) - new
+    window.addEventListener("storage", (ev) => {
+      if (ev.key === "savedRecipes") syncBookmarkIcon();
+    });
+
+    // custom event for same-tab updates - new
+    window.addEventListener("savedRecipesUpdated", () => {
+      syncBookmarkIcon();
+    });
+
   }
 
   // insert tags

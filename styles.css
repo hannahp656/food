@@ -272,7 +272,7 @@ nav .links{display:flex;gap:12px;align-items:center}
 .controls { display: flex; gap: 6px; }
 .add-btn { background: var(--accent); color: #fff; border: none; border-radius: 6px; width: 28px; height: 28px; cursor: pointer; font-size: 1em; display: flex; align-items: center; justify-content: center; }
 .editing .delete-btn { display: inline; } /*maybe remove?*/
-.delete-btn { margin-left: 8px; background: none; border: none; color: crimson; font-weight: bold; cursor: pointer; display: none; }
+.delete-btn { margin-left: 8px; background: none; border: none; color: crimson; font-weight: bold; cursor: pointer; /*display: none;*/ }
 
 /* Overlay for adding recipes - FIX THIS ITS UGLY */
 .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; }
@@ -617,3 +617,34 @@ li {
 /*.hidden {
   display: none !important;
 }*/
+
+/* Bookmark (Save) Button on Recipe Cards */
+.saveRecipeBtn {
+  background: #eef6ea;               /* same as .button--secondary background */
+  color: var(--accent-2);
+  border: 1px solid rgba(58, 77, 57, 0.08);
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1em;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.saveRecipeBtn:hover {
+  background: #e3f1da;
+  transform: translateY(-2px);
+}
+
+.saveRecipeBtn i {
+  color: var(--accent-2);
+  transition: color 0.2s ease;
+}
+
+/* Filled icon state (saved) */
+.saveRecipeBtn i.fa-solid {
+  color: var(--accent);
+}
