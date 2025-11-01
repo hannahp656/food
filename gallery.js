@@ -141,40 +141,7 @@ function renderGallery() {
     gallery.appendChild(card);
   });
 }
-  // setup save button
-  const saveBtn = document.getElementById("saveRecipeBtn");
-  if (saveBtn) {
-    const icon = saveBtn.querySelector("i");
 
-    function updateBookmarkIcon(isSaved) {
-      if (isSaved) {
-        icon.classList.remove("fa-regular");
-        icon.classList.add("fa-solid");
-      } else {
-        icon.classList.remove("fa-solid");
-        icon.classList.add("fa-regular");
-      }
-    }
-
-    let saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
-    let isSaved = saved.some(r => r.link === data.link);
-    updateBookmarkIcon(isSaved);
-
-    saveBtn.addEventListener("click", () => {
-      saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
-      isSaved = saved.some(r => r.link === data.link);
-
-      if (isSaved) {
-        saved = saved.filter(r => r.link !== data.link);
-        localStorage.setItem("savedRecipes", JSON.stringify(saved));
-        updateBookmarkIcon(false);
-      } else {
-        saved.push(data);
-        localStorage.setItem("savedRecipes", JSON.stringify(saved));
-        updateBookmarkIcon(true);
-      }
-    });
-  }
 
 // function to set up search and filters
 function setupSearchAndFilters() {
