@@ -92,7 +92,7 @@ function renderGallery() {
       }
     });
     const saveRecipeBtn = card.querySelector(".saveRecipeBtn");
-    const icon = saveBtn.querySelector("i"); //new
+    const icon = saveRecipeBtn.querySelector("i"); //new
     //if (saveRecipeBtn) {
     saveRecipeBtn.addEventListener("click", e => { // new
       e.stopPropagation(); // stop from opening recipe page - new
