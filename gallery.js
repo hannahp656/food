@@ -91,20 +91,14 @@ function renderGallery() {
         window.location.href = data.link;
       }
     });
-    const saveRecipeBtn = card.querySelector(".saveRecipeBtn");
-    const icon = saveRecipeBtn.querySelector("i"); //new
-    //if (saveRecipeBtn) {
-    saveRecipeBtn.addEventListener("click", e => { // new
-      e.stopPropagation(); // stop from opening recipe page - new
-      let saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
-      let isSaved = saved.some(r => r.link === data.link);
+    const saveRecipeBtn = card.querySelector("#saveRecipeBtn");
+    if (saveRecipeBtn) {
       const icon = saveRecipeBtn.querySelector("i");
-      icon.classList.toggle("fa-solid", isSaved);
-      icon.classList.toggle("fa-regular", !isSaved);
       saveRecipeBtn.addEventListener("click", e => {
-        e.stopPropagation();
-        saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]"); //maybe do let saved
-        isSaved = saved.some(r => r.link === data.link); // maybe do const is Saved
+        e.stopPropagation(); // prevents navigating to recipe page
+        let saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
+        const isSaved = saved.some(r => r.link === data.link);
+
         if (isSaved) {
           saved = saved.filter(r => r.link !== data.link);
           icon.classList.remove("fa-solid");
@@ -114,12 +108,10 @@ function renderGallery() {
           icon.classList.remove("fa-regular");
           icon.classList.add("fa-solid");
         }
+
         localStorage.setItem("savedRecipes", JSON.stringify(saved));
       });
-    //}
-    //card.addEventListener("click", () => {
-    //  window.location.href = data.link;
-    });
+    }
     gallery.appendChild(card);
   });
 }
