@@ -70,14 +70,14 @@ function renderGallery() {
     card.className = "recipe-card";
     card.innerHTML = `
       <img src="${data.image}" alt="${data.title}">
+      <button id="saveRecipeBtn" class="button button--secondary">
+          <i class="fa-regular fa-bookmark"></i>
+      </button>
       <div class="content">
         <h3>${data.title}</h3>
         <div class="card-tags">
           ${data.tags.map(tag => `<span class="tag">${tag}</span>`).join("")}
         </div>
-        <button class="bookmark-btn" title="Save Recipe">
-          <i class="fa-regular fa-bookmark"></i>
-        </button>
         <a href="${data.link}">View Recipe</a>
       </div>
     `;
