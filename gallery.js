@@ -34,12 +34,20 @@ async function loadRecipes() {
       const data = JSON.parse(dataEl.textContent);
       data.file = file;
 
-      // Keep track of ingredients (lowercased for matching)
-      const sourceIngredients = data.cleanedIngredients || data.ingredients || [];
-      if (Array.isArray(sourceIngredients)) {
-        data.ingredientsLower = sourceIngredients.map(i => i.toLowerCase());
-        allIngredients.push(...data.ingredientsLower);
-      }
+      const parsed = data.parsedIngredients || [];
+      data.ingredientsLower = parsed.map(obj => obj.ingredient.toLowerCase());
+      allIngredients.push(...data.ingredientsLower);
+
+//      if (Array.isArray(parsed) && parsed.length > 0) {
+//        // Use the 'ingredient' field from each parsed ingredient
+//        data.ingredientsLower = parsed.map(obj => obj.ingredient.toLowerCase());
+//        allIngredients.push(...data.ingredientsLower);
+//      } else {
+//        // fallback to original ingredients
+//        const sourceIngredients = data.ingredients || [];
+//        data.ingredientsLower = sourceIngredients.map(i => i.toLowerCase());
+//        allIngredients.push(...data.ingredientsLower);
+//      }
 
       allRecipes.push(data);
     } catch (err) {
