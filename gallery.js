@@ -83,14 +83,14 @@ function renderGallery() {
         <a href="${data.link}">View Recipe</a>
       </div>
     `;
-    const bookmarkBtn = card.querySelector(".bookmark-btn");
-    if (bookmarkBtn) {
+    const saveRecipeBtn = card.querySelector(".saveRecipeBtn");
+    if (saveRecipeBtn) {
       let saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
       let isSaved = saved.some(r => r.link === data.link);
-      const icon = bookmarkBtn.querySelector("i");
+      const icon = saveRecipeBtn.querySelector("i");
       icon.classList.toggle("fa-solid", isSaved);
       icon.classList.toggle("fa-regular", !isSaved);
-      bookmarkBtn.addEventListener("click", e => {
+      saveRecipeBtn.addEventListener("click", e => {
         e.stopPropagation();
         saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
         isSaved = saved.some(r => r.link === data.link);
