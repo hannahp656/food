@@ -26,9 +26,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // setup save button
-  const saveBtn = document.getElementById("saveRecipeBtn");
-  if (saveBtn) {
+  // setup save button(s)
+  document.querySelectorAll(".saveRecipeBtn").forEach(saveBtn => {
     const icon = saveBtn.querySelector("i");
 
     function updateBookmarkIcon(isSaved) {
@@ -58,25 +57,25 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem("savedRecipes", JSON.stringify(saved));
         updateBookmarkIcon(true);
       }
+
+      // 🔔 trigger same-tab sync event for gallery + planner
+      window.dispatchEvent(new Event("savedRecipesUpdated"));
     });
-    // Keep the icon in sync if savedRecipes changes elsewhere - new
+
+    // Keep the icon in sync if savedRecipes changes elsewhere
     function syncBookmarkIcon() {
       const saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
       const isSavedNow = saved.some(r => r.link === data.link);
       updateBookmarkIcon(isSavedNow);
     }
 
-    // storage event (fires in other tabs/windows) - new
+    // Cross-tab + same-tab syncing
     window.addEventListener("storage", (ev) => {
       if (ev.key === "savedRecipes") syncBookmarkIcon();
     });
+    window.addEventListener("savedRecipesUpdated", syncBookmarkIcon);
+  });
 
-    // custom event for same-tab updates - new
-    window.addEventListener("savedRecipesUpdated", () => {
-      syncBookmarkIcon();
-    });
-
-  }
 
   // insert tags
   const recipeTags = document.querySelector(".tags");
