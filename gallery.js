@@ -65,16 +65,14 @@ function renderGallery() {
     gallery.innerHTML = "<p style='text-align:center;color:var(--muted)'>No recipes found.</p>";
     return;
   }
-  const saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]"); //new
   filteredRecipes.forEach(data => {
-    const isSaved = saved.some(r => r.link === data.link); //new
     const card = document.createElement("div");
     card.className = "recipe-card";
     card.innerHTML = `
       <div style="position:relative;">
         <img src="${data.image}" alt="${data.title}">
         <button id="saveRecipeBtn" class="button button--secondary" style="position:absolute;top:12px;right:12px;z-index:2;">
-          <i class="fa-${isSaved ? "solid" : "regular"} fa-bookmark"></i>
+          <i class="fa-regular fa-bookmark"></i>
         </button>
       </div>
       <div class="content">
@@ -85,20 +83,17 @@ function renderGallery() {
         <a href="${data.link}">View Recipe</a>
       </div>
     `;
-    // clicking anywhere else goes to the recipe - new
-    card.addEventListener("click", e => {
-      if (!e.target.closest(".save-btn")) {
-        window.location.href = data.link;
-      }
-    });
-    const saveRecipeBtn = card.querySelector("#saveRecipeBtn");
+    const saveRecipeBtn = card.querySelector(".saveRecipeBtn");
     if (saveRecipeBtn) {
+      let saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
+      let isSaved = saved.some(r => r.link === data.link);
       const icon = saveRecipeBtn.querySelector("i");
+      icon.classList.toggle("fa-solid", isSaved);
+      icon.classList.toggle("fa-regular", !isSaved);
       saveRecipeBtn.addEventListener("click", e => {
-        e.stopPropagation(); // prevents navigating to recipe page
-        let saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
-        const isSaved = saved.some(r => r.link === data.link);
-
+        e.stopPropagation();
+        saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
+        isSaved = saved.some(r => r.link === data.link);
         if (isSaved) {
           saved = saved.filter(r => r.link !== data.link);
           icon.classList.remove("fa-solid");
@@ -108,10 +103,12 @@ function renderGallery() {
           icon.classList.remove("fa-regular");
           icon.classList.add("fa-solid");
         }
-
         localStorage.setItem("savedRecipes", JSON.stringify(saved));
       });
     }
+    card.addEventListener("click", () => {
+      window.location.href = data.link;
+    });
     gallery.appendChild(card);
   });
 }
