@@ -175,14 +175,23 @@ document.addEventListener("DOMContentLoaded", () => {
       card.dataset.index = index;
       // FIX WHATEVERS GOING ON WITH THE X - build card content
       card.innerHTML = `
-        <img src="${recipe.image}" alt="${recipe.title}">
+        <div style="position:relative;">
+          <img src="${recipe.image}" alt="${recipe.title}">
+          <button class="delete-saved">✕</button>
+        </div>
         <div class="content">
           <h3>${recipe.title}</h3>
           <div class="card-tags">${recipe.tags.map(tag => `<span class="tag">${tag}</span>`).join("")}</div>
           <a href="${recipe.link}" target="_blank">View Recipe</a>
-          <button class="delete-saved">✕</button>
         </div>
       `;
+        //<img src="${recipe.image}" alt="${recipe.title}">
+        //<div class="content">
+          //<h3>${recipe.title}</h3>
+          //<div class="card-tags">${recipe.tags.map(tag => `<span class="tag">${tag}</span>`).join("")}</div>
+          //<a href="${recipe.link}" target="_blank">View Recipe</a>
+          //<button class="delete-saved">✕</button>
+        //</div>
       // drag start
       card.addEventListener("dragstart", e => {
         e.dataTransfer.setData("application/json", JSON.stringify(recipe));
