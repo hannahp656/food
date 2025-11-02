@@ -71,26 +71,43 @@ document.addEventListener("DOMContentLoaded", () => {
       resultList.innerHTML = "";
       if (!query) return;
 
-      // get recipe titles from gallery page
-      const res = await fetch("recipes.html");
-      const text = await res.text();
-      const doc = new DOMParser().parseFromString(text, "text/html");
-      const cards = doc.querySelectorAll(".recipe-card");
-      cards.forEach(card => {
-        const title = card.querySelector("h3").textContent;
-        const link = card.querySelector("a").getAttribute("href");
-        if (title.toLowerCase().includes(query)) {
-          const li = document.createElement("li");
-          li.textContent = title;
-          li.addEventListener("click", () => {
-            addMealItem(title, link, mealBox);
-            searchDiv.remove();
-          });
-          resultList.appendChild(li);
+      // Fetch all recipe files instead of recipes.html
+      // Use the shared recipe list
+      // (Assumes this file is included BEFORE gallery.js and planner.js in your HTML)
+
+      const matches = [];
+
+      for (const file of recipeFiles) {
+        try {
+          const res = await fetch(file);
+          if (!res.ok) continue;
+          const text = await res.text();
+          const doc = new DOMParser().parseFromString(text, "text/html");
+          const dataEl = doc.querySelector("#recipe-data");
+          if (!dataEl) continue;
+          const data = JSON.parse(dataEl.textContent);
+          if (data.title.toLowerCase().includes(query)) {
+            matches.push({ title: data.title, link: data.link });
+          }
+        } catch (err) {
+          console.error("Error reading recipe:", file, err);
         }
+      }
+
+      resultList.innerHTML = ""; // clear old results
+
+      // Add matches
+      matches.forEach(({ title, link }) => {
+        const li = document.createElement("li");
+        li.textContent = title;
+        li.addEventListener("click", () => {
+          addMealItem(title, link, mealBox);
+          searchDiv.remove();
+        });
+        resultList.appendChild(li);
       });
 
-      // always add “Insert without recipe” option
+      // Always include the "insert custom" option
       const custom = document.createElement("li");
       custom.className = "insert-custom";
       custom.textContent = `Insert "${input.value}" without recipe`;
@@ -99,6 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
         searchDiv.remove();
       });
       resultList.appendChild(custom);
+
     });
   }
 

@@ -112,21 +112,13 @@ ${JSON.stringify(recipeData, null, 2)}
 
 console.log("🎉 All recipes built!");
 
-// 🧩 NEW STEP: Auto-update gallery.js
+// 🧩 NEW STEP: Auto-update shared recipe-files.js
 try {
-  let galleryContent = fs.readFileSync(galleryPath, "utf8");
+  const filesPath = "./recipe-files.js";
+  const newArray = `// Auto-generated file. Do not edit manually.\nconst recipeFiles = [\n  ${builtRecipes.map(r => `"${r}"`).join(",\n  ")}\n];\n`;
 
-  // Replace the recipeFiles array dynamically
-  const newArray = `const recipeFiles = [\n  ${builtRecipes.map(r => `"${r}"`).join(",\n  ")}\n];`;
-
-  // Find and replace the old array definition
-  galleryContent = galleryContent.replace(
-    /const recipeFiles = \[[\s\S]*?\];/,
-    newArray
-  );
-
-  fs.writeFileSync(galleryPath, galleryContent, "utf8");
-  console.log("🧠 Updated gallery.js with new recipe list!");
+  fs.writeFileSync(filesPath, newArray, "utf8");
+  console.log("📁 Updated recipe-files.js with new recipe list!");
 } catch (err) {
-  console.warn("⚠️ Could not update gallery.js automatically:", err.message);
+  console.warn("⚠️ Could not update recipe-files.js automatically:", err.message);
 }
