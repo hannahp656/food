@@ -22,7 +22,7 @@ async function loadAllRecipes() {
     fetch(file)
       .then(res => res.text())
       .then(html => {
-        const match = html.match(/<script id="recipeData"[^>]*>([\s\S]*?)<\/script>/);
+        const match = html.match(/<script id="recipe-data"[^>]*>([\s\S]*?)<\/script>/);
         if (match) {
           try {
             const data = JSON.parse(match[1]);
