@@ -1,51 +1,33 @@
 // shopping-list.js
 
-// Utility: Singularize ingredient names (basic, can be improved)
+// --- Utility functions ---
+
+// singularize basic plurals (e.g. "eggs" → "egg", "tomatoes" → "tomato")
 function singularize(word) {
-  if (word.endsWith('es')) return word.slice(0, -2);
-  if (word.endsWith('s')) return word.slice(0, -1);
+  if (word.endsWith("ies")) return word.slice(0, -3) + "y";
+  if (word.endsWith("es")) return word.slice(0, -2);
+  if (word.endsWith("s")) return word.slice(0, -1);
   return word;
 }
 
-// Utility: Remove descriptors (e.g., "chopped", "fresh", "to taste")
-function cleanIngredientName(name) {
-  // Remove anything after a comma or parenthesis
-  return name.split(',')[0].split('(')[0].trim().toLowerCase();
+// remove descriptors and lowercase the name
+function cleanName(name) {
+  return name.split(",")[0].split("(")[0].trim().toLowerCase();
 }
 
-// Utility: Combine measurements for same ingredient
-function combineIngredients(ingredients) {
-  const combined = {};
-  ingredients.forEach(ing => {
-    const name = singularize(cleanIngredientName(ing.name));
-    if (!combined[name]) {
-      combined[name] = { amount: [], name: name };
-    }
-    if (ing.amount) {
-      combined[name].amount.push(ing.amount);
-    }
-  });
-  // Format output
-  return Object.values(combined).map(ing => ({
-    name: ing.name,
-    amount: ing.amount.length ? ing.amount.join(', ') : ''
-  }));
-}
-
-// Load all recipes listed in recipeFiles
+// load recipe data from recipe files
 async function loadAllRecipes() {
   const recipes = {};
   const fetches = recipeFiles.map(file =>
     fetch(file)
       .then(res => res.text())
       .then(html => {
-        // Extract injected JSON from HTML
-        const match = html.match(/<script id="recipeData".*?>([\s\S]*?)<\/script>/);
+        const match = html.match(/<script id="recipeData"[^>]*>([\s\S]*?)<\/script>/);
         if (match) {
           try {
             const data = JSON.parse(match[1]);
-            recipes[data.slug || file] = data;
-          } catch (e) {}
+            recipes[data.link || file] = data;
+          } catch {}
         }
       })
       .catch(() => {})
@@ -54,68 +36,125 @@ async function loadAllRecipes() {
   return recipes;
 }
 
-// Get meal plan from localStorage
+// get meal plan from localStorage
 function getMealPlan() {
   try {
-    const raw = localStorage.getItem('mealPlan');
-    if (!raw) return {};
-    const parsed = JSON.parse(raw);
-    if (parsed && typeof parsed === 'object') return parsed;
-    return {};
+    return JSON.parse(localStorage.getItem("mealPlan") || "{}");
   } catch {
     return {};
   }
 }
 
-// Aggregate all parsedIngredients from selected meals
-function getShoppingList(recipes, mealPlan) {
-  const allIngredients = [];
-  Object.values(mealPlan).forEach(mealsObj => {
-    Object.values(mealsObj).forEach(mealArr => {
+// --- Main logic ---
+
+function parseAndCombineIngredients(recipes, mealPlan) {
+  let allParsed = [];
+
+  // 1. collect all ingredients from all meals in mealPlan
+  Object.values(mealPlan).forEach(dayObj => {
+    Object.values(dayObj).forEach(mealArr => {
       mealArr.forEach(item => {
-        // Find recipe by link (or slug if available)
         const recipe = Object.values(recipes).find(r => r.link === item.link);
         if (recipe && Array.isArray(recipe.parsedIngredients)) {
-          allIngredients.push(...recipe.parsedIngredients);
+          allParsed.push(...recipe.parsedIngredients);
         }
       });
     });
   });
-  return combineIngredients(allIngredients);
+
+  // 2. strip descriptors
+  allParsed = allParsed.map(i => ({
+    amount: i.amount || "",
+    unit: i.unit || "",
+    ingredient: cleanName(i.ingredient || "")
+  }));
+
+  // 3. sort alphabetically by ingredient
+  allParsed.sort((a, b) => a.ingredient.localeCompare(b.ingredient));
+
+  // 4. combine amount+unit into one string "measurement"
+  allParsed = allParsed.map(i => ({
+    measurement: `${i.amount} ${i.unit}`.trim(),
+    ingredient: i.ingredient
+  }));
+
+  // 5. merge duplicates (singular/plural)
+  const combined = {};
+  allParsed.forEach(i => {
+    const singular = singularize(i.ingredient);
+    if (!combined[singular]) combined[singular] = [];
+    if (i.measurement) combined[singular].push(i.measurement);
+  });
+
+  // 6. format list
+  return Object.entries(combined).map(([ingredient, measurements]) => ({
+    ingredient: ingredient.charAt(0).toUpperCase() + ingredient.slice(1),
+    measurement: measurements.join(", ")
+  }));
 }
 
-// Render shopping list in #content2
+// --- Render ---
+
 function renderShoppingList(list) {
-  const container = document.querySelector('#content2');
+  const container = document.querySelector("#content2");
   if (!container) return;
+
+  if (!list.length) {
+    container.innerHTML = `<h2>Shopping List</h2><p>No meals selected.</p>`;
+    return;
+  }
+
   container.innerHTML = `
     <h2>Shopping List</h2>
-    ${list.length === 0 ? '<p>No meals selected.</p>' : `
-      <ul class="shopping-list">
-        ${list.map(item =>
-          `<li><span class="ingredient">${item.name}</span>${item.amount ? ` <span class="amount">${item.amount}</span>` : ''}</li>`
-        ).join('')}
-      </ul>
-    `}
+    <ul class="shopping-list">
+      ${list
+        .map(
+          item => `
+        <li>
+          <label>
+            <input type="checkbox" class="check-item" />
+            <span class="ingredient">${item.ingredient}</span>: 
+            <span class="measurement">${item.measurement}</span>
+          </label>
+        </li>`
+        )
+        .join("")}
+    </ul>
   `;
+
+  // mark checked items and move them down
+  const ul = container.querySelector(".shopping-list");
+  ul.addEventListener("change", e => {
+    if (e.target.classList.contains("check-item")) {
+      const li = e.target.closest("li");
+      li.classList.toggle("checked");
+      if (li.classList.contains("checked")) {
+        li.style.opacity = "0.6";
+        ul.appendChild(li); // move to bottom
+      } else {
+        li.style.opacity = "1";
+      }
+    }
+  });
 }
 
-// Main: Load recipes, get meal plan, render shopping list
+// --- Update shopping list when needed ---
+
 async function updateShoppingList() {
   const recipes = await loadAllRecipes();
   const mealPlan = getMealPlan();
-  const shoppingList = getShoppingList(recipes, mealPlan);
-  renderShoppingList(shoppingList);
+  const list = parseAndCombineIngredients(recipes, mealPlan);
+  renderShoppingList(list);
 }
 
-// Update shopping list on tab switch or meal plan change
-document.addEventListener('DOMContentLoaded', () => {
-  // If using tabs, update when Shopping List tab is shown
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', e => {
-      if (btn.dataset.tab === 'content2') updateShoppingList();
+document.addEventListener("DOMContentLoaded", () => {
+  // update when switching to Shopping List tab
+  document.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (btn.dataset.tab === "content2") updateShoppingList();
     });
   });
-  // Optionally, update when meal plan changes
-  window.addEventListener('mealPlanUpdated', updateShoppingList);
+
+  // update dynamically if meal plan changes
+  window.addEventListener("mealPlanUpdated", updateShoppingList);
 });
