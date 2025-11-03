@@ -84,7 +84,7 @@ function parseAndCombineIngredients(recipes, mealPlan) {
   // 🧩 Combine duplicates, handling plural/singular matches
     const combined = {};
 
-    allParsedIngredients.forEach(item => {
+    allParsed.forEach(item => {
     let ing = item.ingredient.trim().toLowerCase();
     let measurement = item.measurement.trim();
 
