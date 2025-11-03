@@ -201,6 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
     localStorage.setItem("mealPlan", JSON.stringify(data));
+    window.dispatchEvent(new Event("mealPlanUpdated"));
   }
   function loadMeals() {
     const data = JSON.parse(localStorage.getItem("mealPlan") || "{}");
@@ -244,7 +245,6 @@ document.addEventListener("DOMContentLoaded", () => {
       card.className = "recipe-card";
       card.draggable = true;
       card.dataset.index = index;
-      // FIX WHATEVERS GOING ON WITH THE X - build card content
       card.innerHTML = `
         <div style="position:relative;">
           <img src="${recipe.image}" alt="${recipe.title}">
