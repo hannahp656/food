@@ -57,19 +57,29 @@ async function loadAllRecipes() {
 // Get meal plan from localStorage
 function getMealPlan() {
   try {
-    return JSON.parse(localStorage.getItem('mealPlan')) || [];
+    const raw = localStorage.getItem('mealPlan');
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === 'object') return parsed;
+    return {};
   } catch {
-    return [];
+    return {};
   }
 }
 
 // Aggregate all parsedIngredients from selected meals
 function getShoppingList(recipes, mealPlan) {
   const allIngredients = [];
-  mealPlan.forEach(day => {
-    if (day && day.recipeSlug && recipes[day.recipeSlug] && Array.isArray(recipes[day.recipeSlug].parsedIngredients)) {
-      allIngredients.push(...recipes[day.recipeSlug].parsedIngredients);
-    }
+  Object.values(mealPlan).forEach(mealsObj => {
+    Object.values(mealsObj).forEach(mealArr => {
+      mealArr.forEach(item => {
+        // Find recipe by link (or slug if available)
+        const recipe = Object.values(recipes).find(r => r.link === item.link);
+        if (recipe && Array.isArray(recipe.parsedIngredients)) {
+          allIngredients.push(...recipe.parsedIngredients);
+        }
+      });
+    });
   });
   return combineIngredients(allIngredients);
 }
