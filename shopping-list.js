@@ -81,12 +81,49 @@ function parseAndCombineIngredients(recipes, mealPlan) {
   }));
 
   // 5. merge duplicates (singular/plural)
-  const combined = {};
-  allParsed.forEach(i => {
-    const singular = singularize(i.ingredient);
-    if (!combined[singular]) combined[singular] = [];
-    if (i.measurement) combined[singular].push(i.measurement);
-  });
+  // 🧩 Combine duplicates, handling plural/singular matches
+    const combined = {};
+
+    allParsedIngredients.forEach(item => {
+    let ing = item.ingredient.trim().toLowerCase();
+    let measurement = item.measurement.trim();
+
+    // Helper: singularize or pluralize for comparison
+    const possibleForms = new Set([ing]);
+    if (ing.endsWith("s")) {
+        possibleForms.add(ing.slice(0, -1)); // noodles → noodle
+    } else if (ing.endsWith("es")) {
+        possibleForms.add(ing.slice(0, -2)); // tomatoes → tomato
+    } else {
+        possibleForms.add(ing + "s");  // noodle → noodles
+        possibleForms.add(ing + "es"); // tomato → tomatoes
+    }
+
+    // Find existing match (exact or plural/singular variant)
+    let matchKey = null;
+    for (const key in combined) {
+        if (possibleForms.has(key)) {
+        matchKey = key;
+        break;
+        }
+    }
+
+    // Merge or create
+    if (matchKey) {
+        combined[matchKey].measurements.push(measurement);
+    } else {
+        // Keep plural form as default if available
+        let displayName = ing.endsWith("s") ? ing : (ing + "s");
+        combined[displayName] = { ingredient: displayName, measurements: [measurement] };
+    }
+    });
+
+    // Convert to array for display
+    const finalList = Object.values(combined).map(item => ({
+    ingredient: item.ingredient,
+    measurement: item.measurements.join(", ")
+    }));
+
 
   // 6. format list
   return Object.entries(combined).map(([ingredient, measurements]) => ({
