@@ -696,3 +696,18 @@ li {
   color: var(--muted);
   border-top: 1px solid #eef3e8;
 }
+.prep details summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.prep details summary i {
+  margin-left: 6px;
+  transition: transform 0.2s ease;
+}
+
+.prep details[open] summary i {
+  transform: rotate(90deg);
+}

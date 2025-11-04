@@ -144,6 +144,18 @@ document.addEventListener("DOMContentLoaded", () => {
       return `<li>${displayLine}</li>`;
     }).join("");
   }
+  
+  // ---- Prep & Equipment Section ----
+  const prepSection = document.querySelector(".prep-section");
+  const prepList = document.querySelector(".prep-list");
+  if (data.prep && Array.isArray(data.prep) && data.prep.length > 0) {
+    prepSection.style.display = "block"; // show section
+    data.prep.forEach(item => {
+      const li = document.createElement("li");
+      li.textContent = item;
+      prepList.appendChild(li);
+    });
+  }
 
   // insert instructions (with bolded ingredients + image toggles)
   const stepsList = document.querySelector(".instructions-list");
