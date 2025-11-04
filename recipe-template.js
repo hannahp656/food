@@ -151,8 +151,15 @@ document.addEventListener("DOMContentLoaded", () => {
   if (data.prep && Array.isArray(data.prep) && data.prep.length > 0) {
     prepSection.style.display = "block"; // show section
     data.prep.forEach(item => {
+      let itemText = item;
+      // highlight ingredient names in prep steps
+      (ingredientTags || []).sort((a, b) => b.length - a.length).forEach(ingredient => {
+        const regex = new RegExp(`\\b${ingredient.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")}s?\\b`, "gi");
+        itemText = itemText.replace(regex, `<strong>${ingredient}</strong>`);
+      });
+
       const li = document.createElement("li");
-      li.textContent = item;
+      li.innerHTML = itemText;
       prepList.appendChild(li);
     });
   }
