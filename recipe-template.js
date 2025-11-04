@@ -144,7 +144,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return `<li>${displayLine}</li>`;
     }).join("");
   }
-  
+
   // ---- Prep & Equipment Section ----
   const prepSection = document.querySelector(".prep-section");
   const prepList = document.querySelector(".prep-list");
@@ -158,8 +158,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // insert instructions (with bolded ingredients + image toggles)
+  const stepsSection = document.querySelector(".instructions");
   const stepsList = document.querySelector(".instructions-list");
-  if (stepsList && data.instructions) {
+
+  if (stepsSection && stepsList && Array.isArray(data.instructions) && data.instructions.length > 0) {
     stepsList.innerHTML = data.instructions.map((step, index) => {
       if (typeof step === "string") {
         const next = data.instructions[index + 1];
@@ -193,6 +195,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return "";
     }).join("");
 
+    // handle image toggles
     stepsList.querySelectorAll(".img-toggle").forEach(btn => {
       btn.addEventListener("click", () => {
         const targetId = btn.dataset.target;
@@ -208,5 +211,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
     });
+  } else if (stepsSection) {
+    // hide the whole section if no instructions
+    stepsSection.parentElement.style.display = "none";
   }
 });
