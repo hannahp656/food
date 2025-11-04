@@ -400,7 +400,7 @@ summary {cursor: pointer;}
   margin-bottom: 0;
   display:inline;
 }
-.instructions h3 {
+.instructions h3, .prep h3 {
   color: #3a4d39;
   font-family: Montserrat, Inter, sans-serif;
   margin-top: 0;
@@ -409,7 +409,7 @@ summary {cursor: pointer;}
 li {
     padding-top: 7px;
 }
-.ingredients ul, .instructions ol {
+.ingredients ul, .prep ul, .instructions ol {
   margin: 0;
   padding-left: 1.2em;
   margin-top: 0.4em;
