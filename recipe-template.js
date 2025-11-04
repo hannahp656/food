@@ -128,7 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ✅ simplified ingredient list with ingredient tags restored
-  const ingredientTags = data.cleanedIngredients || [];
+  const ingredientTags = (data.parsedIngredients || []).map(i => i.ingredient.toLowerCase().trim());
   const ingList = document.querySelector(".ingredients-list");
 
   if (ingList && data.ingredients) {
