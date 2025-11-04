@@ -393,14 +393,14 @@ summary {cursor: pointer;}
 .ingredients details[open] summary i {
   transform: rotate(90deg);
 }
-.ingredients h3{
+.ingredients h3, .prep h3{
   color: #3a4d39;
   font-family: Montserrat, Inter, sans-serif;
   margin-top: 0;
   margin-bottom: 0;
   display:inline;
 }
-.instructions h3, .prep h3 {
+.instructions h3{
   color: #3a4d39;
   font-family: Montserrat, Inter, sans-serif;
   margin-top: 0;
