@@ -779,7 +779,7 @@ li {
 .shopping-list li.checked {
   text-decoration: line-through;
   color: var(--muted);
-  opacity: .06;
+ /* opacity: .06;*/
 }
 
 .shopping-list .edit-btn {
