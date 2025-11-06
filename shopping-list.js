@@ -130,22 +130,24 @@ function renderShoppingList(list) {
 
   // render
   container.innerHTML = `
+  <div class="shopping-list-container">
     <h2>Shopping List</h2>
-    <ul class="shopping-list">
-      ${list
-        .map(
-          (item, i) => `
-        <li draggable="true" data-index="${i}" class="${item.checked ? "checked" : ""}">
-          <label>
-            <input type="checkbox" class="check-item" ${item.checked ? "checked" : ""}/>
-            <span class="ingredient">${item.ingredient}</span>:
-            <span class="measurement">${item.measurement}</span>
-          </label>
-          <button class="edit-btn" title="Edit"><i class="fa-solid fa-pen"></i></button>
-        </li>`
-        )
-        .join("")}
-    </ul>
+      <ul class="shopping-list">
+        ${list
+          .map(
+            (item, i) => `
+          <li draggable="true" data-index="${i}" class="${item.checked ? "checked" : ""}">
+            <label>
+              <input type="checkbox" class="check-item" ${item.checked ? "checked" : ""}/>
+              <span class="ingredient">${item.ingredient}</span>:
+              <span class="measurement">${item.measurement}</span>
+            </label>
+            <button class="edit-btn" title="Edit"><i class="fa-solid fa-pen"></i></button>
+          </li>`
+          )
+          .join("")}
+      </ul>
+  </div>
   `;
 
   const ul = container.querySelector(".shopping-list");
