@@ -761,7 +761,7 @@ li {
 .shopping-list li {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  /*justify-content: space-between;*/
   padding: 8px 10px;
   border-bottom: 1px solid #e6eae2;
   cursor: grab;
@@ -779,6 +779,7 @@ li {
 .shopping-list li.checked {
   text-decoration: line-through;
   color: var(--muted);
+  opacity: .06;
 }
 
 .shopping-list .edit-btn {
