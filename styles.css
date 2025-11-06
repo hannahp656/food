@@ -711,3 +711,29 @@ li {
 .prep details[open] summary i {
   transform: rotate(90deg);
 }
+.shopping-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  border-bottom: 1px solid #e6eae2;
+  cursor: grab;
+}
+.shopping-list li.dragging {
+  opacity: 0.5;
+  background: #f0f6ec;
+}
+.shopping-list li.checked {
+  text-decoration: line-through;
+  color: #777;
+}
+.shopping-list .edit-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #3a4d39;
+  font-size: 0.9em;
+}
+.shopping-list .edit-btn:hover {
+  color: #7a9d54;
+}

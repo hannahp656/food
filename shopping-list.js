@@ -111,34 +111,128 @@ function renderShoppingList(list) {
     <ul class="shopping-list">
       ${list
         .map(
-          item => `
-        <li>
+          (item, i) => `
+        <li draggable="true" data-index="${i}">
           <label>
             <input type="checkbox" class="check-item" />
-            <span class="ingredient">${item.ingredient}</span>: 
+            <span class="ingredient">${item.ingredient}</span>:
             <span class="measurement">${item.measurement}</span>
           </label>
+          <button class="edit-btn" title="Edit"><i class="fa-solid fa-pen"></i></button>
         </li>`
         )
         .join("")}
     </ul>
   `;
 
-  // mark checked items and move them down
   const ul = container.querySelector(".shopping-list");
+
+  // ✅ check/uncheck items and move them down
   ul.addEventListener("change", e => {
     if (e.target.classList.contains("check-item")) {
       const li = e.target.closest("li");
       li.classList.toggle("checked");
       if (li.classList.contains("checked")) {
         li.style.opacity = "0.6";
+        li.style.textDecoration = "line-through";
         ul.appendChild(li); // move to bottom
       } else {
         li.style.opacity = "1";
+        li.style.textDecoration = "none";
       }
     }
   });
+
+  // ✅ enable inline editing
+  ul.addEventListener("click", e => {
+    if (e.target.closest(".edit-btn")) {
+      const li = e.target.closest("li");
+      const ingredientSpan = li.querySelector(".ingredient");
+      const measurementSpan = li.querySelector(".measurement");
+      const currentText = `${ingredientSpan.textContent}: ${measurementSpan.textContent}`;
+
+      const input = document.createElement("input");
+      input.type = "text";
+      input.value = currentText;
+      input.className = "edit-input";
+      input.style.width = "90%";
+
+      li.querySelector("label").replaceWith(input);
+      input.focus();
+
+      const saveEdit = () => {
+        const [ingredientPart, ...measurePart] = input.value.split(":");
+        const newIngredient = ingredientPart.trim();
+        const newMeasurement = measurePart.join(":").trim();
+        li.innerHTML = `
+          <label>
+            <input type="checkbox" class="check-item" ${li.classList.contains("checked") ? "checked" : ""}/>
+            <span class="ingredient">${newIngredient}</span>: 
+            <span class="measurement">${newMeasurement}</span>
+          </label>
+          <button class="edit-btn" title="Edit"><i class="fa-solid fa-pen"></i></button>
+        `;
+      };
+
+      input.addEventListener("blur", saveEdit);
+      input.addEventListener("keypress", e => {
+        if (e.key === "Enter") {
+          saveEdit();
+        }
+      });
+    }
+  });
+
+  // ✅ drag-and-drop reordering
+  let dragSrcEl = null;
+
+  ul.addEventListener("dragstart", e => {
+    if (e.target.tagName === "LI") {
+      dragSrcEl = e.target;
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", e.target.dataset.index);
+      e.target.classList.add("dragging");
+    }
+  });
+
+  ul.addEventListener("dragover", e => {
+    e.preventDefault();
+    const afterElement = getDragAfterElement(ul, e.clientY);
+    const dragging = ul.querySelector(".dragging");
+    if (afterElement == null) {
+      ul.appendChild(dragging);
+    } else {
+      ul.insertBefore(dragging, afterElement);
+    }
+  });
+
+  ul.addEventListener("drop", e => {
+    e.preventDefault();
+    const dragging = ul.querySelector(".dragging");
+    dragging.classList.remove("dragging");
+  });
+
+  ul.addEventListener("dragend", e => {
+    e.target.classList.remove("dragging");
+  });
+
+  function getDragAfterElement(container, y) {
+    const draggableElements = [...container.querySelectorAll("li:not(.dragging)")];
+    return draggableElements.reduce(
+      (closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        if (offset < 0 && offset > closest.offset) {
+          return { offset: offset, element: child };
+        } else {
+          return closest;
+        }
+      },
+      { offset: Number.NEGATIVE_INFINITY }
+    ).element;
+  }
 }
+
 
 // --- Update shopping list when needed ---
 
