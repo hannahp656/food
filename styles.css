@@ -737,3 +737,59 @@ li {
 .shopping-list .edit-btn:hover {
   color: #7a9d54;
 }
+/* SHOPPING LIST PAGE (matches meal plan styling) */
+.shopping-list-container {
+  max-width: var(--max-width);
+  margin: 0 auto 30px;
+  padding: 20px;
+  background: #fff;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.shopping-list-container h2 {
+  margin-top: 0;
+  color: var(--accent-2);
+}
+
+.shopping-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 10px;
+}
+
+.shopping-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-bottom: 1px solid #e6eae2;
+  cursor: grab;
+}
+
+.shopping-list li:last-child {
+  border-bottom: none;
+}
+
+.shopping-list li.dragging {
+  opacity: 0.6;
+  background: var(--soft);
+}
+
+.shopping-list li.checked {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+.shopping-list .edit-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--accent-2);
+  font-size: 0.9em;
+  transition: color 0.2s;
+}
+
+.shopping-list .edit-btn:hover {
+  color: var(--accent);
+}
