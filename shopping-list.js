@@ -168,8 +168,8 @@ function renderShoppingList(list) {
       const li = e.target.closest("li");
       li.classList.toggle("checked");
       if (li.classList.contains("checked")) {
-        li.style.opacity = "0.6";
-        li.style.textDecoration = "line-through";
+        //li.style.opacity = "0.6";
+        //li.style.textDecoration = "line-through";
         ul.appendChild(li); // move to bottom
       } else {
         li.style.opacity = "1";
