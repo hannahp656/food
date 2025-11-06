@@ -101,20 +101,43 @@ function renderShoppingList(list) {
   const container = document.querySelector("#content2");
   if (!container) return;
 
-  if (!list.length) {
-    container.innerHTML = `<h2>Shopping List</h2><p>No meals selected.</p>`;
-    return;
+  // Try to restore from localStorage (with same ingredient names)
+  const savedList = JSON.parse(localStorage.getItem("shoppingListState") || "[]");
+
+  // Merge saved checked/edit state with new ingredient data
+  list.forEach(item => {
+    const match = savedList.find(saved => saved.ingredient === item.ingredient);
+    if (match) {
+      item.checked = match.checked || false;
+      item.measurement = match.measurement || item.measurement;
+    } else {
+      item.checked = false;
+    }
+  });
+
+  // Replace list with saved order if it matches same ingredients
+  const savedIngredients = savedList.map(i => i.ingredient);
+  if (
+    savedIngredients.length &&
+    savedIngredients.every(i => list.some(j => j.ingredient === i))
+  ) {
+    list.sort(
+      (a, b) =>
+        savedIngredients.indexOf(a.ingredient) -
+        savedIngredients.indexOf(b.ingredient)
+    );
   }
 
+  // render
   container.innerHTML = `
     <h2>Shopping List</h2>
     <ul class="shopping-list">
       ${list
         .map(
           (item, i) => `
-        <li draggable="true" data-index="${i}">
+        <li draggable="true" data-index="${i}" class="${item.checked ? "checked" : ""}">
           <label>
-            <input type="checkbox" class="check-item" />
+            <input type="checkbox" class="check-item" ${item.checked ? "checked" : ""}/>
             <span class="ingredient">${item.ingredient}</span>:
             <span class="measurement">${item.measurement}</span>
           </label>
@@ -127,7 +150,17 @@ function renderShoppingList(list) {
 
   const ul = container.querySelector(".shopping-list");
 
-  // ✅ check/uncheck items and move them down
+  // 🔁 Save to localStorage
+  function saveListState() {
+    const listData = [...ul.querySelectorAll("li")].map(li => ({
+      ingredient: li.querySelector(".ingredient").textContent,
+      measurement: li.querySelector(".measurement").textContent,
+      checked: li.querySelector(".check-item").checked
+    }));
+    localStorage.setItem("shoppingListState", JSON.stringify(listData));
+  }
+
+  // ✅ check/uncheck items
   ul.addEventListener("change", e => {
     if (e.target.classList.contains("check-item")) {
       const li = e.target.closest("li");
@@ -140,10 +173,11 @@ function renderShoppingList(list) {
         li.style.opacity = "1";
         li.style.textDecoration = "none";
       }
+      saveListState();
     }
   });
 
-  // ✅ enable inline editing
+  // ✏️ edit item
   ul.addEventListener("click", e => {
     if (e.target.closest(".edit-btn")) {
       const li = e.target.closest("li");
@@ -166,31 +200,31 @@ function renderShoppingList(list) {
         const newMeasurement = measurePart.join(":").trim();
         li.innerHTML = `
           <label>
-            <input type="checkbox" class="check-item" ${li.classList.contains("checked") ? "checked" : ""}/>
-            <span class="ingredient">${newIngredient}</span>: 
+            <input type="checkbox" class="check-item" ${
+              li.classList.contains("checked") ? "checked" : ""
+            }/>
+            <span class="ingredient">${newIngredient}</span>:
             <span class="measurement">${newMeasurement}</span>
           </label>
           <button class="edit-btn" title="Edit"><i class="fa-solid fa-pen"></i></button>
         `;
+        saveListState();
       };
 
       input.addEventListener("blur", saveEdit);
       input.addEventListener("keypress", e => {
-        if (e.key === "Enter") {
-          saveEdit();
-        }
+        if (e.key === "Enter") saveEdit();
       });
     }
   });
 
-  // ✅ drag-and-drop reordering
+  // 🧲 drag-and-drop reordering
   let dragSrcEl = null;
 
   ul.addEventListener("dragstart", e => {
     if (e.target.tagName === "LI") {
       dragSrcEl = e.target;
       e.dataTransfer.effectAllowed = "move";
-      e.dataTransfer.setData("text/plain", e.target.dataset.index);
       e.target.classList.add("dragging");
     }
   });
@@ -209,11 +243,13 @@ function renderShoppingList(list) {
   ul.addEventListener("drop", e => {
     e.preventDefault();
     const dragging = ul.querySelector(".dragging");
-    dragging.classList.remove("dragging");
+    if (dragging) dragging.classList.remove("dragging");
+    saveListState();
   });
 
   ul.addEventListener("dragend", e => {
     e.target.classList.remove("dragging");
+    saveListState();
   });
 
   function getDragAfterElement(container, y) {
@@ -231,7 +267,11 @@ function renderShoppingList(list) {
       { offset: Number.NEGATIVE_INFINITY }
     ).element;
   }
+
+  // save initial state
+  saveListState();
 }
+
 
 
 // --- Update shopping list when needed ---
