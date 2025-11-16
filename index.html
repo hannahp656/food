@@ -47,5 +47,62 @@
     <footer>
       oooo look its a footer
     </footer>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+      import {
+        getAuth,
+        GoogleAuthProvider,
+        signInWithPopup,
+        signOut,
+        onAuthStateChanged
+      } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyAvKuWusC_jMg23pB3PGSspHA7qAotb4Hc",
+        authDomain: "recipes-372f8.firebaseapp.com",
+        projectId: "recipes-372f8",
+        storageBucket: "recipes-372f8.firebasestorage.app",
+        messagingSenderId: "874512404094",
+        appId: "1:874512404094:web:80e7143fbe47417d27d22f"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const provider = new GoogleAuthProvider();
+
+      // Elements
+      const userIcon = document.querySelector(".user-icon i");
+      const signInText = document.querySelector(".sign-in-text");
+
+      function updateUI(user) {
+        if (user) {
+          // 🟢 SIGNED IN
+          userIcon.style.color = "var(--accent)"; // green
+          signInText.textContent = "Sign Out";
+        } else {
+          // 🔴 SIGNED OUT
+          userIcon.style.color = "crimson"; // red
+          signInText.textContent = "Sign In";
+        }
+      }
+
+      // Click to sign in / sign out
+      document.querySelector(".user-icon").addEventListener("click", async () => {
+        const user = auth.currentUser;
+        if (user) {
+          await signOut(auth);
+        } else {
+          await signInWithPopup(auth, provider)
+            .catch(err => console.error("Login failed:", err));
+        }
+      });
+
+      // Handles login state changes across tabs/devices
+      onAuthStateChanged(auth, user => {
+        updateUI(user);
+      });
+    </script>
+
+
   </body>
 </html>

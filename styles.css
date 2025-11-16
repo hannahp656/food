@@ -794,3 +794,93 @@ li {
 .shopping-list .edit-btn:hover {
   color: var(--accent);
 }
+
+.user.fa-stack{
+  position: fixed;
+  bottom: 0px;
+  right: 0px;
+}
+i.fa-solid.fa-circle-user{
+    color: var(--accent);
+    scale: 3;
+}
+i.fa-solid.fa-circle{
+    color: #ffffff;
+}
+.signin-button { /* default button, green square button */
+  display:inline-block;
+  background:#fff;
+  color:var(--accent-2);
+  padding:9px 15px;
+  border-radius:999px;
+  box-shadow:0 6px 18px rgba(36,46,28,0.06);
+  border:1px solid rgba(36,46,28,0.04);
+  font-size: 1.05em;
+  font-weight:600;
+  text-decoration:none;
+  transition:transform .14s ease,box-shadow .14s ease,opacity .12s ease; /*maybe take out ease for nav links*/
+  cursor:pointer;
+}
+.user-button{
+  max-width:var(--max-width);
+  margin:0 auto;
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+}
+.sign-in-button{
+  position: fixed;
+  display:inline-block;
+  background:#fff;
+  color:var(--accent-2);
+  padding:9px 15px;
+  border-radius:999px;
+  box-shadow:0 6px 18px rgba(36,46,28,0.06);
+  border:1px solid rgba(36,46,28,0.04);
+  font-size: 1.05em;
+  font-weight:600;
+  text-decoration:none;
+  transition:transform .14s ease,box-shadow .14s ease,opacity .12s ease; /*maybe take out ease for nav links*/
+  cursor:pointer;
+}
+.user-icon {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 24px;
+  background: #fff;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0 14px 0 16px;
+}
+.user-icon:hover{
+  width: 130px;
+  border-radius:999px;
+}
+.sign-in-text {
+  opacity: 0;
+  white-space: nowrap;
+  transform: translateX(10px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  font-weight: 600;
+  color: var(--accent);
+  font-size: 1rem;
+  margin-left: 6px;
+}
+.user-icon:hover .sign-in-text {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: 0.15s;
+}
+.user-icon:not(:hover) {
+  transition-delay: 0.15s; /* wait a bit before shrinking back */
+}
+
+.user-icon:not(:hover) .sign-in-text {
+  transition-delay: 0s; /* text fades out immediately */
+}
