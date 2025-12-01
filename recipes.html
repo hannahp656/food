@@ -9,7 +9,8 @@
     <link rel="stylesheet" href="styles.css">
     <style> html {font-family: Montserrat, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, system-ui, -apple-system, sans-serif;} </style>
     <script type="module" src="firebase-init.js"></script>
-  <script type="module" src="firebase-sync.js"></script>
+<script type="module" src="firebase-sync.js"></script>
+
     <script src="https://kit.fontawesome.com/76fcfe601b.js" crossorigin="anonymous"></script>
   </head>
 
@@ -46,7 +47,6 @@
           <h2>Filters</h2>
           <button id="closeFiltersBtn" class="close-btn">&times;</button>
         </div>
-
         <div class="filter-section">
           <h3>Ingredients</h3>
           <div class="ingredient-filter">
@@ -55,7 +55,7 @@
             <div id="selectedIngredients" class="selected-tags"></div>
           </div>
         </div>
-
+        <!--set up filters for max cooking time, cuisine, meal, type, meal course, and max price-->
         <div class="filter-actions">
           <button id="applyFiltersBtn" class="button">Apply Filters</button>
           <button id="clearFiltersBtn" class="button button--secondary">Clear Filters</button>

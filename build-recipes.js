@@ -24,7 +24,7 @@ function parseIngredient(line) {
   const units = [
     "cup","cups","tbsp","tsp","teaspoon","teaspoons","tablespoon","tablespoons",
     "g","kg","ml","l","oz","lb","pound","pounds","clove","cloves","slice","slices",
-    "can","cans","package","packages","breast","breasts","pinch","handful","dash"
+    "can","cans","package","packages","breast","breasts","pinch","handful","dash", "head", "heads", "bunch", "bunches"
   ];
   let unit = "";
   if (parts.length > 0 && units.includes(parts[0].toLowerCase())) {

@@ -884,14 +884,3 @@ i.fa-solid.fa-circle{
 .user-icon:not(:hover) .sign-in-text {
   transition-delay: 0s; /* text fades out immediately */
 }
-/* Base icon (signed out = red) */
-.user-icon i.fa-circle-user {
-  scale: 3;
-  color: #b83b3b; /* 🔴 replace with your favorite red if you prefer */
-  transition: color 0.25s ease;
-}
-
-/* Signed in = green */
-.user-icon.signed-in i.fa-circle-user {
-  color: var(--accent); /* your existing green */
-}

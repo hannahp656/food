@@ -1,6 +1,4 @@
 // Use the shared recipe list
-// (Assumes this file is included BEFORE gallery.js and planner.js in your HTML)
-
 
 let allRecipes = [];          // Store all recipe data
 let filteredRecipes = [];     // Store filtered view
@@ -24,16 +22,6 @@ async function loadRecipes() {
       const parsed = data.parsedIngredients || []; // get parsed ingredients
       data.ingredientsLower = parsed.map(obj => obj.ingredient.toLowerCase());
       allIngredients.push(...data.ingredientsLower);
-//      if (Array.isArray(parsed) && parsed.length > 0) {
-//        // Use the 'ingredient' field from each parsed ingredient
-//        data.ingredientsLower = parsed.map(obj => obj.ingredient.toLowerCase());
-//        allIngredients.push(...data.ingredientsLower);
-//      } else {
-//        // fallback to original ingredients
-//        const sourceIngredients = data.ingredients || [];
-//        data.ingredientsLower = sourceIngredients.map(i => i.toLowerCase());
-//        allIngredients.push(...data.ingredientsLower);
-//      }
       allRecipes.push(data);
     } catch (err) {
       console.error("Error loading recipe:", file, err);
@@ -44,7 +32,6 @@ async function loadRecipes() {
   renderGallery();
   setupSearchAndFilters();
 }
-
 
 
 // function to render gallery cards
@@ -58,7 +45,6 @@ function renderGallery() {
   filteredRecipes.forEach(data => {
     const card = document.createElement("div");
     card.className = "recipe-card";
-
     card.innerHTML = `
       <div style="position:relative;">
         <img src="${data.image}" alt="${data.title}">
@@ -74,7 +60,6 @@ function renderGallery() {
         <a href="${data.link}">View Recipe</a>
       </div>
     `;
-
     // clicking elsewhere on card goes to recipe page
     card.addEventListener("click", e => {
       // if click happened inside the save button, ignore navigation
@@ -82,36 +67,30 @@ function renderGallery() {
         window.location.href = data.link;
       }
     });
-
     // find the card's save button (scoped to this card)
     const saveBtn = card.querySelector(".saveRecipeBtn");
     const icon = saveBtn.querySelector("i");
-
     // initialize icon from localStorage
     let saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
     const currentlySaved = saved.some(r => r.link === data.link);
     icon.classList.toggle("fa-solid", currentlySaved);
     icon.classList.toggle("fa-regular", !currentlySaved);
-
     // toggle save on click (stop propagation so card click doesn't fire)
     saveBtn.addEventListener("click", e => {
       e.stopPropagation();
-
       saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
       const isSaved = saved.some(r => r.link === data.link);
-
       if (isSaved) {
         saved = saved.filter(r => r.link !== data.link);
         icon.classList.remove("fa-solid");
         icon.classList.add("fa-regular");
       } else {
-        // Save a copy (avoid keeping DOM nodes or circular refs)
+        // Save a copy of the recipe date
         const toSave = {
           title: data.title,
           link: data.link,
           image: data.image,
           tags: data.tags,
-          // if you want scaled ingredients etc., they should already be in data
           ingredients: data.ingredients || [],
           parsedIngredients: data.parsedIngredients || []
         };
@@ -119,18 +98,12 @@ function renderGallery() {
         icon.classList.remove("fa-regular");
         icon.classList.add("fa-solid");
       }
-
       localStorage.setItem("savedRecipes", JSON.stringify(saved));
-
-      // notify other open pages (recipe page, planner) to update immediately
-      // (storage event fires in other tabs, but not in the same tab, so we also dispatch a custom event)
+      // update other parts of the app that care about saved recipes
       window.dispatchEvent(new CustomEvent("savedRecipesUpdated", { detail: { saved } }));
     });
-
     gallery.appendChild(card);
   });
-
-
 }
 
 
@@ -144,9 +117,11 @@ function setupSearchAndFilters() {
   const ingredientSearch = document.getElementById("ingredientSearch");
   const ingredientSuggestions = document.getElementById("ingredientSuggestions");
   const selectedContainer = document.getElementById("selectedIngredients");
+  //need to set these checkboxes up
   const mealBoxes = document.querySelectorAll(".meal-filter");
   const typeBoxes = document.querySelectorAll(".type-filter");
   const cuisineBoxes = document.querySelectorAll(".cuisine-filter");
+  // need to set up a cost filter - max price per serving w box they can type in
   const timeSlider = document.getElementById("timeSlider");
   const timeLabel = document.getElementById("timeLabel");
   const leftoverCheckbox = document.getElementById("leftoverCheckbox");

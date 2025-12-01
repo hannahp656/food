@@ -1,6 +1,7 @@
 // Auto-generated file. Do not edit manually.
 const recipeFiles = [
   "/food/recipes/recipe-baby-carrots.html",
+  "/food/recipes/recipe-banana.html",
   "/food/recipes/recipe-breakfast-potatoes.html",
   "/food/recipes/recipe-breakfast-tacos.html",
   "/food/recipes/recipe-cereal.html",
@@ -15,6 +16,7 @@ const recipeFiles = [
   "/food/recipes/recipe-granny-smith-apple.html",
   "/food/recipes/recipe-grilled-ham-and-cheese.html",
   "/food/recipes/recipe-hot-dog.html",
+  "/food/recipes/recipe-korean-sticky-chicken-tacos.html",
   "/food/recipes/recipe-moms-meatballs.html",
   "/food/recipes/recipe-oatmeal.html",
   "/food/recipes/recipe-peanut-butter-waffle.html",
