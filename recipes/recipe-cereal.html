@@ -8,6 +8,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../styles.css">
     <style> html { font-family: Montserrat, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, system-ui, -apple-system, sans-serif; } </style>
+    <script type="module" src="firebase-init.js"></script>
+<script type="module" src="firebase-sync.js"></script>
+
     <script src="https://kit.fontawesome.com/76fcfe601b.js" crossorigin="anonymous"></script>
   </head>
 
@@ -89,7 +92,8 @@
   "tags": [
     "Entree",
     "5 min",
-    "1 serving"
+    "1 serving",
+    "$1"
   ],
   "extra-tags": [
     "Breakfast",
@@ -97,18 +101,18 @@
     "Quick & Easy"
   ],
   "ingredients": [
-    "1/2 cup cereal",
-    "1/2 cup milk"
+    "1 cup cereal",
+    "1 cup milk"
   ],
   "parsedIngredients": [
     {
-      "amount": "1/2",
+      "amount": "1",
       "unit": "cup",
       "ingredient": "cereal",
       "descriptors": ""
     },
     {
-      "amount": "1/2",
+      "amount": "1",
       "unit": "cup",
       "ingredient": "milk",
       "descriptors": ""
