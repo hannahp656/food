@@ -8,8 +8,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <style>html{font-family: Montserrat, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, system-ui, -apple-system, sans-serif;}</style>
-    <script type="module" src="firebase-init.js"></script>
-<script type="module" src="firebase-sync.js"></script>
 
     <script src="https://kit.fontawesome.com/76fcfe601b.js" crossorigin="anonymous"></script>
   </head>
@@ -79,6 +77,14 @@
     <script src="recipe-files.js"></script>
     <script src="planner.js"></script>
     <script src="shopping-list.js"></script>
+    <!-- 1. Firebase app + auth -->
+<script src="/firebase-init.js" type="module"></script>
+
+<!-- 2. Firebase sync (saves/loads your data) -->
+<script src="/firebase-sync.js" type="module"></script>
+
+<!-- 3. Page-specific logic (ex: index page user button UI) -->
+<script src="/planner.js" type="module"></script>
     <footer>
       oooo look its a footer
     </footer>
