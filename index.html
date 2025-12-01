@@ -7,6 +7,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <script type="module" src="firebase-init.js"></script>
+    <script type="module" src="firebase-sync.js"></script>
     <script src="https://kit.fontawesome.com/76fcfe601b.js" crossorigin="anonymous"></script>
     <style>html{font-family: Montserrat, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, system-ui, -apple-system, sans-serif;}</style>
   </head>
@@ -48,58 +50,50 @@
       oooo look its a footer
     </footer>
     <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+      import { auth, provider } from "./firebase-init.js";
+      import { loadUserData, saveUserData } from "./firebase-sync.js";
+
       import {
-        getAuth,
-        GoogleAuthProvider,
         signInWithPopup,
-        signOut,
-        onAuthStateChanged
+        onAuthStateChanged,
+        signOut
       } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-      const firebaseConfig = {
-        apiKey: "AIzaSyAvKuWusC_jMg23pB3PGSspHA7qAotb4Hc",
-        authDomain: "recipes-372f8.firebaseapp.com",
-        projectId: "recipes-372f8",
-        storageBucket: "recipes-372f8.firebasestorage.app",
-        messagingSenderId: "874512404094",
-        appId: "1:874512404094:web:80e7143fbe47417d27d22f"
-      };
+      const userIcon = document.querySelector(".user-icon");
 
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-      const provider = new GoogleAuthProvider();
-
-      // Elements
-      const userIcon = document.querySelector(".user-icon i");
-      const signInText = document.querySelector(".sign-in-text");
-
-      function updateUI(user) {
-        if (user) {
-          // 🟢 SIGNED IN
-          userIcon.style.color = "var(--accent)"; // green
-          signInText.textContent = "Sign Out";
-        } else {
-          // 🔴 SIGNED OUT
-          userIcon.style.color = "crimson"; // red
-          signInText.textContent = "Sign In";
-        }
-      }
-
-      // Click to sign in / sign out
-      document.querySelector(".user-icon").addEventListener("click", async () => {
-        const user = auth.currentUser;
-        if (user) {
+      // Toggle sign-in / sign-out when clicked
+      userIcon.addEventListener("click", async () => {
+        if (auth.currentUser) {
           await signOut(auth);
-        } else {
-          await signInWithPopup(auth, provider)
-            .catch(err => console.error("Login failed:", err));
+          userIcon.style.color = "#cc0000"; // red when signed OUT
+          return;
+        }
+
+        try {
+          await signInWithPopup(auth, provider);
+        } catch (err) {
+          console.error("Sign-in failed:", err);
         }
       });
 
-      // Handles login state changes across tabs/devices
-      onAuthStateChanged(auth, user => {
-        updateUI(user);
+      // Automatically handle login state changes
+      onAuthStateChanged(auth, async user => {
+        if (user) {
+          window.currentUserUID = user.uid;
+
+          userIcon.style.color = "var(--accent)"; // green when signed IN
+
+          // Load cloud data
+          await loadUserData(user.uid);
+
+          // Immediately push existing local data to cloud too
+          await saveUserData(user.uid);
+
+        } else {
+          window.currentUserUID = null;
+
+          userIcon.style.color = "#cc0000"; // red when logged out
+        }
       });
     </script>
 
