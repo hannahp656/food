@@ -884,3 +884,25 @@ i.fa-solid.fa-circle{
 .user-icon:not(:hover) .sign-in-text {
   transition-delay: 0s; /* text fades out immediately */
 }
+/* User button color based on login state */
+.user-icon {
+  color: #cc0000; /* red when logged out */
+  transition: color 0.3s ease;
+}
+
+.user-icon.signed-in {
+  color: var(--accent); /* green when signed in */
+}
+
+.user-icon i {
+  color: inherit; /* icon follows parent color */
+}
+
+/* Keep existing hover and text animation */
+.user-icon:hover .sign-in-text {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: 0.15s;
+}
+
+

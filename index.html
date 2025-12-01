@@ -55,54 +55,6 @@
 <script src="firebase-sync.js" type="module"></script>
 
 <!-- 3. Page-specific logic (ex: index page user button UI) -->
-<!--<script src="index-auth.js" type="module"></script>-->
-    <script type="module">
-      import { auth, provider } from "./firebase-init.js";
-      import { loadUserData, saveUserData } from "./firebase-sync.js";
-
-      import {
-        signInWithPopup,
-        onAuthStateChanged,
-        signOut
-      } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-
-      const userIcon = document.querySelector(".user-icon");
-
-      // Toggle sign-in / sign-out when clicked
-      userIcon.addEventListener("click", async () => {
-        if (auth.currentUser) {
-          await signOut(auth);
-          userIcon.style.color = "#cc0000"; // red when signed OUT
-          return;
-        }
-
-        try {
-          await signInWithPopup(auth, provider);
-        } catch (err) {
-          console.error("Sign-in failed:", err);
-        }
-      });
-
-      // Automatically handle login state changes
-      onAuthStateChanged(auth, async user => {
-        if (user) {
-          window.currentUserUID = user.uid;
-
-          userIcon.style.color = "var(--accent)"; // green when signed IN
-
-          // Load cloud data
-          await loadUserData(user.uid);
-
-          // Immediately push existing local data to cloud too
-          await saveUserData(user.uid);
-
-        } else {
-          window.currentUserUID = null;
-
-          userIcon.style.color = "#cc0000"; // red when logged out
-        }
-      });
-    </script>
-
+<script type="module" src="index-auth.js"></script>
   </body>
 </html>
