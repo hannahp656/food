@@ -252,7 +252,18 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
         <div class="content">
           <h3>${recipe.title}</h3>
-          <div class="card-tags">${recipe.tags.map(tag => `<span class="tag">${tag}</span>`).join("")}</div>
+          <div class="card-tags">
+          ${data.tags.map(tag => {
+            if (/\bmin\b|\bhour\b/i.test(tag)) {
+              return `<span class="tag"><i class="fa-regular fa-clock"></i> ${tag}</span>`;
+            }
+            else if (/\$/.test(tag)) {
+              return `<span class="tag"><i class="fa-regular fa-money-bill-1"></i> ${tag}</span>`;
+            }
+            else return `<span class="tag"><i class="fa-solid fa-bell-concierge"></i> ${tag}</span>`;
+          }
+          ).join("")}
+        </div>
           <a href="${recipe.link}" target="_blank">View Recipe</a>
         </div>
       `;
