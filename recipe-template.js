@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (/\bmin\b|\bhour\b/i.test(tag)) {
         return `<span class="tag"><i class="fa-regular fa-clock"></i> ${tag}</span>`;
       }
-      else if (/\b$\b/i.test(tag)) {
+      else if (/\$/.test(tag)) {
         return `<span class="tag"><i class="fa-regular fa-money-bill-1"></i> ${tag}</span>`;
       }
       else return `<span class="tag"><i class="fa-solid fa-bell-concierge"></i> ${tag}</span>`;
