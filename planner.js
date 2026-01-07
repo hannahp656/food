@@ -56,6 +56,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // cache for fetched recipe JSONs (keyed by href)
   const recipeTagCache = {};
+  // cache parsed recipe index for inline suggestions
+  let recipesCache = null;
+
+  async function fetchRecipesIndex() {
+    if (recipesCache) return recipesCache;
+    try {
+      const res = await fetch("recipes.html");
+      if (!res.ok) return [];
+      const text = await res.text();
+      const doc = new DOMParser().parseFromString(text, "text/html");
+      const cards = Array.from(doc.querySelectorAll(".recipe-card"));
+      recipesCache = cards.map(card => {
+        const title = card.querySelector("h3").textContent.trim();
+        const link = card.querySelector("a").getAttribute("href");
+        const priceEl = card.querySelector('.card-tags .tag');
+        const price = priceEl ? priceEl.textContent.trim() : null;
+        return { title, link, price };
+      });
+      return recipesCache;
+    } catch (err) {
+      console.warn('Failed to load recipes index for suggestions', err);
+      return [];
+    }
+  }
 
   async function fetchFirstPriceTag(href) {
     if (!href) return null;
@@ -87,6 +111,38 @@ document.addEventListener("DOMContentLoaded", () => {
     const cost = document.createElement('span');
     cost.className = 'tag meal-cost';
     if (costTag) cost.textContent = costTag;
+    // make cost editable: click to replace with input, Enter to save
+    cost.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const current = (cost.textContent || '').trim();
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'inline-cost-input';
+      // strip leading $ when editing
+      input.value = current && current.startsWith('$') ? current.slice(1) : (current === '$???' ? '' : current);
+      input.style.width = '70px';
+      cost.replaceWith(input);
+      input.focus();
+      input.select();
+      const finish = () => {
+        const v = input.value.trim();
+        if (!v) {
+          cost.textContent = '$???';
+        } else {
+          const n = parseFloat(v);
+          if (!isNaN(n)) cost.textContent = '$' + n.toFixed(2);
+          else cost.textContent = '$' + v;
+        }
+        input.replaceWith(cost);
+        saveMeals();
+        updateTotalCost();
+      };
+      input.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter') finish();
+        if (ev.key === 'Escape') { input.replaceWith(cost); }
+      });
+      input.addEventListener('blur', finish);
+    });
     li.appendChild(cost);
 
     // title element
@@ -156,6 +212,72 @@ document.addEventListener("DOMContentLoaded", () => {
     targetBox.querySelector('.meal-list').appendChild(li);
     saveMeals();
     updateTotalCost();
+  }
+
+  // start an inline add row in the given meal box
+  async function startInlineAdd(box) {
+    if (!box) return;
+    // avoid duplicates
+    if (box.querySelector('.inline-add')) {
+      const input = box.querySelector('.inline-add input');
+      if (input) input.focus();
+      return;
+    }
+    const list = box.querySelector('.meal-list');
+    const li = document.createElement('li');
+    li.className = 'inline-add';
+    li.innerHTML = `<input class="inline-add-input" placeholder="Add item or search recipes..." /><ul class="inline-suggestions"></ul>`;
+    list.appendChild(li);
+    const input = li.querySelector('.inline-add-input');
+    const sugg = li.querySelector('.inline-suggestions');
+    let matches = [];
+    input.focus();
+
+    const updateSuggestions = async (query) => {
+      sugg.innerHTML = '';
+      if (!query) return;
+      matches = (await fetchRecipesIndex()).filter(r => r.title.toLowerCase().includes(query.toLowerCase()));
+      matches.slice(0,8).forEach(m => {
+        const s = document.createElement('li');
+        s.textContent = m.title + (m.price ? ` (${m.price})` : '');
+        s.addEventListener('click', () => {
+          addMealItem(m.title, m.link, m.price, box);
+          li.remove();
+        });
+        sugg.appendChild(s);
+      });
+      // add the insert-without-recipe option
+      const insert = document.createElement('li');
+      insert.className = 'insert-without-recipe';
+      insert.textContent = `Insert "${query}" without a recipe`;
+      insert.addEventListener('click', () => {
+        addMealItem(query, null, '$???', box);
+        li.remove();
+      });
+      sugg.appendChild(insert);
+    };
+
+    input.addEventListener('input', e => updateSuggestions(e.target.value));
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const val = input.value.trim();
+        if (!val) { li.remove(); return; }
+        // if there is at least one match and the typed text exactly matches the first match, choose it
+        if (matches.length && matches[0].title.toLowerCase() === val.toLowerCase()) {
+          addMealItem(matches[0].title, matches[0].link, matches[0].price, box);
+        } else {
+          addMealItem(val, null, '$???', box);
+        }
+        li.remove();
+      } else if (e.key === 'Escape') {
+        li.remove();
+      }
+    });
+
+    // if the input loses focus and is empty, remove the inline row
+    input.addEventListener('blur', () => {
+      setTimeout(() => { if (!li.contains(document.activeElement)) { if (!input.value.trim()) li.remove(); } }, 150);
+    });
   }
 
   // parse a cost tag like '$4', '$.5', '$1.50 each' and return number (float) or null
@@ -235,10 +357,12 @@ document.addEventListener("DOMContentLoaded", () => {
       box.querySelectorAll("li").forEach(li => {
         // title, link, and leftovers stored on dataset / DOM by createMealListItem
         const leftoversEl = li.querySelector('.leftovers');
+        const costEl = li.querySelector('.meal-cost');
         data[day][meal].push({
           title: li.dataset.title || '',
           link: li.dataset.link || null,
-          leftovers: !!(leftoversEl && leftoversEl.classList.contains('active'))
+          leftovers: !!(leftoversEl && leftoversEl.classList.contains('active')),
+          cost: costEl ? costEl.textContent.trim() : null
         });
       });
     });
@@ -253,7 +377,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (box) {
           const list = box.querySelector(".meal-list");
           data[day][meal].forEach(item => {
-            const li = createMealListItem(item.title, item.link, null, !!item.leftovers);
+            const li = createMealListItem(item.title, item.link, item.cost || null, !!item.leftovers);
             list.appendChild(li);
           });
         }
@@ -366,11 +490,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", () => {
-      // deactivate all tabs and content
-      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-      document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
-
-      // activate clicked tab and corresponding content
+      activeMealBox = e.target.closest(".meal-box");
+      // start inline add row instead of opening overlay
+      startInlineAdd(activeMealBox);
       btn.classList.add("active");
       const tabId = btn.dataset.tab;
       document.getElementById(tabId).classList.add("active");
