@@ -58,6 +58,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function fetchRecipesIndex() {
     if (recipesCache) return recipesCache;
+    // Prefer in-memory gallery data if gallery.js has populated it
+    try {
+      if (window.allRecipes && Array.isArray(window.allRecipes) && window.allRecipes.length) {
+        recipesCache = window.allRecipes.map(r => ({ title: r.title, link: r.link, price: (Array.isArray(r.tags) ? r.tags.find(t => /^\$/.test(t)) : null) }));
+        return recipesCache;
+      }
+    } catch (err) {
+      // ignore and fall back to fetching recipes.html
+    }
     try {
       const res = await fetch("recipes.html");
       if (!res.ok) return [];
@@ -223,7 +232,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const list = box.querySelector('.meal-list');
     const li = document.createElement('li');
     li.className = 'inline-add';
-    li.innerHTML = `<input class="inline-add-input" placeholder="Add item or search recipes..." /><ul class="inline-suggestions"></ul>`;
+    li.innerHTML = `<input id="inlineAdd" name="inlineAdd" class="inline-add-input" placeholder="Add item or search recipes..." autocomplete="off" /><ul class="inline-suggestions" role="listbox"></ul>`;
     list.appendChild(li);
     const input = li.querySelector('.inline-add-input');
     const sugg = li.querySelector('.inline-suggestions');

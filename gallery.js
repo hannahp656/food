@@ -29,6 +29,8 @@ async function loadRecipes() {
   }
   allIngredients = [...new Set(allIngredients)].sort(); // delete duplicate ingredients
   filteredRecipes = [...allRecipes];
+  // expose in-memory recipe list for other scripts (planner inline search)
+  try { window.allRecipes = allRecipes; } catch (err) { /* ignore in restrictive envs */ }
   renderGallery();
   setupSearchAndFilters();
 }
@@ -64,7 +66,6 @@ function renderGallery() {
             }
             else return `<span class="tag"><i class="fa-solid fa-bell-concierge"></i> ${tag}</span>`;
           }
-            //`<span class="tag">${tag}</span>`
           ).join("")}
         </div>
         <a href="${data.link}">View Recipe</a>
