@@ -36,22 +36,23 @@ document.addEventListener("DOMContentLoaded", () => {
     planner.appendChild(section);
   });
 
-  // load saved data
-  loadMeals();
+  // load saved data (moved below after helper functions to avoid TDZ issues)
 
   // add button -> open overlay
   document.querySelectorAll(".add-btn").forEach(btn => {
     btn.addEventListener("click", e => {
       activeMealBox = e.target.closest(".meal-box");
-      overlay.classList.remove("hidden");
-      recipeSearch.value = "";
-      customRecipe.value = "";
-      searchResults.innerHTML = "";
+      if (overlay) overlay.classList.remove("hidden");
+      if (recipeSearch) recipeSearch.value = "";
+      if (customRecipe) customRecipe.value = "";
+      if (searchResults) searchResults.innerHTML = "";
     });
   });
 
-  // close overlay
-  closeOverlay.addEventListener("click", () => overlay.classList.add("hidden"));
+  // close overlay (if present)
+  if (closeOverlay && overlay) {
+    closeOverlay.addEventListener("click", () => overlay.classList.add("hidden"));
+  }
 
   // cache for fetched recipe JSONs (keyed by href)
   const recipeTagCache = {};
@@ -150,7 +151,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // search recipes
-  recipeSearch.addEventListener("input", async () => {
+  if (recipeSearch && searchResults) {
+    recipeSearch.addEventListener("input", async () => {
     const query = recipeSearch.value.toLowerCase();
     searchResults.innerHTML = "";
     if (!query) return;
@@ -170,19 +172,22 @@ document.addEventListener("DOMContentLoaded", () => {
           const priceEl = card.querySelector('.card-tags .tag');
           const price = priceEl ? priceEl.textContent.trim() : null;
           addMealItem(title, link, price);
-          overlay.classList.add("hidden");
+          if (overlay) overlay.classList.add("hidden");
         });
         searchResults.appendChild(li);
       }
     });
   });
-  // add custom recipe
-  customRecipe.addEventListener("keypress", e => {
-    if (e.key === "Enter" && customRecipe.value.trim()) {
-      addMealItem(customRecipe.value.trim(), null, null);
-      overlay.classList.add("hidden");
-    }
-  });
+  }
+  // add custom recipe (if input exists)
+  if (customRecipe) {
+    customRecipe.addEventListener("keypress", e => {
+      if (e.key === "Enter" && customRecipe.value.trim()) {
+        addMealItem(customRecipe.value.trim(), null, null);
+        if (overlay) overlay.classList.add("hidden");
+      }
+    });
+  }
 
   // (addMealItem defined later after helper functions)
 
@@ -258,6 +263,8 @@ document.addEventListener("DOMContentLoaded", () => {
       container.appendChild(card);
     });
   }
+  // now that helpers exist, load saved meal plan and saved recipes
+  loadMeals();
   loadSavedRecipes();
 
   // print meal plan
