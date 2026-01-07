@@ -121,6 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       // persist immediately
       saveMeals();
+      updateTotalCost();
     });
     li.appendChild(leftovers);
 
@@ -131,12 +132,18 @@ document.addEventListener("DOMContentLoaded", () => {
     del.addEventListener('click', () => {
       li.remove();
       saveMeals();
+      updateTotalCost();
     });
     li.appendChild(del);
 
-    // if cost missing and we have a link, fetch it async
+    // if we have a cost immediately, set and update total
+    if (costTag) {
+      cost.textContent = costTag;
+      updateTotalCost();
+    }
+    // if cost missing and we have a link, fetch it async and update total when it arrives
     if (!costTag && link) {
-      fetchFirstPriceTag(link).then(tag => { if (tag) cost.textContent = tag; });
+      fetchFirstPriceTag(link).then(tag => { if (tag) { cost.textContent = tag; updateTotalCost(); } });
     }
 
     return li;
@@ -148,6 +155,32 @@ document.addEventListener("DOMContentLoaded", () => {
     const li = createMealListItem(title, link, costTag, leftoversActive);
     targetBox.querySelector('.meal-list').appendChild(li);
     saveMeals();
+    updateTotalCost();
+  }
+
+  // parse a cost tag like '$4', '$.5', '$1.50 each' and return number (float) or null
+  function parseCostTag(tag) {
+    if (!tag) return null;
+    // find number like 1 or .5 or 1.50
+    const m = tag.toString().match(/(\d+(?:\.\d+)?|\.\d+)/);
+    if (!m) return null;
+    const n = parseFloat(m[0]);
+    return isNaN(n) ? null : n;
+  }
+
+  // update the total cost display by summing all .meal-cost values in the planner
+  function updateTotalCost() {
+    const totalEl = document.getElementById('totalCost');
+    if (!totalEl) return;
+    let total = 0;
+    document.querySelectorAll('.meal-list li').forEach(li => {
+      const costEl = li.querySelector('.meal-cost');
+      if (!costEl) return;
+      const tag = costEl.textContent && costEl.textContent.trim();
+      const num = parseCostTag(tag);
+      if (num !== null) total += num;
+    });
+    totalEl.textContent = `Total: $${total.toFixed(2)}`;
   }
 
   // search recipes
@@ -226,6 +259,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
     });
+    // update totals after initial render (some costs may still populate async)
+    updateTotalCost();
   }
 
   // render saved recipes
