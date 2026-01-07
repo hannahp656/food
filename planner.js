@@ -38,14 +38,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // load saved data (moved below after helper functions to avoid TDZ issues)
 
-  // add button -> open overlay
+  // add button -> start inline add row
   document.querySelectorAll(".add-btn").forEach(btn => {
     btn.addEventListener("click", e => {
       activeMealBox = e.target.closest(".meal-box");
-      if (overlay) overlay.classList.remove("hidden");
-      if (recipeSearch) recipeSearch.value = "";
-      if (customRecipe) customRecipe.value = "";
-      if (searchResults) searchResults.innerHTML = "";
+      startInlineAdd(activeMealBox);
     });
   });
 
@@ -490,9 +487,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", () => {
-      activeMealBox = e.target.closest(".meal-box");
-      // start inline add row instead of opening overlay
-      startInlineAdd(activeMealBox);
+      // deactivate all tabs and content
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+
+      // activate clicked tab and corresponding content
       btn.classList.add("active");
       const tabId = btn.dataset.tab;
       document.getElementById(tabId).classList.add("active");
