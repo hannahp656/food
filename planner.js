@@ -1,12 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
   const days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
   const meals = ["breakfast","lunch","dinner"];
-  //const overlay = document.getElementById("overlay");
-  //const closeOverlay = document.getElementById("closeOverlay");
-  //const recipeSearch = document.getElementById("recipeSearch");
-  //const searchResults = document.getElementById("searchResults");
-  //const customRecipe = document.getElementById("customRecipe");
-  //let activeMealBox = null;
+  const overlay = document.getElementById("overlay");
+  const closeOverlay = document.getElementById("closeOverlay");
+  const recipeSearch = document.getElementById("recipeSearch");
+  const searchResults = document.getElementById("searchResults");
+  const customRecipe = document.getElementById("customRecipe");
+  let activeMealBox = null;
 
   // build planner
   const planner = document.getElementById("planner");
@@ -39,150 +39,152 @@ document.addEventListener("DOMContentLoaded", () => {
   // load saved data
   loadMeals();
 
-  // add button -> toggle inline search box
-    document.querySelectorAll(".add-btn").forEach(btn => {
-      btn.addEventListener("click", e => {
-        const mealBox = e.target.closest(".meal-box");
-        toggleSearchBar(mealBox);
-      });
+  // add button -> open overlay
+  document.querySelectorAll(".add-btn").forEach(btn => {
+    btn.addEventListener("click", e => {
+      activeMealBox = e.target.closest(".meal-box");
+      overlay.classList.remove("hidden");
+      recipeSearch.value = "";
+      customRecipe.value = "";
+      searchResults.innerHTML = "";
     });
-  // creates a search bar inside the meal box
-  function toggleSearchBar(mealBox) {
-    // remove if already open
-    let existing = mealBox.querySelector(".inline-search");
-    if (existing) {
-      existing.remove();
-      return;
-    }
-
-    const searchDiv = document.createElement("div");
-    searchDiv.className = "inline-search";
-    searchDiv.innerHTML = `
-      <input type="text" placeholder="Search for recipes by title" class="meal-search">
-      <ul class="search-results"></ul>
-    `;
-    mealBox.appendChild(searchDiv);
-
-    const input = searchDiv.querySelector(".meal-search");
-    const resultList = searchDiv.querySelector(".search-results");
-
-    input.addEventListener("input", async () => {
-      const query = input.value.toLowerCase().trim();
-      resultList.innerHTML = "";
-      if (!query) return;
-
-      // Fetch all recipe files instead of recipes.html
-      // Use the shared recipe list
-      // (Assumes this file is included BEFORE gallery.js and planner.js in your HTML)
-
-      const matches = [];
-
-      for (const file of recipeFiles) {
-        try {
-          const res = await fetch(file);
-          if (!res.ok) continue;
-          const text = await res.text();
-          const doc = new DOMParser().parseFromString(text, "text/html");
-          const dataEl = doc.querySelector("#recipe-data");
-          if (!dataEl) continue;
-          const data = JSON.parse(dataEl.textContent);
-          if (data.title.toLowerCase().includes(query)) {
-            matches.push({ title: data.title, link: data.link });
-          }
-        } catch (err) {
-          console.error("Error reading recipe:", file, err);
-        }
-      }
-
-      resultList.innerHTML = ""; // clear old results
-
-      // Add matches
-      matches.forEach(({ title, link }) => {
-        const li = document.createElement("li");
-        li.textContent = title;
-        li.addEventListener("click", () => {
-          addMealItem(title, link, mealBox);
-          searchDiv.remove();
-        });
-        resultList.appendChild(li);
-      });
-
-      // Always include the "insert custom" option
-      const custom = document.createElement("li");
-      custom.className = "insert-custom";
-      custom.textContent = `Insert "${input.value}" without recipe`;
-      custom.addEventListener("click", () => {
-        addMealItem(input.value, null, mealBox);
-        searchDiv.remove();
-      });
-      resultList.appendChild(custom);
-
-    });
-  }
-
+  });
 
   // close overlay
-  //closeOverlay.addEventListener("click", () => overlay.classList.add("hidden"));
+  closeOverlay.addEventListener("click", () => overlay.classList.add("hidden"));
 
-  // search recipes
-  //recipeSearch.addEventListener("input", async () => {
-    //const query = recipeSearch.value.toLowerCase();
-    //searchResults.innerHTML = "";
-    //if (!query) return;
-    // fetch recipes.html and parse for matching titles
-    //const res = await fetch("recipes.html");
-    //const text = await res.text();
-    //const doc = new DOMParser().parseFromString(text, "text/html");
-    //const cards = doc.querySelectorAll(".recipe-card");
-    // filter cards by title match
-    //cards.forEach(card => {
-      //const title = card.querySelector("h3").textContent;
-      //const link = card.querySelector("a").getAttribute("href");
-      //if (title.toLowerCase().includes(query)) {
-        //const li = document.createElement("li");
-        //li.textContent = title;
-        //li.addEventListener("click", () => {
-          //addMealItem(title, link);
-          //overlay.classList.add("hidden");
-        //});
-        //searchResults.appendChild(li);
-      //}
-    //});
-  //});
-  // add custom recipe
-  //customRecipe.addEventListener("keypress", e => {
-    //if (e.key === "Enter" && customRecipe.value.trim()) {
-      //addMealItem(customRecipe.value.trim(), null);
-      //overlay.classList.add("hidden");
-    //}
-  //});
+  // cache for fetched recipe JSONs (keyed by href)
+  const recipeTagCache = {};
 
-  // add meal item to list
-  function addMealItem(title, link, targetBox = activeMealBox) {
-    if (!targetBox) return;
-    const li = document.createElement("li");
-    // if link provided, make title a link
+  async function fetchFirstPriceTag(href) {
+    if (!href) return null;
+    if (recipeTagCache[href]) return recipeTagCache[href];
+    try {
+      const res = await fetch(href);
+      if (!res.ok) return null;
+      const text = await res.text();
+      const doc = new DOMParser().parseFromString(text, "text/html");
+      const dataEl = doc.querySelector("#recipe-data");
+      if (!dataEl) return null;
+      const json = JSON.parse(dataEl.textContent);
+      const tag = Array.isArray(json.tags) ? json.tags.find(t => /^\$/.test(t)) : null;
+      recipeTagCache[href] = tag || null;
+      return recipeTagCache[href];
+    } catch (err) {
+      console.warn('Failed to fetch recipe for price tag', href, err);
+      return null;
+    }
+  }
+
+  // create a meal list <li> with cost, title/link, leftovers toggle, and delete button
+  function createMealListItem(title, link, costTag, leftoversActive = false) {
+    const li = document.createElement('li');
+    li.dataset.title = title;
+    if (link) li.dataset.link = link;
+
+    // cost element (styled like a tag)
+    const cost = document.createElement('span');
+    cost.className = 'tag meal-cost';
+    if (costTag) cost.textContent = costTag;
+    li.appendChild(cost);
+
+    // title element
     if (link) {
-      const a = document.createElement("a");
+      const a = document.createElement('a');
       a.href = link;
       a.textContent = title;
       li.appendChild(a);
     } else {
-      li.textContent = title;
+      const txt = document.createTextNode(title);
+      li.appendChild(txt);
     }
-    // add delete button
-    const del = document.createElement("button");
-    del.textContent = "✕";
-    del.className = "delete-btn";
-    del.addEventListener("click", () => {
+
+    // leftovers toggle
+    const leftovers = document.createElement('span');
+    leftovers.className = 'leftovers';
+    leftovers.textContent = 'leftovers';
+    leftovers.style.cursor = 'pointer';
+    if (leftoversActive) {
+      leftovers.classList.add('active');
+      leftovers.style.color = '';
+    } else {
+      leftovers.style.color = 'var(--muted)';
+    }
+    leftovers.addEventListener('click', () => {
+      if (leftovers.classList.contains('active')) {
+        leftovers.classList.remove('active');
+        leftovers.style.color = 'var(--muted)';
+      } else {
+        leftovers.classList.add('active');
+        leftovers.style.color = '';
+      }
+      // persist immediately
+      saveMeals();
+    });
+    li.appendChild(leftovers);
+
+    // delete button
+    const del = document.createElement('button');
+    del.textContent = '✕';
+    del.className = 'delete-btn';
+    del.addEventListener('click', () => {
       li.remove();
       saveMeals();
     });
     li.appendChild(del);
-    // append to list
-    targetBox.querySelector(".meal-list").appendChild(li);
+
+    // if cost missing and we have a link, fetch it async
+    if (!costTag && link) {
+      fetchFirstPriceTag(link).then(tag => { if (tag) cost.textContent = tag; });
+    }
+
+    return li;
+  }
+
+  // add meal item to list (costTag optional)
+  function addMealItem(title, link, costTag = null, targetBox = activeMealBox, leftoversActive = false) {
+    if (!targetBox) return;
+    const li = createMealListItem(title, link, costTag, leftoversActive);
+    targetBox.querySelector('.meal-list').appendChild(li);
     saveMeals();
   }
+
+  // search recipes
+  recipeSearch.addEventListener("input", async () => {
+    const query = recipeSearch.value.toLowerCase();
+    searchResults.innerHTML = "";
+    if (!query) return;
+    // fetch recipes.html and parse for matching titles
+    const res = await fetch("recipes.html");
+    const text = await res.text();
+    const doc = new DOMParser().parseFromString(text, "text/html");
+    const cards = doc.querySelectorAll(".recipe-card");
+    // filter cards by title match
+    cards.forEach(card => {
+      const title = card.querySelector("h3").textContent;
+      const link = card.querySelector("a").getAttribute("href");
+      if (title.toLowerCase().includes(query)) {
+        const li = document.createElement("li");
+        li.textContent = title;
+        li.addEventListener("click", () => {
+          const priceEl = card.querySelector('.card-tags .tag');
+          const price = priceEl ? priceEl.textContent.trim() : null;
+          addMealItem(title, link, price);
+          overlay.classList.add("hidden");
+        });
+        searchResults.appendChild(li);
+      }
+    });
+  });
+  // add custom recipe
+  customRecipe.addEventListener("keypress", e => {
+    if (e.key === "Enter" && customRecipe.value.trim()) {
+      addMealItem(customRecipe.value.trim(), null, null);
+      overlay.classList.add("hidden");
+    }
+  });
+
+  // (addMealItem defined later after helper functions)
 
   // save/load to localStorage
   function saveMeals() {
@@ -193,15 +195,17 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!data[day]) data[day] = {};
       data[day][meal] = [];
       box.querySelectorAll("li").forEach(li => {
-        const a = li.querySelector("a");
+        // title, link, and leftovers stored on dataset / DOM by createMealListItem
+        const leftoversEl = li.querySelector('.leftovers');
         data[day][meal].push({
-          title: a ? a.textContent : li.childNodes[0].textContent,
-          link: a ? a.href : null
+          title: li.dataset.title || '',
+          link: li.dataset.link || null,
+          leftovers: !!(leftoversEl && leftoversEl.classList.contains('active'))
         });
       });
     });
     localStorage.setItem("mealPlan", JSON.stringify(data));
-    window.dispatchEvent(new Event("mealPlanUpdated"));
+    // (helpers live at top-level)
   }
   function loadMeals() {
     const data = JSON.parse(localStorage.getItem("mealPlan") || "{}");
@@ -211,23 +215,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (box) {
           const list = box.querySelector(".meal-list");
           data[day][meal].forEach(item => {
-            const li = document.createElement("li");
-            if (item.link) {
-              const a = document.createElement("a");
-              a.href = item.link;
-              a.textContent = item.title;
-              li.appendChild(a);
-            } else {
-              li.textContent = item.title;
-            }
-            const del = document.createElement("button");
-            del.textContent = "✕";
-            del.className = "delete-btn";
-            del.addEventListener("click", () => {
-              li.remove();
-              saveMeals();
-            });
-            li.appendChild(del);
+            const li = createMealListItem(item.title, item.link, null, !!item.leftovers);
             list.appendChild(li);
           });
         }
@@ -245,26 +233,14 @@ document.addEventListener("DOMContentLoaded", () => {
       card.className = "recipe-card";
       card.draggable = true;
       card.dataset.index = index;
+      // FIX WHATEVERS GOING ON WITH THE X - build card content
       card.innerHTML = `
-        <div style="position:relative;">
-          <img src="${recipe.image}" alt="${recipe.title}">
-          <button class="delete-saved">✕</button>
-        </div>
+        <img src="${recipe.image}" alt="${recipe.title}">
         <div class="content">
           <h3>${recipe.title}</h3>
-          <div class="card-tags">
-          ${data.tags.map(tag => {
-            if (/\bmin\b|\bhour\b/i.test(tag)) {
-              return `<span class="tag"><i class="fa-regular fa-clock"></i> ${tag}</span>`;
-            }
-            else if (/\$/.test(tag)) {
-              return `<span class="tag"><i class="fa-regular fa-money-bill-1"></i> ${tag}</span>`;
-            }
-            else return `<span class="tag"><i class="fa-solid fa-bell-concierge"></i> ${tag}</span>`;
-          }
-          ).join("")}
-        </div>
+          <div class="card-tags">${recipe.tags.map(tag => `<span class="tag">${tag}</span>`).join("")}</div>
           <a href="${recipe.link}" target="_blank">View Recipe</a>
+          <button class="delete-saved">✕</button>
         </div>
       `;
       // drag start
@@ -341,7 +317,8 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       list.style.background = "";
       const data = JSON.parse(e.dataTransfer.getData("application/json"));
-      addMealItem(data.title, data.link, list.closest(".meal-box"));
+      const price = data.tags && data.tags.find(t => /^\$/.test(t)) || null;
+      addMealItem(data.title, data.link, price, list.closest(".meal-box"));
     });
   });
 
@@ -356,15 +333,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const tabId = btn.dataset.tab;
       document.getElementById(tabId).classList.add("active");
     });
-  });
-    // 🔄 Keep saved recipes in sync across tabs and pages
-  window.addEventListener("storage", (e) => {
-    if (e.key === "savedRecipes") loadSavedRecipes();
-  });
-
-  // 🔔 Also listen for custom same-tab updates
-  window.addEventListener("savedRecipesUpdated", () => {
-    loadSavedRecipes();
   });
 
 });
