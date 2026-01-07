@@ -795,6 +795,7 @@ li {
   color: var(--accent);
 }
 
+/*
 .user.fa-stack{
   position: fixed;
   bottom: 0px;
@@ -807,7 +808,7 @@ i.fa-solid.fa-circle-user{
 i.fa-solid.fa-circle{
     color: #ffffff;
 }
-.signin-button { /* default button, green square button */
+.signin-button {
   display:inline-block;
   background:#fff;
   color:var(--accent-2);
@@ -818,7 +819,7 @@ i.fa-solid.fa-circle{
   font-size: 1.05em;
   font-weight:600;
   text-decoration:none;
-  transition:transform .14s ease,box-shadow .14s ease,opacity .12s ease; /*maybe take out ease for nav links*/
+  transition:transform .14s ease,box-shadow .14s ease,opacity .12s ease;
   cursor:pointer;
 }
 .user-button{
@@ -840,7 +841,7 @@ i.fa-solid.fa-circle{
   font-size: 1.05em;
   font-weight:600;
   text-decoration:none;
-  transition:transform .14s ease,box-shadow .14s ease,opacity .12s ease; /*maybe take out ease for nav links*/
+  transition:transform .14s ease,box-shadow .14s ease,opacity .12s ease;
   cursor:pointer;
 }
 .user-icon {
@@ -878,31 +879,31 @@ i.fa-solid.fa-circle{
   transition-delay: 0.15s;
 }
 .user-icon:not(:hover) {
-  transition-delay: 0.15s; /* wait a bit before shrinking back */
+  transition-delay: 0.15s;
 }
 
 .user-icon:not(:hover) .sign-in-text {
-  transition-delay: 0s; /* text fades out immediately */
+  transition-delay: 0s;
 }
-/* User button color based on login state */
+
 .user-icon {
-  color: #cc0000; /* red when logged out */
+  color: #cc0000; 
   transition: color 0.3s ease;
 }
 
 .user-icon.signed-in {
-  color: var(--accent); /* green when signed in */
+  color: var(--accent); 
 }
 
 .user-icon i {
-  color: inherit; /* icon follows parent color */
+  color: inherit; 
 }
 
-/* Keep existing hover and text animation */
+
 .user-icon:hover .sign-in-text {
   opacity: 1;
   transform: translateX(0);
   transition-delay: 0.15s;
 }
-
+*/
 
