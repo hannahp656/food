@@ -68,6 +68,27 @@ document.addEventListener("DOMContentLoaded", () => {
       // ignore and fall back to fetching recipes.html
     }
     try {
+      // If recipeFiles exists, fetch each recipe page and extract its #recipe-data JSON for reliable title lookup
+      const files = (window.recipeFiles || recipeFiles || []);
+      if (Array.isArray(files) && files.length) {
+        const fetches = files.map(async file => {
+          try {
+            const r = await fetch(file);
+            if (!r.ok) return null;
+            const t = await r.text();
+            const d = new DOMParser().parseFromString(t, 'text/html');
+            const dataEl = d.querySelector('#recipe-data');
+            if (!dataEl) return null;
+            const json = JSON.parse(dataEl.textContent);
+            const price = Array.isArray(json.tags) ? json.tags.find(tg => /^\$/.test(tg)) : null;
+            return { title: json.title, link: file, price };
+          } catch (err) { return null; }
+        });
+        const results = (await Promise.all(fetches)).filter(Boolean);
+        recipesCache = results;
+        return recipesCache;
+      }
+      // fallback: parse recipes.html cards
       const res = await fetch("recipes.html");
       if (!res.ok) return [];
       const text = await res.text();
