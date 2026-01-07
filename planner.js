@@ -232,8 +232,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const updateSuggestions = async (query) => {
       sugg.innerHTML = '';
-      if (!query) return;
+      if (!query) { sugg.style.display = 'none'; return; }
       matches = (await fetchRecipesIndex()).filter(r => r.title.toLowerCase().includes(query.toLowerCase()));
+      // fallback to savedRecipes in localStorage if no index matches
+      let savedMatches = [];
+      if (!matches.length) {
+        try {
+          const saved = JSON.parse(localStorage.getItem('savedRecipes') || '[]');
+          savedMatches = saved.filter(s => s.title && s.title.toLowerCase().includes(query.toLowerCase()));
+        } catch (err) { savedMatches = []; }
+      }
+      const shown = [];
       matches.slice(0,8).forEach(m => {
         const s = document.createElement('li');
         s.textContent = m.title + (m.price ? ` (${m.price})` : '');
@@ -242,7 +251,24 @@ document.addEventListener("DOMContentLoaded", () => {
           li.remove();
         });
         sugg.appendChild(s);
+        shown.push(true);
       });
+      // also show saved matches if index had none
+      if (!matches.length && savedMatches.length) {
+        savedMatches.slice(0,8).forEach(m => {
+          const s = document.createElement('li');
+          // saved recipe may have tags; try to pull a $ tag
+          const price = (m.tags && m.tags.find(t => /^\$/.test(t))) || null;
+          s.textContent = m.title + (price ? ` (${price})` : '');
+          s.addEventListener('click', () => {
+            addMealItem(m.title, m.link || null, price, box);
+            li.remove();
+          });
+          sugg.appendChild(s);
+          shown.push(true);
+        });
+      }
+      sugg.style.display = shown.length ? 'block' : 'none';
       // add the insert-without-recipe option
       const insert = document.createElement('li');
       insert.className = 'insert-without-recipe';
@@ -251,7 +277,10 @@ document.addEventListener("DOMContentLoaded", () => {
         addMealItem(query, null, '$???', box);
         li.remove();
       });
+      insert.style.fontWeight = '600';
       sugg.appendChild(insert);
+      // ensure suggestions visible (insert always shows)
+      sugg.style.display = 'block';
     };
 
     input.addEventListener('input', e => updateSuggestions(e.target.value));
