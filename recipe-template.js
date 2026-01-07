@@ -84,10 +84,13 @@ document.addEventListener("DOMContentLoaded", () => {
       if (/\bmin\b|\bhour\b/i.test(tag)) {
         return `<span class="tag"><i class="fa-regular fa-clock"></i> ${tag}</span>`;
       }
-      return `<span class="tag">${tag}</span>`;
+      else if (/\b$\b/i.test(tag)) {
+        return `<span class="tag"><i class="fa-regular fa-money-bill-1"></i> ${tag}</span>`;
+      }
+      else return `<span class="tag"><i class="fa-solid fa-bell-concierge"></i> ${tag}</span>`;
     }).join("");
 
-    const secondLine = data.tags.slice(3).map(tag => {
+    const secondLine = data.tags.slice(3).map(tag => { //take this out bc only 3 tags
       return `<span class="tag">${tag}</span>`;
     }).join("");
 
