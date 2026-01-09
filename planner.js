@@ -264,11 +264,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const floatSugg = document.createElement('ul');
     floatSugg.className = 'inline-suggestions floating';
     floatSugg.setAttribute('role', 'listbox');
+    // ensure it's visually obvious while debugging
     floatSugg.style.display = 'none';
+    floatSugg.style.background = '#fff';
+    floatSugg.style.border = '1px solid rgba(0,0,0,0.08)';
+    floatSugg.style.zIndex = '10000';
+    floatSugg.style.minWidth = '120px';
     document.body.appendChild(floatSugg);
 
     const positionSuggestions = () => {
       const rect = input.getBoundingClientRect();
+      console.debug('positionSuggestions rect:', rect, 'scroll', window.scrollX, window.scrollY);
       floatSugg.style.width = rect.width + 'px';
       floatSugg.style.left = (rect.left + window.scrollX) + 'px';
       floatSugg.style.top = (rect.bottom + window.scrollY + 6) + 'px';
