@@ -279,7 +279,7 @@ nav .links{display:flex;gap:12px;align-items:center}
   border: none;
   background: transparent;
   padding: 4px;
-  border-radius: 6px;
+  border-radius: 15px;
   font-size: 1rem;
   display: inline-flex;
   align-items: center;
@@ -287,7 +287,7 @@ nav .links{display:flex;gap:12px;align-items:center}
 }
 .leftovers i { font-size: 1.05rem; }
 .leftovers:focus { outline: 2px solid rgba(58,77,57,0.12); }
-.leftovers.active {color: white; outline: 3px solid var(--accent); background: var(--accent);}
+.leftovers.active {color: var(--accent); outline: 3px solid var(--accent)}
 
 /* total cost display above planner */
 .total-cost { font-weight:700; color:var(--accent-2); background:#f2fbf0; padding:6px 10px; border-radius:8px; border:1px solid #e6f3df }
