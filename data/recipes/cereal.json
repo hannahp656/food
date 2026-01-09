@@ -1,0 +1,12 @@
+{
+    "title": "Cereal",
+    "image": "https://www.foodservicedirect.com/_next/image?url=https%3A%2F%2Fdrryor7280ntb.cloudfront.net%2Fmedia%2Fcatalog%2Fproduct%2F1%2F0%2F10016000322629_4_f5nsoylxbjgqhvst.jpg&w=3840&q=75",
+    "cover": "https://www.foodservicedirect.com/_next/image?url=https%3A%2F%2Fdrryor7280ntb.cloudfront.net%2Fmedia%2Fcatalog%2Fproduct%2F1%2F0%2F10016000322629_4_f5nsoylxbjgqhvst.jpg&w=3840&q=75",
+    "link": "/food/recipes/recipe-cereal.html",
+    "tags": ["$1", "5 min", "1"],
+    "extra-tags": ["Entree","Breakfast", "Snack", "Quick & Easy"],
+    "ingredients": [
+    "1 cup cereal",
+    "1 cup milk"
+    ]
+}

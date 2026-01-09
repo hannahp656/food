@@ -3,26 +3,34 @@
 "image": "/food/recipe_images/crunchy-beef-tacos.jpg",
 "cover": "/food/recipe_images/crunchy-beef-tacos.jpg",
 "link": "/food/recipes/recipe-crunchy-beef-tacos.html",
-"tags": ["Full Meal", "20 min", "8 tacos", "Mexican", "Leftover-Safe"],
+"tags": ["$4", "20 min", "4"],
+"extra-tags": ["Full Meal", "Mexican", "Leftover-Safe","Lunch", "Dinner", "Stovetop", "Microwave"],
 "ingredients": [
 "1 lb ground chuck, 80/20",
-"1/4 cup tacp seasoning",
+"1/4 cup taco seasoning",
 "3/4 cup water",
 "4 oz sharp cheddar cheese, shredded",
 "2 cups lettuce, shredded",
-"1/2 can black beans",
-"8 crunchy taco shells"
+"1 can black beans",
+"8 taco shells"
+],
+"prep": [
+"Grab your grease jar and suction thingie and set near the stove.",
+"Put your taco shells on a plate near the microwave.",
+"On a cutting board, shred the lettuce and sharp cheddar cheese.",
+"Pour the black beans into  a small pot and set on the stove. Set a spoon in there for stirring later.",
+"Dump the taco seasoning and water into a measuring cup, whisk, and set aside.",
+"Grab a skillet and metal spatula and set near the stove."
 ],
 "instructions": [
 "Turn skillet on medium-high.",
-"Drop meat into the skillet in chunks.",
+"Drop ground chuck into the skillet in chunks.",
 "Chop and move around until cooked through (no pink).",
-"Turn off the heat and remove the grease from the skillet.",
-"Mix seasoning into the water.",
-"Pour over the cooked meat and stir to combine.",
-"Turn it to medium until it starts bubbling, then turn to low to simmer for 5 minutes.",
-"Pour beans into a small pot on medium low, stirring every once in a while.",
+"Turn off the heat. Suction the grease out into the grease jar.",
+"Pour the seasoning mix over the meat and stir.",
+"Turn it up to medium until it starts bubbling, then turn to low to simmer for 5 minutes.",
+"Turn the beans on medium low, stirring every once in a while.",
 "Heat up taco shells.",
 "EAT! om nom"
 ]
-    }
+}

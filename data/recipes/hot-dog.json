@@ -1,0 +1,18 @@
+{
+    "title": "Hot Dog",
+    "image": "https://www.siftandsimmer.com/wp-content/uploads/2021/05/bakery-style-hot-dog-buns3.jpg",
+    "cover": "https://www.siftandsimmer.com/wp-content/uploads/2021/05/bakery-style-hot-dog-buns3.jpg",
+    "link": "/food/recipes/recipe-hot-dog.html",
+    "tags": ["$???", "10 min", "1"],
+    "extra-tags": ["Entree", "Lunch", "Dinner", "Quick & Easy", "Air Fryer", "Toaster"],
+    "ingredients": [
+    "1 hot dog",
+    "1 slice bread, optional",
+    "Ketchup"
+    ],
+    "instructions": [
+    "Put the hot dog in the air fryer at 390°F for 8 minutes.",
+    "Turn the air fryer down to 350°F and cook for another 3 minutes.",
+    "Toast the bread."
+    ]
+}

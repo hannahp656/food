@@ -1,0 +1,16 @@
+{
+    "title": "Oatmeal",
+    "image": "https://www.thespicehouse.com/cdn/shop/articles/Homemade_Instant_Cinnamon-Raisin_Oatmeal_720x.jpg?v=1635436261",
+    "cover": "https://www.thespicehouse.com/cdn/shop/articles/Homemade_Instant_Cinnamon-Raisin_Oatmeal_720x.jpg?v=1635436261",
+    "link": "/food/recipes/recipe-oatmeal.html",
+    "tags": ["$???", "5 min", "1"],
+    "extra-tags": ["Entree","Breakfast", "Stovetop", "Quick & Easy"],
+    "ingredients": [
+    "1/2 cup oats",
+    "1/2 cup water",
+    "Raisins, optional"
+    ],
+    "instructions": [
+    "Pour the oats and water into a small pot and cook on medium heat for 5 minutes, stirring occasionally."
+    ]
+}
