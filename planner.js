@@ -274,10 +274,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const positionSuggestions = () => {
       const rect = input.getBoundingClientRect();
-      console.debug('positionSuggestions rect:', rect, 'scroll', window.scrollX, window.scrollY);
+      // use viewport coordinates for fixed positioning (don't add page scroll)
+      const left = rect.left;
+      const top = rect.bottom + 6; // a little gap
+      console.debug('positionSuggestions rect:', rect, 'computed left/top:', left, top);
       floatSugg.style.width = rect.width + 'px';
-      floatSugg.style.left = (rect.left + window.scrollX) + 'px';
-      floatSugg.style.top = (rect.bottom + window.scrollY + 6) + 'px';
+      floatSugg.style.left = left + 'px';
+      floatSugg.style.top = top + 'px';
+      floatSugg.style.position = 'fixed';
     };
 
     const cleanup = () => {
