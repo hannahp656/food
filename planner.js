@@ -253,7 +253,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const list = box.querySelector('.meal-list');
     const li = document.createElement('li');
     li.className = 'inline-add';
-    li.innerHTML = `<input id="inlineAdd" name="inlineAdd" class="inline-add-input" placeholder="Add item or search recipes..." autocomplete="off" /><ul class="inline-suggestions" role="listbox"></ul>`;
+    const suggId = `inline-suggestions-${Date.now()}-${Math.random().toString(36).slice(2,6)}`;
+    li.innerHTML = `<input id="inlineAdd" name="inlineAdd" class="inline-add-input" placeholder="Add item or search recipes..." autocomplete="off" aria-autocomplete="list" aria-expanded="false" aria-controls="${suggId}" /><ul id="${suggId}" class="inline-suggestions" role="listbox"></ul>`;
     list.appendChild(li);
     const input = li.querySelector('.inline-add-input');
     const sugg = li.querySelector('.inline-suggestions');
@@ -275,10 +276,17 @@ document.addEventListener("DOMContentLoaded", () => {
       const shown = [];
       matches.slice(0,8).forEach(m => {
         const s = document.createElement('li');
+        s.setAttribute('role','option');
+        s.tabIndex = -1;
         s.textContent = m.title + (m.price ? ` (${m.price})` : '');
         s.addEventListener('click', () => {
           addMealItem(m.title, m.link, m.price, box);
           li.remove();
+        });
+        s.addEventListener('keydown', (ke) => {
+          if (ke.key === 'Enter') { s.click(); }
+          else if (ke.key === 'ArrowDown') { if (s.nextElementSibling) s.nextElementSibling.focus(); }
+          else if (ke.key === 'ArrowUp') { if (s.previousElementSibling) s.previousElementSibling.focus(); else input.focus(); }
         });
         sugg.appendChild(s);
         shown.push(true);
@@ -287,12 +295,19 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!matches.length && savedMatches.length) {
         savedMatches.slice(0,8).forEach(m => {
           const s = document.createElement('li');
+          s.setAttribute('role','option');
+          s.tabIndex = -1;
           // saved recipe may have tags; try to pull a $ tag
           const price = (m.tags && m.tags.find(t => /^\$/.test(t))) || null;
           s.textContent = m.title + (price ? ` (${price})` : '');
           s.addEventListener('click', () => {
             addMealItem(m.title, m.link || null, price, box);
             li.remove();
+          });
+          s.addEventListener('keydown', (ke) => {
+            if (ke.key === 'Enter') { s.click(); }
+            else if (ke.key === 'ArrowDown') { if (s.nextElementSibling) s.nextElementSibling.focus(); }
+            else if (ke.key === 'ArrowUp') { if (s.previousElementSibling) s.previousElementSibling.focus(); else input.focus(); }
           });
           sugg.appendChild(s);
           shown.push(true);
@@ -302,18 +317,31 @@ document.addEventListener("DOMContentLoaded", () => {
       // add the insert-without-recipe option
       const insert = document.createElement('li');
       insert.className = 'insert-without-recipe';
+      insert.setAttribute('role','option');
+      insert.tabIndex = -1;
       insert.textContent = `Insert "${query}" without a recipe`;
       insert.addEventListener('click', () => {
         addMealItem(query, null, '$???', box);
         li.remove();
       });
+      insert.addEventListener('keydown', (ke) => {
+        if (ke.key === 'Enter') insert.click();
+        else if (ke.key === 'ArrowUp' && insert.previousElementSibling) insert.previousElementSibling.focus();
+      });
       insert.style.fontWeight = '600';
       sugg.appendChild(insert);
       // ensure suggestions visible (insert always shows)
       sugg.style.display = 'block';
+      input.setAttribute('aria-expanded','true');
     };
 
     input.addEventListener('input', e => updateSuggestions(e.target.value));
+    input.addEventListener('keydown', e => {
+      if (e.key === 'ArrowDown') {
+        const first = sugg.querySelector('li');
+        if (first) { first.focus(); e.preventDefault(); }
+      }
+    });
     input.addEventListener('keydown', e => {
       if (e.key === 'Enter') {
         const val = input.value.trim();
