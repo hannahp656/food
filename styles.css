@@ -273,8 +273,21 @@ nav .links{display:flex;gap:12px;align-items:center}
 .meal-cost { padding:4px 8px; border-radius:999px; font-weight:700; font-size:0.8rem; background:#f7fbf5; color:var(--accent-2); border:1px solid #eef6ea }
 
 /* leftovers toggle style */
-.leftovers { font-size:0.9rem; color:var(--muted); cursor:pointer; padding:2px 6px; border-radius:6px }
-.leftovers.active { color:var(--accent-2); font-weight:700 }
+.leftovers {
+  color: var(--muted);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  padding: 4px;
+  border-radius: 6px;
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.leftovers i { font-size: 1.05rem; }
+.leftovers:focus { outline: 2px solid rgba(58,77,57,0.12); }
+.leftovers.active { color: #000; }
 
 /* total cost display above planner */
 .total-cost { font-weight:700; color:var(--accent-2); background:#f2fbf0; padding:6px 10px; border-radius:8px; border:1px solid #e6f3df }

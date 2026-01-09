@@ -183,25 +183,17 @@ document.addEventListener("DOMContentLoaded", () => {
       li.appendChild(txt);
     }
 
-    // leftovers toggle
-    const leftovers = document.createElement('span');
+    // leftovers toggle (icon)
+    const leftovers = document.createElement('button');
+    leftovers.type = 'button';
     leftovers.className = 'leftovers';
-    leftovers.textContent = 'leftovers';
-    leftovers.style.cursor = 'pointer';
-    if (leftoversActive) {
-      leftovers.classList.add('active');
-      leftovers.style.color = '';
-    } else {
-      leftovers.style.color = 'var(--muted)';
-    }
+    leftovers.title = 'Leftover-safe';
+    leftovers.setAttribute('aria-pressed', leftoversActive ? 'true' : 'false');
+    leftovers.innerHTML = '<i class="fa-solid fa-rotate-left" aria-hidden="true"></i>';
+    if (leftoversActive) leftovers.classList.add('active');
     leftovers.addEventListener('click', () => {
-      if (leftovers.classList.contains('active')) {
-        leftovers.classList.remove('active');
-        leftovers.style.color = 'var(--muted)';
-      } else {
-        leftovers.classList.add('active');
-        leftovers.style.color = '';
-      }
+      const active = leftovers.classList.toggle('active');
+      leftovers.setAttribute('aria-pressed', active ? 'true' : 'false');
       // persist immediately
       saveMeals();
       updateTotalCost();
