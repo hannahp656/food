@@ -564,6 +564,7 @@ li {
 .inline-add { padding: 6px 0; position: relative; }
 .inline-add-input { width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid #d6e2cf; }
 .inline-suggestions { list-style: none; padding: 6px 8px; margin: 6px 0 0 0; max-height: 180px; overflow-y: auto; border-radius: 6px; background: #fff; box-shadow: 0 6px 18px rgba(0,0,0,0.06); position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 60; display: none; }
+.inline-suggestions.floating { position: fixed !important; left: auto; right: auto; top: auto; z-index: 1000; box-shadow: 0 8px 30px rgba(0,0,0,0.12); }
 .inline-suggestions li { padding: 8px 10px; cursor: pointer; border-radius: 6px; }
 .inline-suggestions li:hover, .inline-suggestions li:focus { background: #f4f8f3; outline: none; }
 .inline-cost-input { padding: 4px 6px; border-radius: 6px; border: 1px solid #d6e2cf; }

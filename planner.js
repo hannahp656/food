@@ -257,13 +257,33 @@ document.addEventListener("DOMContentLoaded", () => {
     li.innerHTML = `<input id="inlineAdd" name="inlineAdd" class="inline-add-input" placeholder="Add item or search recipes..." autocomplete="off" aria-autocomplete="list" aria-expanded="false" aria-controls="${suggId}" /><ul id="${suggId}" class="inline-suggestions" role="listbox"></ul>`;
     list.appendChild(li);
     const input = li.querySelector('.inline-add-input');
-    const sugg = li.querySelector('.inline-suggestions');
     let matches = [];
     input.focus();
 
+    // create a floating suggestion container appended to body to avoid clipping problems
+    const floatSugg = document.createElement('ul');
+    floatSugg.className = 'inline-suggestions floating';
+    floatSugg.setAttribute('role', 'listbox');
+    floatSugg.style.display = 'none';
+    document.body.appendChild(floatSugg);
+
+    const positionSuggestions = () => {
+      const rect = input.getBoundingClientRect();
+      floatSugg.style.width = rect.width + 'px';
+      floatSugg.style.left = (rect.left + window.scrollX) + 'px';
+      floatSugg.style.top = (rect.bottom + window.scrollY + 6) + 'px';
+    };
+
+    const cleanup = () => {
+      if (floatSugg && floatSugg.parentNode) floatSugg.parentNode.removeChild(floatSugg);
+      window.removeEventListener('resize', positionSuggestions);
+      window.removeEventListener('scroll', positionSuggestions, true);
+    };
+
     const updateSuggestions = async (query) => {
-      sugg.innerHTML = '';
-      if (!query) { sugg.style.display = 'none'; return; }
+      floatSugg.innerHTML = '';
+      if (!query) { floatSugg.style.display = 'none'; input.setAttribute('aria-expanded','false'); return; }
+      positionSuggestions();
       matches = (await fetchRecipesIndex()).filter(r => r.title.toLowerCase().includes(query.toLowerCase()));
       // fallback to savedRecipes in localStorage if no index matches
       let savedMatches = [];
@@ -282,13 +302,14 @@ document.addEventListener("DOMContentLoaded", () => {
         s.addEventListener('click', () => {
           addMealItem(m.title, m.link, m.price, box);
           li.remove();
+          cleanup();
         });
         s.addEventListener('keydown', (ke) => {
           if (ke.key === 'Enter') { s.click(); }
           else if (ke.key === 'ArrowDown') { if (s.nextElementSibling) s.nextElementSibling.focus(); }
           else if (ke.key === 'ArrowUp') { if (s.previousElementSibling) s.previousElementSibling.focus(); else input.focus(); }
         });
-        sugg.appendChild(s);
+        floatSugg.appendChild(s);
         shown.push(true);
       });
       // also show saved matches if index had none
@@ -303,17 +324,17 @@ document.addEventListener("DOMContentLoaded", () => {
           s.addEventListener('click', () => {
             addMealItem(m.title, m.link || null, price, box);
             li.remove();
+            cleanup();
           });
           s.addEventListener('keydown', (ke) => {
             if (ke.key === 'Enter') { s.click(); }
             else if (ke.key === 'ArrowDown') { if (s.nextElementSibling) s.nextElementSibling.focus(); }
             else if (ke.key === 'ArrowUp') { if (s.previousElementSibling) s.previousElementSibling.focus(); else input.focus(); }
           });
-          sugg.appendChild(s);
+          floatSugg.appendChild(s);
           shown.push(true);
         });
       }
-      sugg.style.display = shown.length ? 'block' : 'none';
       // add the insert-without-recipe option
       const insert = document.createElement('li');
       insert.className = 'insert-without-recipe';
@@ -323,29 +344,33 @@ document.addEventListener("DOMContentLoaded", () => {
       insert.addEventListener('click', () => {
         addMealItem(query, null, '$???', box);
         li.remove();
+        cleanup();
       });
       insert.addEventListener('keydown', (ke) => {
         if (ke.key === 'Enter') insert.click();
         else if (ke.key === 'ArrowUp' && insert.previousElementSibling) insert.previousElementSibling.focus();
       });
       insert.style.fontWeight = '600';
-      sugg.appendChild(insert);
-      // ensure suggestions visible (insert always shows)
-      sugg.style.display = 'block';
+      floatSugg.appendChild(insert);
+
+      floatSugg.style.display = 'block';
       input.setAttribute('aria-expanded','true');
+      window.addEventListener('resize', positionSuggestions);
+      window.addEventListener('scroll', positionSuggestions, true);
     };
 
     input.addEventListener('input', e => updateSuggestions(e.target.value));
     input.addEventListener('keydown', e => {
       if (e.key === 'ArrowDown') {
-        const first = sugg.querySelector('li');
+        const first = floatSugg.querySelector('li');
         if (first) { first.focus(); e.preventDefault(); }
       }
+      if (e.key === 'Escape') { li.remove(); cleanup(); }
     });
     input.addEventListener('keydown', e => {
       if (e.key === 'Enter') {
         const val = input.value.trim();
-        if (!val) { li.remove(); return; }
+        if (!val) { li.remove(); cleanup(); return; }
         // if there is at least one match and the typed text exactly matches the first match, choose it
         if (matches.length && matches[0].title.toLowerCase() === val.toLowerCase()) {
           addMealItem(matches[0].title, matches[0].link, matches[0].price, box);
@@ -353,14 +378,16 @@ document.addEventListener("DOMContentLoaded", () => {
           addMealItem(val, null, '$???', box);
         }
         li.remove();
+        cleanup();
       } else if (e.key === 'Escape') {
         li.remove();
+        cleanup();
       }
     });
 
     // if the input loses focus and is empty, remove the inline row
     input.addEventListener('blur', () => {
-      setTimeout(() => { if (!li.contains(document.activeElement)) { if (!input.value.trim()) li.remove(); } }, 150);
+      setTimeout(() => { if (!li.contains(document.activeElement) && !floatSugg.contains(document.activeElement)) { if (!input.value.trim()) { li.remove(); cleanup(); } } }, 150);
     });
   }
 
