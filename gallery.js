@@ -28,6 +28,7 @@ async function loadRecipes() {
     }
   }
   allIngredients = [...new Set(allIngredients)].sort(); // delete duplicate ingredients
+  console.log("allIngredients loaded:", allIngredients.length, allIngredients.slice(0, 10)); // debug: check if ingredients are loaded
   filteredRecipes = [...allRecipes];
   // expose in-memory recipe list for other scripts (planner inline search)
   try { window.allRecipes = allRecipes; } catch (err) { /* ignore in restrictive envs */ }
@@ -125,7 +126,6 @@ function setupSearchAndFilters() {
   const closeBtn = document.getElementById("closeFiltersBtn");
   const filterDropdown = document.getElementById("filterDropdown");
   const ingredientSearch = document.getElementById("ingredientSearch");
-  const ingredientSuggestions = document.getElementById("ingredientSuggestions");
   const selectedContainer = document.getElementById("selectedIngredients");
   const maxCostInput = document.getElementById("maxCostInput");
   const leftoverCheckbox = document.getElementById("leftoverCheckbox");
@@ -161,37 +161,64 @@ function setupSearchAndFilters() {
   if (openBtn) openBtn.addEventListener('click', () => { if (filterDropdown.classList.contains('open')) closeDropdown(); else openDropdown(); });
   if (closeBtn) closeBtn.addEventListener('click', closeDropdown);
   // ingredient search and filter
+  let floatingSuggestions = null; // for floating suggestions
   if (ingredientSearch) {
     ingredientSearch.addEventListener("input", e => {
       const query = e.target.value.toLowerCase().trim();
-      ingredientSuggestions.innerHTML = "";
+      console.log("ingredient search input:", query); // debug: check if input event fires
+      // remove existing floating
+      if (floatingSuggestions) {
+        floatingSuggestions.remove();
+        floatingSuggestions = null;
+      }
       if (!query) {
-        ingredientSuggestions.style.display = "none";
         return;
       }
       const matches = allIngredients.filter(ing => ing.includes(query) && !selectedIngredients.includes(ing));
+      console.log("matches found:", matches.length, matches.slice(0, 5)); // debug: check matches
       if (matches.length === 0) {
-        ingredientSuggestions.style.display = "none";
         return;
       }
-      ingredientSuggestions.innerHTML = matches.map(ing => `<li role="option">${ing}</li>`).join("");
-      ingredientSuggestions.style.display = "block";
+      // create floating suggestions
+      floatingSuggestions = document.createElement('ul');
+      floatingSuggestions.className = 'inline-suggestions floating';
+      floatingSuggestions.innerHTML = matches.map(ing => `<li role="option">${ing}</li>`).join("");
+      document.body.appendChild(floatingSuggestions);
+      // position it below the input
+      const rect = ingredientSearch.getBoundingClientRect();
+      floatingSuggestions.style.position = 'fixed';
+      floatingSuggestions.style.left = rect.left + 'px';
+      floatingSuggestions.style.top = (rect.bottom + 6) + 'px';
+      floatingSuggestions.style.width = rect.width + 'px';
+      floatingSuggestions.style.zIndex = '1000';
+      // add click handler
+      floatingSuggestions.addEventListener("click", e => {
+        if (e.target.tagName === "LI") {
+          const ing = e.target.textContent;
+          if (!selectedIngredients.includes(ing)) selectedIngredients.push(ing);
+          ingredientSearch.value = "";
+          if (floatingSuggestions) {
+            floatingSuggestions.remove();
+            floatingSuggestions = null;
+          }
+          renderSelectedIngredients();
+        }
+      });
+      // hide on outside click or blur
+      const hideSuggestions = () => {
+        if (floatingSuggestions) {
+          floatingSuggestions.remove();
+          floatingSuggestions = null;
+        }
+      };
+      document.addEventListener('click', hideSuggestions, { once: true });
+      ingredientSearch.addEventListener('blur', hideSuggestions, { once: true });
     });
     // allow keyboard selection
     ingredientSearch.addEventListener('keydown', e => {
-      if (e.key === 'ArrowDown') {
-        const first = ingredientSuggestions.querySelector('li'); if (first) first.focus();
-      }
-    });
-  }
-  if (ingredientSuggestions) {  // clicking a suggestion to add an ingredient filter
-    ingredientSuggestions.addEventListener("click", e => {
-      if (e.target.tagName === "LI") {
-        const ing = e.target.textContent;
-        if (!selectedIngredients.includes(ing)) selectedIngredients.push(ing);
-        ingredientSearch.value = "";
-        ingredientSuggestions.style.display = "none";
-        renderSelectedIngredients();
+      if (e.key === 'ArrowDown' && floatingSuggestions) {
+        const first = floatingSuggestions.querySelector('li');
+        if (first) first.focus();
       }
     });
   }
