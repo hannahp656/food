@@ -18,7 +18,7 @@
       <div class="container">
         <!--<div class="brand"><a href="index.html" style="color:inherit;text-decoration:none">Hannah's Recipes</a></div>-->
         <div class="links">
-          <a class="button active" href="recipes.html">Recipes</a>
+          <a class="button button--active" href="recipes.html">Recipes</a>
           <a class="button" href="meal-planner.html">Meal Planner</a>
         </div>
       </div>
@@ -33,42 +33,91 @@
       <div class="container">
         <h1>Recipe Gallery</h1>
       </div>
-    </header>
-    <!-- filter bar -->
+      <div class="container">
+        <!-- filter bar -->
     <div class="filter-bar">
       <!-- new search + filters UI -->
       <div class="search-bar">
-        <input type="text" id="titleSearch" placeholder="Search recipes by title...">
-        <button id="openFiltersBtn" class="button button--secondary">
-          <i class="fa-solid fa-sliders"></i> Filters
-        </button>
+        <div class="search-input">
+          <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
+          <input type="text" id="titleSearch" placeholder="Search recipes by title...">
+        </div>
+        <div class="filter-row">
+          <button id="openFiltersBtn" class="button button--secondary" aria-expanded="false">
+            <i class="fa-solid fa-filter filter-icon" aria-hidden="true"></i>
+            Filters
+            <i class="fa-solid fa-chevron-right chevron" aria-hidden="true"></i>
+          </button>
+        </div>
       </div>
 
       <!-- sidebar for filters -->
-      <div id="filterSidebar" class="filter-sidebar hidden">
+      <div id="filterDropdown" class="filter-dropdown hidden">
         <div class="filter-header">
-          <h2>Filters</h2>
+          <h3>Filters</h3>
           <button id="closeFiltersBtn" class="close-btn">&times;</button>
         </div>
+
         <div class="filter-section">
-          <h3>Ingredients</h3>
+          <h4>Ingredient Search</h4>
           <div class="ingredient-filter">
             <input type="text" id="ingredientSearch" placeholder="Search ingredients...">
-            <ul id="ingredientSuggestions"></ul>
+            <ul id="ingredientSuggestions" class="inline-suggestions small"></ul>
             <div id="selectedIngredients" class="selected-tags"></div>
           </div>
         </div>
-        <!--set up filters for max cooking time, cuisine, meal, type, meal course, and max price-->
+
+        <div class="filter-section">
+          <h4>Meal Type</h4>
+          <div class="tag-group meal-type">
+            <button type="button" class="filter-tag" data-value="entree">Entree</button>
+            <button type="button" class="filter-tag" data-value="side">Side</button>
+            <button type="button" class="filter-tag" data-value="full meal">Full Meal</button>
+            <button type="button" class="filter-tag" data-value="snack">Snack</button>
+          </div>
+        </div>
+
+        <div class="filter-section">
+          <h4>Cost</h4>
+          <label class="cost-label">Less than $ <input id="maxCostInput" type="number" min="0" step="0.01" placeholder="per serving"></label>
+        </div>
+
+        <div class="filter-section">
+          <h4>Max Time</h4>
+          <div class="tag-group time-tags">
+            <button type="button" class="filter-tag" data-value="0" data-range="lte">0 min</button>
+            <button type="button" class="filter-tag" data-value="15" data-range="lte">15 min</button>
+            <button type="button" class="filter-tag" data-value="30" data-range="lte">30 min</button>
+            <button type="button" class="filter-tag" data-value="60" data-range="gte">1 hour+</button>
+          </div>
+        </div>
+
+        <div class="filter-section">
+          <label><input type="checkbox" id="leftoverCheckbox"> Leftover-Safe?</label>
+        </div>
+
+        <div class="filter-section">
+          <h4>Other Tags</h4>
+          <div class="tag-group other-tags">
+            <button type="button" class="filter-tag" data-value="quick & easy">Quick &amp; Easy</button>
+            <button type="button" class="filter-tag" data-value="breakfast">Breakfast</button>
+            <button type="button" class="filter-tag" data-value="chinese">Chinese</button>
+            <button type="button" class="filter-tag" data-value="korean">Korean</button>
+          </div>
+        </div>
+
         <div class="filter-actions">
           <button id="applyFiltersBtn" class="button">Apply Filters</button>
           <button id="clearFiltersBtn" class="button button--secondary">Clear Filters</button>
         </div>
       </div>
 
-      <!-- overlay when sidebar is open -->
-      <div id="overlay" class="overlay hidden"></div>
+
 
     </div>
+      </div>
+    </header>
+    
     <!-- gallery container -->
     <main>
       <section class="gallery" id="gallery">

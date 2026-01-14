@@ -2,6 +2,7 @@
   --bg: #f8fbf6;
   --card: #ffffff;
   --muted: #6b7a5a;
+  --tint:#eef6ea;
   --accent: #7a9d54;
   --accent-2: #3a4d39;
   --soft: rgba(122,157,84,0.08);
@@ -30,33 +31,18 @@ nav{color: var(--bg); padding:5px 5px; border-style: solid; border-color: var(--
 nav .container{display:flex; align-items:center; justify-content:space-between; gap:12px; width: fit-content; padding:0px}
 @media (max-width:720px){nav .container{flex-direction:column}}
 nav .links{display:flex ;gap:12px; align-items:center}
+nav .button{background:var(--bg); color:var(--accent-2); border-radius:999px; font-size: 1.3em;}
+nav .button--active{background: var(--accent); color: white;}
 
-nav .button{
-  background:#f8fbf6;
-  color:var(--accent-2);
-  border-radius:999px;
-  font-size: 1.3em;
-}
-nav .button .active{
-  background: var(--accent);
-  color: white;
-  border-radius:999px;
-  font-size: 1.3em;
-}
-.button--nav{ /* off-white pill button */
-  background:#f8fbf6;
-  color:var(--accent-2);
-  border-radius:999px;
-  font-size: 1.3em;
-}
-.button--nav--active{
-  background: var(--accent);
-  color: white;
-  border-radius:999px;
-  font-size: 1.3em;
+/* Home hero Section - green title area on home page*/
+.home-hero{margin: -10px 0px; padding:48px 20px; background:var(--accent);}
+.home-hero .container{text-align:center; position:relative; padding:36px 18px;}
+.home-hero h1{ /*font-family:Montserrat, Inter;*/ font-size:3.5rem; margin:0; color:white; position:relative;}
+.home-hero h1::after{ /* white line after title */
+  content:''; display:block; width:88px; height:8px; border-radius:6px; background:var(--bg); margin:25px auto 0; opacity:0.95
 }
 
-/* Hero Section - green title area on home page*/
+/* Hero Section - green title area */
 .hero{margin: -10px 0px; padding:48px 20px; background:var(--accent);}
 .hero .container{text-align:center; position:relative; padding:36px 18px;}
 .hero h1{ /*font-family:Montserrat, Inter;*/ font-size:3.5rem; margin:0; color:white; position:relative;}
@@ -78,36 +64,24 @@ nav .button .active{
   font-size: 1.05em;
   font-weight:600;
   text-decoration:none;
-  transition:transform .14s ease,box-shadow .14s ease,opacity .12s ease; /*maybe take out ease for nav links*/
+  /*transition:transform .14s ease,box-shadow .14s ease,opacity .12s ease; */
   cursor:pointer;
 }
 .button--secondary { /* light green square button */
-  background:#eef6ea;
+  background:var(--tint);
   color:var(--accent-2);
   border:1px solid rgba(58,77,57,0.06)
 }
-.button--link{
-  background: #f8fbf6;
+.button--link{ /* underlined button*/
+  background: transparent;
   color: var(--accent-2);
   border-bottom: 6px solid var(--accent);
   border-radius: 0px;
 }
-
-.button:hover{
-  transform:translateY(-3px);
-  box-shadow:0 9px 20px rgba(58,77,57,0.2);
-  opacity:0.98
-}
-.button:active{
-  transform:translateY(-1px)
-}
-.button:focus{
-  outline:3px solid rgba(122,157,84,0.18);
-  outline-offset:3px
-}
+.button:hover{transform:translateY(-3px);}
 
 /* TAGS */
-.tags{ /*container for tags in hero*/
+.tags{ /*container for tags in hero, maybe just keep margin stuff*/
   display:flex;
   flex-wrap:wrap;
   gap:8px;
@@ -292,6 +266,39 @@ nav .button .active{
 .overlay-content { background: #fff; padding: 20px; border-radius: var(--radius); width: 300px; }
 .overlay.hidden { display: none; }
 #searchResults { list-style: none; padding: 0; margin-top: 8px; max-height: 120px; overflow-y: auto; border: 1px solid #ddd; border-radius: 6px; }
+
+/* dropdown filter styles */
+.filter-dropdown { position: absolute; left: 0; right: 0; top: calc(100% + 8px); background: #fff; border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); padding: 14px; z-index: 220; display: none; }
+.filter-dropdown.active, .filter-dropdown.open { display: block; }
+.filter-section { margin-bottom: 12px; }
+.filter-section h4 { margin: 0 0 6px 0; font-size: 0.95rem; color: #3a4d39; }
+.tag-group { display: flex; gap: 8px; flex-wrap: wrap; }
+.filter-tag { background: #f4f7f2; border: 1px solid #e6efe1; padding: 6px 10px; border-radius: 999px; cursor: pointer; color: var(--muted); }
+.filter-tag.active { background: var(--accent); color: #fff; border-color: rgba(0,0,0,0.06); }
+.cost-label input { width: 120px; margin-left: 6px; padding: 6px 8px; border-radius: 8px; border: 1px solid #d6e2cf; }
+.inline-suggestions.small { position: absolute; left: 0; right: auto; top: calc(100% + 6px); z-index: 230; background: #fff; box-shadow: 0 6px 18px rgba(0,0,0,0.06); border-radius: 8px; max-height: 140px; overflow-y: auto; display: none; }
+.selected-tags { margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; }
+.selected-tags .tag { background: #f4f7f2; padding: 6px 10px; border-radius: 999px; }
+/* make filter-bar position relative so dropdown can sit below it */
+.filter-bar { position: relative; }
+
+/* search bar layout: place filters button on its own line */
+.search-bar { display: flex; flex-direction: column; gap: 8px; }
+.filter-row { display: flex; justify-content: flex-end; }
+
+/* search input icon */
+.search-input { position: relative; display:flex; align-items:center; }
+.search-input .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 0.95rem; pointer-events: none; }
+.search-input input { padding-left: 34px; }
+
+/* filter button layout: keep filter icon and move chevron to right edge */
+.filter-row button { position: relative; padding-right: 40px; }
+.filter-row .filter-icon { margin-right: 8px; }
+.filter-row .chevron { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); transition: transform .18s ease; display:inline-block; }
+
+/* chevron rotation on open */
+#openFiltersBtn.open .chevron { transform: rotate(90deg); }
+#openFiltersBtn[aria-expanded="true"] .chevron { transform: rotate(90deg); }
 #searchResults li { padding: 6px; cursor: pointer; }
 #searchResults li:hover { background: var(--soft); }
 
