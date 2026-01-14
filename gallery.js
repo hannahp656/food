@@ -193,6 +193,7 @@ function setupSearchAndFilters() {
       floatingSuggestions.style.zIndex = '1000';
       // add click handler
       floatingSuggestions.addEventListener("click", e => {
+        e.stopPropagation(); // prevent document click from hiding
         if (e.target.tagName === "LI") {
           const ing = e.target.textContent;
           if (!selectedIngredients.includes(ing)) selectedIngredients.push(ing);
