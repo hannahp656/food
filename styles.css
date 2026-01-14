@@ -136,8 +136,9 @@ nav .button--active{background: var(--accent); color: white;}
 .recipe-card h3{margin:0;font-size:1.05rem;color:var(--accent-2)}
 
 /* GALLERY PAGE */
-.filter-bar{max-width:var(--max-width);margin:18px auto;padding:12px}
-.filter-bar input,.filter-bar select{padding:10px 12px;border-radius:10px;border:1px solid #e6eae2;background:#fff;min-width:160px}
+.filter-bar{max-width:var(--max-width);margin:18px auto;padding:12px;position: relative}
+.filter-bar input{padding:10px 12px;border-radius:10px;border:1px solid #e6eae2;background:#fff;min-width:10px}
+.filter-bar select{padding:10px 12px;border-radius:10px;border:1px solid #e6eae2;background:#fff;min-width:160px}
 .filter-bar small{color:var(--muted);display:block;margin-top:6px}
 @media (max-width:600px){.filter-bar{flex-direction:column}}
 .gallery{max-width:var(--max-width);margin:10px auto 60px auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;padding:0 18px}
@@ -270,17 +271,18 @@ nav .button--active{background: var(--accent); color: white;}
 /* dropdown filter styles */
 .filter-dropdown { position: absolute; left: 0; right: 0; top: calc(100% + 8px); background: #fff; border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); padding: 14px; z-index: 220; display: none; }
 .filter-dropdown.active, .filter-dropdown.open { display: block; }
-.filter-section { margin-bottom: 12px; }
+.filter-section { margin-bottom: 20px; text-align: left;}
 .filter-section h4 { margin: 0 0 6px 0; font-size: 0.95rem; color: #3a4d39; }
 .tag-group { display: flex; gap: 8px; flex-wrap: wrap; }
 .filter-tag { background: #f4f7f2; border: 1px solid #e6efe1; padding: 6px 10px; border-radius: 999px; cursor: pointer; color: var(--muted); }
 .filter-tag.active { background: var(--accent); color: #fff; border-color: rgba(0,0,0,0.06); }
-.cost-label input { width: 120px; margin-left: 6px; padding: 6px 8px; border-radius: 8px; border: 1px solid #d6e2cf; }
+.cost-label{font-size: .9em;}
+.cost-label input { width: 60px; margin: 0px 6px; padding: 6px 8px; border-radius: 8px; border: 1px solid #d6e2cf; }
 .inline-suggestions.small { position: absolute; left: 0; right: auto; top: calc(100% + 6px); z-index: 230; background: #fff; box-shadow: 0 6px 18px rgba(0,0,0,0.06); border-radius: 8px; max-height: 140px; overflow-y: auto; display: none; }
 .selected-tags { margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; }
 .selected-tags .tag { background: #f4f7f2; padding: 6px 10px; border-radius: 999px; }
 /* make filter-bar position relative so dropdown can sit below it */
-.filter-bar { position: relative; }
+
 
 /* search bar layout: place filters button on its own line */
 .search-bar { display: flex; flex-direction: column; gap: 8px; }
@@ -289,7 +291,6 @@ nav .button--active{background: var(--accent); color: white;}
 /* search input icon */
 .search-input { position: relative;display: flex;align-items: center;gap: 8px; }
 .search-input .search-icon { color: white; font-size: 0.95rem; pointer-events: none; }
-.search-input input { padding-left: 34px; }
 
 /* filter button layout: keep filter icon and move chevron to right edge */
 .filter-row button { position: relative; padding-right: 40px; }
@@ -531,10 +532,7 @@ li {
 }
 
 #titleSearch {
-  max-width: 400px;
-  padding: 10px 14px;
-  border-radius: 10px;
-  border: 1px solid #e6eae2;
+  /*max-width: 400px;*/
   font-size: 1em;
 }
 
@@ -568,7 +566,7 @@ li {
 }
 .close-btn {
 
-/* inline add input and suggestions */
+/* inline add input and suggestions, why are these within the close button?? */
 .inline-add { padding: 6px 0; position: relative; }
 .inline-add-input { width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid #d6e2cf; }
 .inline-suggestions { list-style: none; padding: 6px 8px; margin: 6px 0 0 0; max-height: 180px; overflow-y: auto; border-radius: 6px; background: #fff; box-shadow: 0 6px 18px rgba(0,0,0,0.06); position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 60; display: none; }
@@ -581,9 +579,13 @@ li {
   font-size: 1.6em;
   cursor: pointer;
   color: var(--muted);
+  position: absolute;
+  left: 10px;
+  top: 10px;
 }
-.filter-section {
-  margin-bottom: 24px;
+.filter-actions{
+  text-align: right;
+  padding-bottom: 18px;
 }
 .ingredient-filter input {
   width: 100%;

@@ -40,9 +40,10 @@
             </button>
           </div>
           <div id="filterDropdown" class="filter-dropdown hidden">
-            <div class="filter-header">
-              <h3>Filters</h3>
-              <button id="closeFiltersBtn" class="close-btn">&times;</button>
+            <button id="closeFiltersBtn" class="close-btn">&times;</button>
+            <div class="filter-actions">
+              <button id="applyFiltersBtn" class="button">Apply</button>
+              <button id="clearFiltersBtn" class="button button--secondary">Clear</button>
             </div>
 
             <div class="filter-section">
@@ -65,8 +66,8 @@
             </div>
 
             <div class="filter-section">
-              <h4>Cost</h4>
-              <label class="cost-label">Less than $ <input id="maxCostInput" type="number" min="0" step="0.01" placeholder="per serving"></label>
+              <h4 style="margin:0;">Cost</h4>
+              <label class="cost-label">Less than $<input id="maxCostInput" type="number" min="0" step="0.01" placeholder="">per serving</label>
             </div>
 
             <div class="filter-section">
@@ -83,7 +84,7 @@
               <label><input type="checkbox" id="leftoverCheckbox"> Leftover-Safe?</label>
             </div>
 
-            <div class="filter-section">
+            <div class="filter-section" style="margin-bottom: 10px;">
               <h4>Other Tags</h4>
               <div class="tag-group other-tags">
                 <button type="button" class="filter-tag" data-value="quick & easy">Quick &amp; Easy</button>
@@ -93,19 +94,9 @@
               </div>
             </div>
 
-            <div class="filter-actions">
-              <button id="applyFiltersBtn" class="button">Apply Filters</button>
-              <button id="clearFiltersBtn" class="button button--secondary">Clear Filters</button>
-            </div>
+            
           </div>
-
-
-
-    </div>
-      </div>
-      <div class="container">
-        <!-- filter bar -->
-    
+        </div>
       </div>
     </header>
     
