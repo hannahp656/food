@@ -162,10 +162,13 @@ function setupSearchAndFilters() {
   if (closeBtn) closeBtn.addEventListener('click', closeDropdown);
   // ingredient search and filter
   let floatingSuggestions = null; // for floating suggestions
+  let blurTimeout = null; // to delay hide on blur
   if (ingredientSearch) {
     ingredientSearch.addEventListener("input", e => {
       const query = e.target.value.toLowerCase().trim();
       console.log("ingredient search input:", query); // debug: check if input event fires
+      // clear any pending blur timeout
+      if (blurTimeout) clearTimeout(blurTimeout);
       // remove existing floating
       if (floatingSuggestions) {
         floatingSuggestions.remove();
@@ -205,7 +208,7 @@ function setupSearchAndFilters() {
           renderSelectedIngredients();
         }
       });
-      // hide on outside click or blur
+      // hide on outside click
       const hideSuggestions = () => {
         if (floatingSuggestions) {
           floatingSuggestions.remove();
@@ -213,7 +216,12 @@ function setupSearchAndFilters() {
         }
       };
       document.addEventListener('click', hideSuggestions, { once: true });
-      ingredientSearch.addEventListener('blur', hideSuggestions, { once: true });
+      // delayed hide on blur
+      ingredientSearch.addEventListener('blur', () => {
+        blurTimeout = setTimeout(() => {
+          hideSuggestions();
+        }, 150); // small delay to allow click on li
+      });
     });
     // allow keyboard selection
     ingredientSearch.addEventListener('keydown', e => {
