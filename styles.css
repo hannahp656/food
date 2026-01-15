@@ -780,4 +780,6 @@ li {
   border-top: 1px solid #eef3e8;
 }
 
+.inline-suggestions.floating { display: block !important; }
+
 
