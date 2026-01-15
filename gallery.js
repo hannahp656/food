@@ -168,7 +168,11 @@ function setupSearchAndFilters() {
       const query = e.target.value.toLowerCase().trim();
       console.log("ingredient search input:", query); // debug: check if input event fires
       // clear any pending blur timeout
-      if (blurTimeout) clearTimeout(blurTimeout);
+      if (blurTimeout) {
+        console.log("clearing pending blur timeout");
+        clearTimeout(blurTimeout);
+        blurTimeout = null;
+      }
       // remove existing floating
       if (floatingSuggestions) {
         floatingSuggestions.remove();
@@ -186,14 +190,19 @@ function setupSearchAndFilters() {
       floatingSuggestions = document.createElement('ul');
       floatingSuggestions.className = 'inline-suggestions floating';
       floatingSuggestions.innerHTML = matches.map(ing => `<li role="option">${ing}</li>`).join("");
+      console.log("created floating suggestions with", matches.length, "items");
       document.body.appendChild(floatingSuggestions);
+      console.log("appended floating suggestions to body");
       // position it below the input
       const rect = ingredientSearch.getBoundingClientRect();
+      console.log("input rect:", rect);
       floatingSuggestions.style.position = 'fixed';
       floatingSuggestions.style.left = rect.left + 'px';
       floatingSuggestions.style.top = (rect.bottom + 6) + 'px';
       floatingSuggestions.style.width = rect.width + 'px';
       floatingSuggestions.style.zIndex = '1000';
+      console.log("positioned at left:", rect.left, "top:", rect.bottom + 6, "width:", rect.width);
+      console.log("floatingSuggestions.offsetHeight after positioning:", floatingSuggestions.offsetHeight);
       // add click handler
       floatingSuggestions.addEventListener("click", e => {
         e.stopPropagation(); // prevent document click from hiding
@@ -210,6 +219,7 @@ function setupSearchAndFilters() {
       });
       // hide on outside click
       const hideSuggestions = () => {
+        console.log("hiding suggestions due to outside click");
         if (floatingSuggestions) {
           floatingSuggestions.remove();
           floatingSuggestions = null;
@@ -218,7 +228,9 @@ function setupSearchAndFilters() {
       document.addEventListener('click', hideSuggestions, { once: true });
       // delayed hide on blur
       ingredientSearch.addEventListener('blur', () => {
+        console.log("blur event on input, setting timeout to hide");
         blurTimeout = setTimeout(() => {
+          console.log("blur timeout triggered, hiding suggestions");
           hideSuggestions();
         }, 150); // small delay to allow click on li
       });
