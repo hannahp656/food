@@ -136,6 +136,35 @@ nav .button--active{background: var(--accent); color: white;}
 .recipe-card .content a:hover{background:var(--accent);color:#fff;transform:translateY(-3px)}
 .recipe-card img{width:100%;height:160px;object-fit:cover;display:block}
 .recipe-card h3{margin:0;font-size:1.05rem;color:var(--accent-2)}
+/* Bookmark (Save) Button on Recipe Cards */
+.saveRecipeBtn {
+  background: #eef6ea;               /* same as .button--secondary background */
+  color: var(--accent-2);
+  border: 1px solid rgba(58, 77, 57, 0.08);
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1em;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.saveRecipeBtn:hover {
+  background: #e3f1da;
+  transform: translateY(-2px);
+}
+
+.saveRecipeBtn i {
+  color: var(--accent-2);
+  transition: color 0.2s ease;
+}
+/* Filled icon state (saved) */
+.saveRecipeBtn i.fa-solid {
+  color: var(--accent);
+}
 
 /* GALLERY PAGE */
 .filter-bar{max-width:var(--max-width);margin:18px auto;padding:12px;position: relative}
@@ -166,18 +195,6 @@ nav .button--active{background: var(--accent); color: white;}
   padding-bottom: 18px;
 }
 .close-btn {
-
-/* inline add input and suggestions, why are these within the close button?? */
-/*.inline-add { padding: 6px 0; position: relative; }
-.inline-add-input { width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid #d6e2cf; }
-.inline-suggestions { list-style: none; padding: 6px 8px; margin: 6px 0 0 0; max-height: 180px; overflow-y: auto; border-radius: 6px; background: #fff; box-shadow: 0 6px 18px rgba(0,0,0,0.06); position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 60; display: none; }
-.inline-suggestions.floating { position: fixed !important; left: auto; right: auto; top: auto; z-index: 1000; background: #fff; border-radius: 8px; box-shadow: 0 8px 30px rgba(0,0,0,0.12); max-height: 140px; overflow-y: auto; padding: 0; margin: 0; list-style: none; }
-.inline-suggestions.floating li { padding: 6px 10px; cursor: pointer; border-bottom: 1px solid #f0f0f0; }
-.inline-suggestions.floating li:last-child { border-bottom: none; }
-.inline-suggestions.floating li:hover { background: var(--soft); }
-.inline-suggestions li { padding: 8px 10px; cursor: pointer; border-radius: 6px; }
-.inline-suggestions li:hover, .inline-suggestions li:focus { background: #f4f8f3; outline: none; }
-.inline-cost-input { padding: 4px 6px; border-radius: 6px; border: 1px solid #d6e2cf; }*/
   background: none;
   border: none;
   font-size: 1.6em;
@@ -187,7 +204,7 @@ nav .button--active{background: var(--accent); color: white;}
   left: 10px;
   top: 10px;
 }
-
+/*gallery ingredient search*/
 .inline-suggestions { list-style: none; padding: 6px 8px; margin: 6px 0 0 0; max-height: 180px; overflow-y: auto; border-radius: 6px; background: #fff; box-shadow: 0 6px 18px rgba(0,0,0,0.06); position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 60; display: none; }
 .inline-suggestions.floating { position: fixed !important; left: auto; right: auto; top: auto; z-index: 1000; background: #fff; border-radius: 8px; box-shadow: 0 8px 30px rgba(0,0,0,0.12); max-height: 140px; overflow-y: auto; padding: 0; margin: 0; list-style: none; }
 .inline-suggestions.floating li { padding: 6px 10px; cursor: pointer; border-bottom: 1px solid #f0f0f0; }
@@ -195,32 +212,11 @@ nav .button--active{background: var(--accent); color: white;}
 .inline-suggestions.floating li:hover { background: var(--soft); }
 .inline-suggestions li { padding: 8px 10px; cursor: pointer; border-radius: 6px; }
 .inline-suggestions li:hover, .inline-suggestions li:focus { background: #f4f8f3; outline: none; }
+.inline-suggestions.floating { display: block !important; }
 
 /*cant find where the below stuff is used - removing unused styles*/
 .selected-tags { margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; }
 .selected-tags .tag { background: #f4f7f2; padding: 6px 10px; border-radius: 999px; }
-.search-bar { display: flex; flex-direction: column; gap: 8px; }
-.filter-row { display: flex; justify-content: flex-end; }
-.filter-row button { position: relative; padding-right: 40px; }
-/* Search bar */
-.search-bar {
-  max-width: var(--max-width);
-  margin: 18px auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-}
-.inline-add { padding: 6px 0; position: relative; }
-.inline-add-input { width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid #d6e2cf; }
-.inline-cost-input { padding: 4px 6px; border-radius: 6px; border: 1px solid #d6e2cf; }
-.ingredient-filter input {
-  width: 100%;
-  padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid #e6eae2;
-}
 .selected-tags {
   display: flex;
   flex-wrap: wrap;
@@ -244,6 +240,17 @@ nav .button--active{background: var(--accent); color: white;}
   color: var(--muted);
   cursor: pointer;
 }
+
+.inline-add { padding: 6px 0; position: relative; }
+.inline-add-input { width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid #d6e2cf; }
+.inline-cost-input { padding: 4px 6px; border-radius: 6px; border: 1px solid #d6e2cf; }
+.ingredient-filter input {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #e6eae2;
+}
+
 /* Sidebar overlay */
 #overlay {
   position: fixed;
@@ -257,34 +264,7 @@ nav .button--active{background: var(--accent); color: white;}
 
 
 
-/*
-.filter-sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 320px;
-  height: 100%;
-  background: #fff;
-  box-shadow: 4px 0 18px rgba(0,0,0,0.1);
-  padding: 20px;
-  transform: translateX(-100%);
-  transition: transform 0.3s ease;
-  z-index: 1000;
-  overflow-y: auto;
-}
-.filter-sidebar.active {
-  transform: translateX(0);
-}
-.filter-sidebar .filter-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-.filter-sidebar h2 {
-  margin: 0;
-  color: var(--accent-2);
-}*/
+
 
 
 
@@ -702,37 +682,9 @@ li {
 
 
 
-/* Bookmark (Save) Button on Recipe Cards */
-.saveRecipeBtn {
-  background: #eef6ea;               /* same as .button--secondary background */
-  color: var(--accent-2);
-  border: 1px solid rgba(58, 77, 57, 0.08);
-  border-radius: 50%;
-  width: 38px;
-  height: 38px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.1em;
-  cursor: pointer;
-  transition: transform 0.2s ease, background 0.2s ease;
-}
 
-.saveRecipeBtn:hover {
-  background: #e3f1da;
-  transform: translateY(-2px);
-}
 
-.saveRecipeBtn i {
-  color: var(--accent-2);
-  transition: color 0.2s ease;
-}
-/* Filled icon state (saved) */
-.saveRecipeBtn i.fa-solid {
-  color: var(--accent);
-}
-
-/* Inline meal search (matches gallery style) WHERE ARE THESE USED*/
+/* Inline meal search (matches gallery style) WHERE ARE THESE USED
 .inline-search {
   margin-top: 10px;
   position: relative;
@@ -778,8 +730,47 @@ li {
   font-style: italic;
   color: var(--muted);
   border-top: 1px solid #eef3e8;
+}*/
+
+/*.search-bar { display: flex; flex-direction: column; gap: 8px; }
+.filter-row { display: flex; justify-content: flex-end; }
+.filter-row button { position: relative; padding-right: 40px; }
+.search-bar {
+  max-width: var(--max-width);
+  margin: 18px auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+}*/
+
+
+/*
+.filter-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 320px;
+  height: 100%;
+  background: #fff;
+  box-shadow: 4px 0 18px rgba(0,0,0,0.1);
+  padding: 20px;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  z-index: 1000;
+  overflow-y: auto;
 }
-
-.inline-suggestions.floating { display: block !important; }
-
-
+.filter-sidebar.active {
+  transform: translateX(0);
+}
+.filter-sidebar .filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.filter-sidebar h2 {
+  margin: 0;
+  color: var(--accent-2);
+}*/
