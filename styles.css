@@ -69,13 +69,13 @@ nav .button--active{background: var(--accent); color: white;}
   border:1px solid rgba(58,77,57,0.06)
 }
 .button--tertiary{
-  background: white;
+  background: var(--tint);
   color:var(--accent-2);
-  border: 1px solid white;
+  border: 1px solid var(--tint);
 }
 .button--outline{
   background: transparent;
-  border: 1px solid white;
+  border: 1px solid var(--tint);
 }
 .button--link{ /* underlined button*/
   background: transparent;
@@ -216,6 +216,7 @@ nav .button--active{background: var(--accent); color: white;}
   display: flex;
   border-bottom: 2px solid #dce3e0;
   margin-bottom: 20px;
+  justify-content: space-evenly;
 }
 .tab-btn {
   background: none;

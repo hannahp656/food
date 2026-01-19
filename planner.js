@@ -201,15 +201,20 @@ document.addEventListener("DOMContentLoaded", () => {
     li.appendChild(leftovers);
 
     // delete button
-    const del = document.createElement('button');
-    del.textContent = '✕';
-    del.className = 'delete-btn';
+    //const del = document.createElement('button');
+    //del.textContent = '✕';
+    //del.className = 'delete-btn';
+    const del = document.createElement('i');
+    del.className = 'fa-solid fa-xmark delete-btn';
+    del.style.color = 'red';
     del.addEventListener('click', () => {
       li.remove();
       saveMeals();
       updateTotalCost();
     });
-    li.appendChild(del);
+    li.appendChild(del)
+
+    
 
     // if we have a cost immediately, set and update total
     if (costTag) {
