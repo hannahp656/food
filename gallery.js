@@ -51,7 +51,7 @@ function renderGallery() {
     card.innerHTML = `
       <div style="position:relative;">
         <img src="${data.image}" alt="${data.title}">
-        <button class="saveRecipeBtn button button--secondary" style="position:absolute;top:12px;right:12px;z-index:2;">
+        <button class="saveRecipeBtn" style="position:absolute;top:12px;right:12px;z-index:2;">
           <i class="fa-regular fa-bookmark"></i>
         </button>
       </div>
