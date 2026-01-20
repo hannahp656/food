@@ -22,6 +22,10 @@ async function loadRecipes() {
       const parsed = data.parsedIngredients || []; // get parsed ingredients
       data.ingredientsLower = parsed.map(obj => obj.ingredient.toLowerCase());
       allIngredients.push(...data.ingredientsLower);
+      // Merge tags and extra-tags/extraTags into allTags
+      const tags = Array.isArray(data.tags) ? data.tags : [];
+      const extraTags = Array.isArray(data["extra-tags"]) ? data["extra-tags"] : (Array.isArray(data.extraTags) ? data.extraTags : []);
+      data.allTags = [...tags, ...extraTags];
       allRecipes.push(data);
     } catch (err) {
       console.error("Error loading recipe:", file, err);
@@ -347,7 +351,8 @@ function parsePrice(tag) {
         else matchesTime = recipeTime <= timeLimitObj.value;
       }
 
-      const tags = (r.tags || []).map(t => t.toLowerCase());
+      // Use allTags for tag-based filtering
+      const tags = (r.allTags || []).map(t => t.toLowerCase());
       const matchesMealType = selectedMealTypes.length === 0 || selectedMealTypes.some(m => tags.includes(m));
       const matchesOtherTags = selectedOtherTags.length === 0 || selectedOtherTags.some(t => tags.includes(t));
       const matchesLeftover = !leftoverOnly || tags.includes("leftover-safe");
