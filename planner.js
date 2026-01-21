@@ -518,24 +518,52 @@ document.addEventListener("DOMContentLoaded", () => {
       card.dataset.index = index;
       // FIX WHATEVERS GOING ON WITH THE X - build card content
       card.innerHTML = `
-        <img src="${recipe.image}" alt="${recipe.title}">
+        <div style="position:relative;">
+          <img src="${recipe.image}" alt="${recipe.title}">
+          <button class="saveRecipeBtn" style="position:absolute;top:12px;right:12px;z-index:2;">
+            <i class="fa-solid fa-bookmark"></i>
+          </button>
+        </div>
         <div class="content">
           <h3>${recipe.title}</h3>
-          <div class="card-tags">${recipe.tags.map(tag => `<span class="tag">${tag}</span>`).join("")}</div>
-          <a href="${recipe.link}" target="_blank">View Recipe</a>
-          <button class="delete-saved">✕</button>
+          <div class="card-tags">
+            ${recipe.tags.map(tag => {
+              if (/\bmin\b|\bhour\b/i.test(tag)) {
+                return `<span class="tag"><i class="fa-regular fa-clock"></i> ${tag}</span>`;
+              }
+              else if (/\$/.test(tag)) {
+                return `<span class="tag"><i class="fa-regular fa-money-bill-1"></i> ${tag}</span>`;
+              }
+              else return `<span class="tag"><i class="fa-solid fa-bell-concierge"></i> ${tag}</span>`;
+            }
+            ).join("")}
+          </div>
         </div>
       `;
+      // clicking elsewhere on card goes to recipe page
+      card.addEventListener("click", e => {
+        // if click happened inside the save button, ignore navigation
+        if (!e.target.closest(".saveRecipeBtn")) {
+          window.location.href = recipe.link;
+        }
+      });
       // drag start
       card.addEventListener("dragstart", e => {
         e.dataTransfer.setData("application/json", JSON.stringify(recipe));
       });
-      // delete saved recipe
-      card.querySelector(".delete-saved").addEventListener("click", () => {
-        let updated = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
-        updated.splice(index, 1);
-        localStorage.setItem("savedRecipes", JSON.stringify(updated));
-        loadSavedRecipes();
+      // toggle save on click (stop propagation so card click doesn't fire)
+      const saveBtn = card.querySelector(".saveRecipeBtn");
+      saveBtn.addEventListener("click", e => {
+        e.stopPropagation();
+        let saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
+        const isSaved = saved.some(r => r.link === recipe.link);
+        if (isSaved) {
+          saved = saved.filter(r => r.link !== recipe.link);
+          localStorage.setItem("savedRecipes", JSON.stringify(saved));
+          // update other parts of the app that care about saved recipes
+          window.dispatchEvent(new CustomEvent("savedRecipesUpdated", { detail: { saved } }));
+          loadSavedRecipes(); // reload the list
+        }
       });
       // append card
       container.appendChild(card);
