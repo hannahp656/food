@@ -73,7 +73,7 @@ function renderGallery() {
           }
           ).join("")}
         </div>
-        <a href="${data.link}">View Recipe</a>
+        
       </div>
     `;
     // clicking elsewhere on card goes to recipe page
