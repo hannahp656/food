@@ -1,11 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   const days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
   const meals = ["breakfast","lunch","dinner"];
-  const overlay = document.getElementById("overlay");
-  const closeOverlay = document.getElementById("closeOverlay");
-  const recipeSearch = document.getElementById("recipeSearch");
-  const searchResults = document.getElementById("searchResults");
-  const customRecipe = document.getElementById("customRecipe");
   let activeMealBox = null;
 
   // build planner
@@ -45,11 +40,6 @@ document.addEventListener("DOMContentLoaded", () => {
       startInlineAdd(activeMealBox);
     });
   });
-
-  // close overlay (if present)
-  if (closeOverlay && overlay) {
-    closeOverlay.addEventListener("click", () => overlay.classList.add("hidden"));
-  }
 
   // cache for fetched recipe JSONs (keyed by href)
   const recipeTagCache = {};
@@ -422,45 +412,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (num !== null) total += num;
     });
     totalEl.textContent = `Total: $${total.toFixed(2)}`;
-  }
-
-  // search recipes
-  if (recipeSearch && searchResults) {
-    recipeSearch.addEventListener("input", async () => {
-    const query = recipeSearch.value.toLowerCase();
-    searchResults.innerHTML = "";
-    if (!query) return;
-    // fetch recipes.html and parse for matching titles
-    const res = await fetch("recipes.html");
-    const text = await res.text();
-    const doc = new DOMParser().parseFromString(text, "text/html");
-    const cards = doc.querySelectorAll(".recipe-card");
-    // filter cards by title match
-    cards.forEach(card => {
-      const title = card.querySelector("h3").textContent;
-      const link = card.querySelector("a").getAttribute("href");
-      if (title.toLowerCase().includes(query)) {
-        const li = document.createElement("li");
-        li.textContent = title;
-        li.addEventListener("click", () => {
-          const priceEl = card.querySelector('.card-tags .tag');
-          const price = priceEl ? priceEl.textContent.trim() : null;
-          addMealItem(title, link, price);
-          if (overlay) overlay.classList.add("hidden");
-        });
-        searchResults.appendChild(li);
-      }
-    });
-  });
-  }
-  // add custom recipe (if input exists)
-  if (customRecipe) {
-    customRecipe.addEventListener("keypress", e => {
-      if (e.key === "Enter" && customRecipe.value.trim()) {
-        addMealItem(customRecipe.value.trim(), null, null);
-        if (overlay) overlay.classList.add("hidden");
-      }
-    });
   }
 
   // (addMealItem defined later after helper functions)
