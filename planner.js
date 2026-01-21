@@ -207,6 +207,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const del = document.createElement('i');
     del.className = 'fa-solid fa-xmark delete-btn';
     del.style.color = 'red';
+    del.style.marginRight = '5px';
     del.addEventListener('click', () => {
       li.remove();
       saveMeals();
@@ -606,10 +607,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  document.querySelectorAll(".tab-btn").forEach(btn => {
+  document.querySelectorAll(".button-tab").forEach(btn => {
     btn.addEventListener("click", () => {
       // deactivate all tabs and content
-      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".button-tab").forEach(b => b.classList.remove("active"));
       document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
 
       // activate clicked tab and corresponding content
