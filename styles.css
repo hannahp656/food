@@ -45,6 +45,8 @@ nav .button--active{background: var(--accent); color: white;}
 .home .hero .container{padding:36px 18px;}
 .home .hero h1{font-size:3.5rem;}
 .home .hero h1::after{height:8px;margin:25px auto 0;}
+/* Recipe Hero Adjustments */
+.recipe-hero{margin: -38px 0px -10px 0px;}
 
 /* BUTTONS */
 /*add back in micro-interactions for computer:
@@ -418,41 +420,25 @@ nav .button--active{background: var(--accent); color: white;}
 }
 @media (max-width: 800px) {.recipe-content {flex-direction: column;gap: 1.5em;padding: 1em;}}
 
-.media-container {
-  display: inline-block;
-  max-width: 100%;
-  height: auto;
-  padding: 0;
-  margin: 0 auto;
-}
-.media-container img,
-.media-container video {
-  display: block;
-  width: auto;
-  height: auto;
-  max-width: 100%;
-  max-height: 100%;
-  margin: 0 auto;
-}
 /* video on recipe page */
 .video-container {
+    max-width: 420px;
     margin: 0 auto 2em auto;
     position: relative;
+    aspect-ratio: 9/16;
     background: #e9f5e1;
     border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 4px 16px #dbead7;
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     max-width: 600px;
 }
 .video-container video {
-    width: auto;
-    height: auto;
-    max-width: 100%;
-    max-height: 100%;
-    display: block;
-    margin: 0 auto;
-    object-fit: contain;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 .video-overlay {
   position: absolute;
@@ -613,6 +599,10 @@ li {
   }
 }
 
+
+
+
+
 /* Inline meal search (matches gallery style) WHERE ARE THESE USED
 .inline-search {
   margin-top: 10px;
@@ -710,20 +700,3 @@ li {
   content:''; display:block; width:88px; height:8px; border-radius:6px; background:var(--bg); margin:25px auto 0; opacity:0.95
 }*/
 /*.filter-row .filter-icon { margin-left: auto; }*/
-
-.media-container {
-  display: inline-block;
-  max-width: 100%;
-  height: auto;
-  padding: 0;
-  margin: 0 auto;
-}
-.media-container img,
-.media-container video {
-  display: block;
-  width: auto;
-  height: auto;
-  max-width: 100%;
-  max-height: 100%;
-  margin: 0 auto;
-}

@@ -80,6 +80,18 @@ function renderGallery() {
     card.addEventListener("click", e => {
       // if click happened inside the save button, ignore navigation
       if (!e.target.closest(".saveRecipeBtn")) {
+        // Store current filter state in sessionStorage
+        const filterState = {
+          titleQuery: document.getElementById("titleSearch")?.value || "",
+          selectedIngredients: [...selectedIngredients],
+          selectedMealTypes: Array.from(document.querySelectorAll('.meal-type .filter-tag.active')).map(b => b.dataset.value),
+          selectedOtherTags: Array.from(document.querySelectorAll('.other-tags .filter-tag.active')).map(b => b.dataset.value),
+          timeLimit: document.querySelector('.time-tags .filter-tag.active')?.dataset.value || null,
+          timeRange: document.querySelector('.time-tags .filter-tag.active')?.dataset.range || null,
+          maxCost: document.getElementById("maxCostInput")?.value || "",
+          leftoverOnly: document.getElementById("leftoverCheckbox")?.checked || false
+        };
+        sessionStorage.setItem("recipeFilters", JSON.stringify(filterState));
         window.location.href = data.link;
       }
     });
@@ -286,7 +298,58 @@ function setupSearchAndFilters() {
       applyFilters(); // Reapply filters and keep dropdown closed
     });
   }
+
+  // Apply filters from URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has("q")) {
+    if (titleSearch) titleSearch.value = urlParams.get("q");
+  }
+  if (urlParams.has("ingredients")) {
+    selectedIngredients = urlParams.get("ingredients").split(",");
+    if (selectedContainer) {
+      selectedContainer.innerHTML = selectedIngredients.map(ing => `<span class="selected-tag">${ing} <button class="remove-tag" data-ingredient="${ing}">&times;</button></span>`).join("");
+      // Add event listeners for remove buttons
+      selectedContainer.querySelectorAll('.remove-tag').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const ing = btn.dataset.ingredient;
+          selectedIngredients = selectedIngredients.filter(i => i !== ing);
+          btn.parentElement.remove();
+          applyFilters();
+        });
+      });
+    }
+  }
+  if (urlParams.has("mealTypes")) {
+    const mealTypes = urlParams.get("mealTypes").split(",");
+    document.querySelectorAll('.meal-type .filter-tag').forEach(btn => {
+      if (mealTypes.includes(btn.dataset.value)) btn.classList.add('active');
+    });
+  }
+  if (urlParams.has("otherTags")) {
+    const otherTags = urlParams.get("otherTags").split(",");
+    document.querySelectorAll('.other-tags .filter-tag').forEach(btn => {
+      if (otherTags.includes(btn.dataset.value)) btn.classList.add('active');
+    });
+  }
+  if (urlParams.has("timeLimit")) {
+    const timeLimit = urlParams.get("timeLimit");
+    const timeRange = urlParams.get("timeRange");
+    document.querySelectorAll('.time-tags .filter-tag').forEach(btn => {
+      if (btn.dataset.value === timeLimit && btn.dataset.range === timeRange) btn.classList.add('active');
+    });
+  }
+  if (urlParams.has("maxCost")) {
+    if (maxCostInput) maxCostInput.value = urlParams.get("maxCost");
+  }
+  if (urlParams.get("leftoverOnly") === "true") {
+    if (leftoverCheckbox) leftoverCheckbox.checked = true;
+  }
+  // Apply the filters from URL
+  applyFilters();
+  // Clear sessionStorage after applying
+  sessionStorage.removeItem("recipeFilters");
 }
+
 
 // function to format time label
 function formatTimeLabel(minutes) {

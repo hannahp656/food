@@ -6,6 +6,33 @@ document.addEventListener("DOMContentLoaded", () => {
   // set document title
   document.title = `${data.title} - Hannah's Recipes`;
 
+  // Update back link with filter parameters
+  const backLink = document.querySelector(".back-link");
+  if (backLink) {
+    const filterState = JSON.parse(sessionStorage.getItem("recipeFilters") || "{}");
+    const params = new URLSearchParams();
+    if (filterState.titleQuery) params.set("q", filterState.titleQuery);
+    if (filterState.selectedIngredients && filterState.selectedIngredients.length > 0) {
+      params.set("ingredients", filterState.selectedIngredients.join(","));
+    }
+    if (filterState.selectedMealTypes && filterState.selectedMealTypes.length > 0) {
+      params.set("mealTypes", filterState.selectedMealTypes.join(","));
+    }
+    if (filterState.selectedOtherTags && filterState.selectedOtherTags.length > 0) {
+      params.set("otherTags", filterState.selectedOtherTags.join(","));
+    }
+    if (filterState.timeLimit) {
+      params.set("timeLimit", filterState.timeLimit);
+      params.set("timeRange", filterState.timeRange);
+    }
+    if (filterState.maxCost) params.set("maxCost", filterState.maxCost);
+    if (filterState.leftoverOnly) params.set("leftoverOnly", "true");
+    const queryString = params.toString();
+    if (queryString) {
+      backLink.href = "../recipes.html?" + queryString;
+    }
+  }
+
   // insert title
   const h1 = document.querySelector("header.hero h1");
   if (h1) h1.textContent = data.title;
