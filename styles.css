@@ -254,9 +254,9 @@ nav .button--active{background: var(--accent); color: white;}
 #planner {flex: 2;   /* ~65% */}
 /* Layout split */
 .planner-layout {display: flex;gap: 30px;align-items: flex-start;}
-.planner-actions {text-align: left;margin: 0 0 20px 0;}
-/*where is this being used?*/.planner-controls {display: flex;justify-content: center;gap: 12px;margin: 20px auto;}
-.day { max-width: var(--max-width); margin: 0 auto 30px; padding: 20px; background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); }
+/*.planner-actions {text-align: left;margin: 0 0 20px 0;}
+.planner-controls {display: flex;justify-content: center;gap: 12px;margin: 20px auto;}
+.day { max-width: var(--max-width); margin: 0 auto 30px; padding: 20px; background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); }*/
 .day h2 { margin-top: 0; color: var(--accent-2); }
 .meals { display: flex; gap: 20px;flex-direction: column; }
 .meal-box { flex: 1; width: 100%; background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px; }
@@ -272,24 +272,12 @@ nav .button--active{background: var(--accent); color: white;}
 .saved-recipes .gallery {display: flex;flex-direction: column;gap: 14px;}
 .saved-recipes .recipe-card {width: 100%;position: relative;}
 .meal-list .drag-over {background: rgba(122,157,84,0.08);border-radius: 8px;}
-.saved-recipes .delete-saved {background: crimson;color: #fff;border: none;border-radius: 50%;width: 23px;height: 23px;cursor: pointer;font-size: 0.9em;font-weight: bold;position: absolute;top: 8px;right: 8px;}
 @media (max-width: 720px) {
   .planner-layout {flex-direction: column;align-items: normal;}
   #planner, .saved-recipes {flex: 1 1 100%;}
 }
-/* add recipe */
-.inline-add { padding: 6px 0; position: relative; }
-.inline-add-input { width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid #d6e2cf; }
-.inline-cost-input { padding: 4px 6px; border-radius: 6px; border: 1px solid #d6e2cf; }
-.ingredient-filter input {
-  width: 100%;
-  padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid #e6eae2;
-}
-
+/* meal cost tag in planner*/
 .meal-cost { padding:4px 8px; font-size:0.8rem}
-
 /* leftovers toggle */
 .leftovers {color: #c5c6c4; cursor: pointer; border: none; background: transparent; padding: 4px; border-radius: 15px; font-size: 1rem; display: inline-flex; align-items: center; justify-content: center;}
 .leftovers i { font-size: 1.05rem; }
@@ -298,8 +286,12 @@ nav .button--active{background: var(--accent); color: white;}
 .controls { display: flex; gap: 6px; }
 .add-btn { background: var(--accent); color: #fff; border: none; border-radius: 6px; width: 28px; height: 28px; cursor: pointer; font-size: 1em; display: flex; align-items: center; justify-content: center; }
 .delete-btn { margin-left: 8px; background: none; border: none; color: crimson; font-weight: bold; cursor: pointer;}
+/* add recipe */
+.inline-add { padding: 6px 0; position: relative; }
+.inline-add-input { width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid #d6e2cf; }
+.inline-cost-input { padding: 4px 6px; border-radius: 6px; border: 1px solid #d6e2cf; }
+.ingredient-filter input {width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid #e6eae2;}
 
-/* Overlay for adding recipes - FIX THIS ITS UGLY */
 
 .shopping-list li {
   display: flex;
@@ -426,25 +418,41 @@ nav .button--active{background: var(--accent); color: white;}
 }
 @media (max-width: 800px) {.recipe-content {flex-direction: column;gap: 1.5em;padding: 1em;}}
 
+.media-container {
+  display: inline-block;
+  max-width: 100%;
+  height: auto;
+  padding: 0;
+  margin: 0 auto;
+}
+.media-container img,
+.media-container video {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  margin: 0 auto;
+}
 /* video on recipe page */
 .video-container {
-    max-width: 420px;
     margin: 0 auto 2em auto;
     position: relative;
-    aspect-ratio: 9/16;
     background: #e9f5e1;
     border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 4px 16px #dbead7;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: inline-block;
     max-width: 600px;
 }
 .video-container video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+    margin: 0 auto;
+    object-fit: contain;
 }
 .video-overlay {
   position: absolute;
@@ -605,10 +613,6 @@ li {
   }
 }
 
-
-
-
-
 /* Inline meal search (matches gallery style) WHERE ARE THESE USED
 .inline-search {
   margin-top: 10px;
@@ -706,3 +710,20 @@ li {
   content:''; display:block; width:88px; height:8px; border-radius:6px; background:var(--bg); margin:25px auto 0; opacity:0.95
 }*/
 /*.filter-row .filter-icon { margin-left: auto; }*/
+
+.media-container {
+  display: inline-block;
+  max-width: 100%;
+  height: auto;
+  padding: 0;
+  margin: 0 auto;
+}
+.media-container img,
+.media-container video {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  margin: 0 auto;
+}
