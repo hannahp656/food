@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title> <!-- JavaScript fills -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.css">
+    <script src="https://kit.fontawesome.com/76fcfe601b.js" crossorigin="anonymous"></script>
+  </head>
+  <body class="cute-home">
+    <!-- navigation bar -->
+    <nav>
+      <div class="container">
+        <div class="links">
+          <a class="button" href="../recipes.html">Recipes</a>
+          <a class="button" href="../meal-planner.html">Meal Planner</a>
+        </div>
+      </div>
+    </nav>
+    <!-- hero section -->
+    <header class="hero recipe-hero">
+      <div class="container">
+        <div class="top-row">
+          <a class="back-link" href="../recipes.html"><i class="fa-solid fa-arrow-left"></i></a>
+          <div class="action-buttons">
+            <button id="viewOriginalBtn" class="button button--secondary" style="display:none;">
+              View Original
+            </button>
+            <button class="saveRecipeBtn">
+              <i class="fa-regular fa-bookmark"></i>
+            </button>
+          </div>
+        </div>
+        <h1></h1> <!-- JavaScript fills -->
+        <div class="tags"></div> <!-- JavaScript fills -->
+      </div>
+    </header>
+    <!-- recipe section -->
+    <div class="container split" style="margin-top:20px;display:flex;gap:24px;align-items:flex-start;">
+      <!-- recipe video & image -->
+      <div class="left-col"> <!--style="flex:0 0 420px;"-->
+        <div class="video-container"></div> <!-- JavaScript fills -->
+      </div>
+      <!-- recipe content -->
+      <div class="right-col" ><!--style="flex:1;"-->
+        <main>
+          <div class="recipe-container">
+            <!-- ingredients -->
+            <div class="recipe-content">
+              <section class="ingredients">
+                <details open>
+                  <summary><h3>Ingredients</h3><i class="fa-solid fa-angle-right"></i></summary>
+                  <ul class="ingredients-list"></ul> <!-- JavaScript fills -->
+                </details>
+              </section>
+            </div>
+            <!-- prep & equipment -->
+            <div class="recipe-content prep-section" style="display:none;">
+              <section class="prep">
+                <details open>
+                  <summary><h3>Prep & Equipment</h3><i class="fa-solid fa-angle-right"></i></summary>
+                  <ul class="prep-list"></ul> <!-- JavaScript fills -->
+                </details>
+              </section>
+            </div>
+            <!-- instructions -->
+            <div class="recipe-content">
+              <section class="instructions">
+                <h3>Instructions</h3>
+                <ol class="instructions-list"></ol> <!-- JavaScript fills -->
+              </section>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script id="recipe-data" type="application/json">
+{
+  "title": "Mexican Street Corn",
+  "image": "link",
+  "cover": "link",
+  "video": "/food/recipe_videos/XXX.mp4",
+  "link": "/food/recipes/recipe-mexican-street-corn.html",
+  "original": "XXX",
+  "tags": [
+    "$??",
+    "?? min",
+    "??"
+  ],
+  "extra-tags": [
+    "Asian",
+    "Full Meal",
+    "Entree",
+    "Side",
+    "Breakfast",
+    "Snack",
+    "Leftover-Safe",
+    "Quick & Easy"
+  ],
+  "ingredients": [
+    "NEED INGREDIENTS"
+  ],
+  "prep": [
+    "NEED PREP"
+  ],
+  "instructions": [
+    "NEED INSTRUCTIONS",
+    {
+      "image": "link"
+    }
+  ],
+  "parsedIngredients": [
+    {
+      "amount": "",
+      "unit": "",
+      "ingredient": "NEED INGREDIENTS",
+      "descriptors": ""
+    }
+  ]
+}
+</script>
+    <script src="../recipe-template.js"></script>
+      oooo look its a footer
+    </footer>
+  </body>
+</html>

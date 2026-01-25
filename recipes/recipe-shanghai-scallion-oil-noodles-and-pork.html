@@ -7,18 +7,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../styles.css">
-    <style> html { font-family: Montserrat, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, system-ui, -apple-system, sans-serif; } </style>
-
     <script src="https://kit.fontawesome.com/76fcfe601b.js" crossorigin="anonymous"></script>
   </head>
-
   <body class="cute-home">
     <!-- navigation bar -->
     <nav>
       <div class="container">
         <div class="links">
-          <a class="button button--nav" href="../meal-planner.html">Meal Planner</a>
-          <a class="button button--nav" href="../recipes.html">Recipes</a>
+          <a class="button" href="../recipes.html">Recipes</a>
+          <a class="button" href="../meal-planner.html">Meal Planner</a>
         </div>
       </div>
     </nav>
@@ -43,11 +40,11 @@
     <!-- recipe section -->
     <div class="container split" style="margin-top:20px;display:flex;gap:24px;align-items:flex-start;">
       <!-- recipe video & image -->
-      <div class="left-col" style="flex:0 0 420px;">
+      <div class="left-col"> <!--style="flex:0 0 420px;"-->
         <div class="video-container"></div> <!-- JavaScript fills -->
       </div>
       <!-- recipe content -->
-      <div class="right-col" style="flex:1;">
+      <div class="right-col" ><!--style="flex:1;"-->
         <main>
           <div class="recipe-container">
             <!-- ingredients -->
@@ -184,9 +181,6 @@
 }
 </script>
     <script src="../recipe-template.js"></script>
-<!--<script type="module" src="../firebase-init.js"></script>
-<script type="module" src="../firebase-sync.js"></script>
-<script type="module" src="../index-auth.js"></script>-->
       oooo look its a footer
     </footer>
   </body>
