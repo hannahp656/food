@@ -117,11 +117,16 @@ document.addEventListener("DOMContentLoaded", () => {
       else return `<span class="tag"><i class="fa-solid fa-bell-concierge"></i> ${tag}</span>`;
     }).join("");
 
-    const secondLine = data.tags.slice(3).map(tag => { //take this out bc only 3 tags
+    const secondLine = data.tags.slice(3).map(tag => {
       return `<span class="tag">${tag}</span>`;
     }).join("");
 
-    recipeTags.innerHTML = `<div>${firstLine}</div>${secondLine ? `<div>${secondLine}</div>` : ""}`;
+    let extraTagsLine = "";
+    if (data["extra-tags"] && data["extra-tags"].length > 0) {
+      extraTagsLine = `<div>${data["extra-tags"].map(tag => `<span class="tag">${tag}</span>`).join("")}</div>`;
+    }
+
+    recipeTags.innerHTML = `<div>${firstLine}</div>${secondLine ? `<div>${secondLine}</div>` : ""}${extraTagsLine}`;
   }
 
   // insert video if available
