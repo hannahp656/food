@@ -5,6 +5,7 @@ let filteredRecipes = [];     // Store filtered view
 let allIngredients = [];      // Store all unique ingredients
 let selectedIngredients = []; // Ingredients selected for filtering
 let eatingOutFilter = "no";   // Default to 'no' (exclude Eating Out)
+let currentSort = "none";     // Default sort is random
 
 // load all recipes
 async function loadRecipes() {
@@ -43,14 +44,56 @@ async function loadRecipes() {
 
 
 // function to render gallery cards
+function shuffleArray(array) {
+  // Fisher-Yates shuffle
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+function sortRecipes(recipes) {
+  if (currentSort === "none") {
+    return shuffleArray([...recipes]);
+  } else if (currentSort === "price") {
+    return [...recipes].sort((a, b) => {
+      const getPrice = r => {
+        const tag = (r.tags || []).find(t => /^\$/.test(t));
+        if (!tag) return Infinity;
+        const m = tag.match(/(\d+(?:\.\d+)?|\.\d+)/);
+        return m ? parseFloat(m[0]) : Infinity;
+      };
+      return getPrice(a) - getPrice(b);
+    });
+  } else if (currentSort === "time") {
+    return [...recipes].sort((a, b) => {
+      const getTime = r => {
+        if (r.time) return parseInt(r.time, 10) || 9999;
+        const tag = (r.tags || []).find(t => /\b\d+\s*min\b/i.test(t));
+        if (!tag) return 9999;
+        const m = tag.match(/(\d+)\s*min/i);
+        return m ? parseInt(m[1], 10) : 9999;
+      };
+      return getTime(a) - getTime(b);
+    });
+  } else if (currentSort === "az") {
+    return [...recipes].sort((a, b) => a.title.localeCompare(b.title));
+  } else if (currentSort === "za") {
+    return [...recipes].sort((a, b) => b.title.localeCompare(a.title));
+  }
+  return recipes;
+}
+
 function renderGallery() {
   const gallery = document.getElementById("gallery");
   gallery.innerHTML = "";
-  if (filteredRecipes.length === 0) {
+  let toRender = sortRecipes(filteredRecipes);
+  if (toRender.length === 0) {
     gallery.innerHTML = "<p style='text-align:center;color:var(--muted)'>No recipes found.</p>";
     return;
   }
-  filteredRecipes.forEach(data => {
+  toRender.forEach(data => {
     const card = document.createElement("div");
     card.className = "recipe-card";
     card.innerHTML = `
@@ -153,6 +196,7 @@ function setupSearchAndFilters() {
   const timeTags = document.querySelectorAll('.time-tags .filter-tag');
   const otherTags = document.querySelectorAll('.other-tags .filter-tag');
   const eatingOutBtns = document.querySelectorAll('.eating-out-toggle .filter-tag');
+  const proteinTags = document.querySelectorAll('.protein-tags .filter-tag');
   // tag click behavior
   const toggleTag = (btn) => btn.classList.toggle('active');
   mealTypeTags.forEach(btn => btn.addEventListener('click', () => { toggleTag(btn); }));
@@ -162,6 +206,7 @@ function setupSearchAndFilters() {
     btn.classList.add('active');
   }));
   otherTags.forEach(btn => btn.addEventListener('click', () => { toggleTag(btn); }));
+  proteinTags.forEach(btn => btn.addEventListener('click', () => { toggleTag(btn); applyFilters(); }));
   eatingOutBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       eatingOutBtns.forEach(b => b.classList.remove('active'));
@@ -370,7 +415,7 @@ function formatTimeLabel(minutes) {
   if (minutes < 60) return `${minutes} min`;
   const hours = minutes / 60;
   if (hours === 1) return "1 hour";
-  if (hours % 1 === 0.5) return `${hours} hours`; // e.g. 1.5 -> "1.5 hours"
+  if (hours % 1 === 0.5) return `${hours} hours`;
   const fractionalHours = {
     0.25: "¼",
     0.5: "½",
@@ -401,6 +446,7 @@ function parsePrice(tag) {
     const selectedOtherTags = Array.from(document.querySelectorAll('.other-tags .filter-tag.active')).map(b => b.dataset.value.toLowerCase());
     const timeBtn = document.querySelector('.time-tags .filter-tag.active');
     const timeLimitObj = timeBtn ? { value: parseInt(timeBtn.dataset.value,10), range: timeBtn.dataset.range } : null;
+    const selectedProteinTags = Array.from(document.querySelectorAll('.protein-tags .filter-tag.active')).map(b => b.dataset.value.toLowerCase());
 
     // filter recipes
     filteredRecipes = allRecipes.filter(r => {
@@ -429,6 +475,8 @@ function parsePrice(tag) {
 
       // Use allTags for tag-based filtering
       const tags = (r.allTags || []).map(t => t.toLowerCase());
+      // Protein filter
+      const matchesProtein = selectedProteinTags.length === 0 || selectedProteinTags.some(p => tags.includes(p));
       const matchesMealType = selectedMealTypes.length === 0 || selectedMealTypes.some(m => tags.includes(m));
       const matchesOtherTags = selectedOtherTags.length === 0 || selectedOtherTags.some(t => tags.includes(t));
       const matchesLeftover = !leftoverOnly || tags.includes("leftover-safe");
@@ -452,7 +500,8 @@ function parsePrice(tag) {
         matchesMealType &&
         matchesOtherTags &&
         matchesLeftover &&
-        matchesCost
+        matchesCost &&
+        matchesProtein
       );
     });
     renderGallery();
@@ -460,3 +509,29 @@ function parsePrice(tag) {
 
 // Load everything
 loadRecipes();
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Sort dropdown logic
+  const sortBtn = document.getElementById("sortBtn");
+  const sortDropdown = document.getElementById("sortDropdown");
+  if (sortBtn && sortDropdown) {
+    sortBtn.addEventListener("click", e => {
+      e.stopPropagation();
+      sortDropdown.style.display = sortDropdown.style.display === "block" ? "none" : "block";
+    });
+    document.addEventListener("click", () => {
+      sortDropdown.style.display = "none";
+    });
+    sortDropdown.querySelectorAll(".sort-option, li").forEach(option => {
+      option.addEventListener("click", e => {
+        e.stopPropagation();
+        sortDropdown.querySelectorAll(".sort-option, li").forEach(o => o.classList.remove("active"));
+        option.classList.add("active");
+        currentSort = option.dataset.sort;
+        sortBtn.innerHTML = option.textContent + ' <i class="fa fa-chevron-down" style="margin-left: 6px;"></i>';
+        sortDropdown.style.display = "none";
+        renderGallery();
+      });
+    });
+  }
+});
