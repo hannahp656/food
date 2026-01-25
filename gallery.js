@@ -4,6 +4,7 @@ let allRecipes = [];          // Store all recipe data
 let filteredRecipes = [];     // Store filtered view
 let allIngredients = [];      // Store all unique ingredients
 let selectedIngredients = []; // Ingredients selected for filtering
+let eatingOutFilter = "no";   // Default to 'no' (exclude Eating Out)
 
 // load all recipes
 async function loadRecipes() {
@@ -151,6 +152,7 @@ function setupSearchAndFilters() {
   const mealTypeTags = document.querySelectorAll('.meal-type .filter-tag');
   const timeTags = document.querySelectorAll('.time-tags .filter-tag');
   const otherTags = document.querySelectorAll('.other-tags .filter-tag');
+  const eatingOutBtns = document.querySelectorAll('.eating-out-toggle .filter-tag');
   // tag click behavior
   const toggleTag = (btn) => btn.classList.toggle('active');
   mealTypeTags.forEach(btn => btn.addEventListener('click', () => { toggleTag(btn); }));
@@ -160,6 +162,14 @@ function setupSearchAndFilters() {
     btn.classList.add('active');
   }));
   otherTags.forEach(btn => btn.addEventListener('click', () => { toggleTag(btn); }));
+  eatingOutBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      eatingOutBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      eatingOutFilter = btn.dataset.value;
+      applyFilters();
+    });
+  });
 
   // leftover checkbox setup
   if (leftoverCheckbox) leftoverCheckbox.addEventListener("change", applyFilters);
@@ -295,6 +305,9 @@ function setupSearchAndFilters() {
       document.querySelectorAll('.filter-tag').forEach(b => b.classList.remove('active'));
       if (maxCostInput) maxCostInput.value = '';
       if (leftoverCheckbox) leftoverCheckbox.checked = false; // Reset leftover checkbox
+      // reset eating out filter
+      eatingOutFilter = "no";
+      eatingOutBtns.forEach(btn => btn.classList.remove('active'));
       applyFilters(); // Reapply filters and keep dropdown closed
     });
   }
@@ -427,6 +440,9 @@ function parsePrice(tag) {
         const price = parsePrice(priceTag);
         matchesCost = (price === null) || (price <= maxCost);
       }
+
+      // Eating Out filter
+      if (eatingOutFilter === "no" && tags.includes("eating out")) return false;
 
       // return filtered result
       return (
