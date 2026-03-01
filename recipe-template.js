@@ -37,11 +37,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const h1 = document.querySelector("header.hero h1");
   if (h1) h1.textContent = data.title;
 
+  // insert hero image - is this used??
+  //const heroImg = document.querySelector("header.hero img");
+ // if (heroImg && data.cover) {
+  //  heroImg.src = data.cover;
+  //  heroImg.alt = data.title;
+  //}
   // insert hero image
-  const heroImg = document.querySelector("header.hero img");
-  if (heroImg && data.cover) {
-    heroImg.src = data.cover;
-    heroImg.alt = data.title;
+  const imgContainer = document.querySelector(".image-container");
+  if (data.image) {
+    const img = document.createElement("img");
+    img.src = data.image;
+    img.alt = data.title;
+    img.style.width = "100%";
+    img.style.display = "block";
+    imgContainer.appendChild(img);
   }
 
   // setup "view original recipe" button
@@ -56,7 +66,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // setup save button(s)
   document.querySelectorAll(".saveRecipeBtn").forEach(saveBtn => {
     const icon = saveBtn.querySelector("i");
-
     function updateBookmarkIcon(isSaved) {
       if (isSaved) {
         icon.classList.remove("fa-regular");
@@ -66,15 +75,12 @@ document.addEventListener("DOMContentLoaded", () => {
         icon.classList.add("fa-regular");
       }
     }
-
     let saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
     let isSaved = saved.some(r => r.link === data.link);
     updateBookmarkIcon(isSaved);
-
     saveBtn.addEventListener("click", () => {
       saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
       isSaved = saved.some(r => r.link === data.link);
-
       if (isSaved) {
         saved = saved.filter(r => r.link !== data.link);
         localStorage.setItem("savedRecipes", JSON.stringify(saved));
@@ -84,19 +90,13 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem("savedRecipes", JSON.stringify(saved));
         updateBookmarkIcon(true);
       }
-
-      // 🔔 trigger same-tab sync event for gallery + planner
       window.dispatchEvent(new Event("savedRecipesUpdated"));
     });
-
-    // Keep the icon in sync if savedRecipes changes elsewhere
     function syncBookmarkIcon() {
       const saved = JSON.parse(localStorage.getItem("savedRecipes") || "[]");
       const isSavedNow = saved.some(r => r.link === data.link);
       updateBookmarkIcon(isSavedNow);
     }
-
-    // Cross-tab + same-tab syncing
     window.addEventListener("storage", (ev) => {
       if (ev.key === "savedRecipes") syncBookmarkIcon();
     });
@@ -116,20 +116,18 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       else return `<span class="tag"><i class="fa-solid fa-bell-concierge"></i> ${tag}</span>`;
     }).join("");
-
     const secondLine = data.tags.slice(3).map(tag => {
       return `<span class="tag">${tag}</span>`;
     }).join("");
-
     let extraTagsLine = "";
     if (data["extra-tags"] && data["extra-tags"].length > 0) {
       extraTagsLine = `<div>${data["extra-tags"].map(tag => `<span class="tag">${tag}</span>`).join("")}</div>`;
     }
-
     recipeTags.innerHTML = `<div>${firstLine}</div>${secondLine ? `<div>${secondLine}</div>` : ""}${extraTagsLine}`;
   }
 
   // insert video if available
+  const videoSection = document.querySelector(".video-section");
   const videoContainer = document.querySelector(".video-container");
   if (data.video) {
     const videoElement = document.createElement("video");
@@ -139,33 +137,24 @@ document.addEventListener("DOMContentLoaded", () => {
     videoElement.setAttribute("playsinline", "");
     videoElement.style.width = "100%";
     videoElement.style.display = "block";
-
     const overlay = document.createElement("div");
     overlay.className = "video-overlay";
     const playButton = document.createElement("div");
     playButton.className = "play-button";
     overlay.appendChild(playButton);
-
     overlay.addEventListener("click", () => {
       videoElement.play();
       overlay.style.display = "none";
     });
-
     videoContainer.appendChild(videoElement);
     videoContainer.appendChild(overlay);
-  } else if (data.cover) {
-    const img = document.createElement("img");
-    img.src = data.cover;
-    img.alt = data.title;
-    img.style.width = "100%";
-    img.style.display = "block";
-    videoContainer.appendChild(img);
+  } else {
+    videoSection.style.display = "none";
   }
 
-  // ✅ simplified ingredient list with ingredient tags restored
+  // insert ingredients list
   const ingredientTags = (data.parsedIngredients || []).map(i => i.ingredient.toLowerCase().trim());
   const ingList = document.querySelector(".ingredients-list");
-
   if (ingList && data.ingredients) {
     ingList.innerHTML = data.ingredients.map(line => {
       let displayLine = line;
@@ -180,26 +169,80 @@ document.addEventListener("DOMContentLoaded", () => {
     }).join("");
   }
 
-  // ---- Prep & Equipment Section ----
+  // insert prep steps
+  //const prepSection = document.querySelector(".prep-section");
+  //const prepList = document.querySelector(".prep-list");
+  //if (data.prep && Array.isArray(data.prep) && data.prep.length > 0) {
+  //  prepSection.style.display = "block";
+  //  data.prep.forEach(item => {
+  //    let itemText = item;
+  //    (ingredientTags || []).sort((a, b) => b.length - a.length).forEach(ingredient => {
+  //      const regex = new RegExp(`\\b${ingredient.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")}s?\\b`, "gi");
+  //      itemText = itemText.replace(regex, `<strong>${ingredient}</strong>`);
+  //    });
+  //    const li = document.createElement("li");
+  //    li.innerHTML = itemText;
+ //     prepList.appendChild(li);
+ //   });
+ // } else {
+//    prepSection.style.display = "none";
+//}
+
   const prepSection = document.querySelector(".prep-section");
   const prepList = document.querySelector(".prep-list");
-  if (data.prep && Array.isArray(data.prep) && data.prep.length > 0) {
-    prepSection.style.display = "block"; // show section
-    data.prep.forEach(item => {
-      let itemText = item;
-      // highlight ingredient names in prep steps
-      (ingredientTags || []).sort((a, b) => b.length - a.length).forEach(ingredient => {
-        const regex = new RegExp(`\\b${ingredient.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")}s?\\b`, "gi");
-        itemText = itemText.replace(regex, `<strong>${ingredient}</strong>`);
-      });
 
-      const li = document.createElement("li");
-      li.innerHTML = itemText;
-      prepList.appendChild(li);
+  if (prepSection && prepList && Array.isArray(data.prep) && data.prep.length > 0) {
+    prepList.innerHTML = data.prep.map((prep, index) => {
+      if (typeof prep === "string") {
+        const next = data.prep[index + 1];
+        let prepText = prep;
+        ingredientTags
+          .sort((a, b) => b.length - a.length)
+          .forEach(ingredient => {
+            const regex = new RegExp(`\\b${ingredient.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")}\\b`, "gi");
+            prepText = prepText.replace(regex, `<strong>${ingredient}</strong>`);
+          });
+        if (next && typeof next === "object" && next.image) {
+          const id = `img-${Math.random().toString(36).substr(2, 9)}`;
+          return `
+            <li>
+              ${prepText}
+              <button class="img-toggle" data-target="${id}">
+                <i class="fa-solid fa-angle-right"></i>
+              </button>
+              <div id="${id}" class="instruction-img hidden">
+                <img src="${next.image}" alt="Instruction image">
+              </div>
+            </li>
+          `;
+        }
+
+        return `<li>${prepText}</li>`;
+      }
+
+      return "";
+    }).join("");
+// handle image toggles
+    prepList.querySelectorAll(".img-toggle").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const targetId = btn.dataset.target;
+        const target = document.getElementById(targetId);
+        const icon = btn.querySelector("i");
+
+        if (target.classList.contains("hidden")) {
+          target.classList.remove("hidden");
+          icon.style.transform = "rotate(90deg)";
+        } else {
+          target.classList.add("hidden");
+          icon.style.transform = "rotate(0deg)";
+        }
+      });
     });
+  } else if (prepSection) {
+    prepSection.style.display = "none";
   }
 
-  // insert instructions (with bolded ingredients + image toggles)
+  // insert instructions
   const stepsSection = document.querySelector(".instructions");
   const stepsList = document.querySelector(".instructions-list");
 

@@ -54,8 +54,10 @@ function parseAndCombineIngredients(recipes, mealPlan) {
   Object.values(mealPlan).forEach(dayObj => {
     Object.values(dayObj).forEach(mealArr => {
       mealArr.forEach(item => {
+        // skip items marked as leftovers
+        if (item.leftovers) return;
         const recipe = Object.values(recipes).find(r =>
-        item.link && (r.link === item.link || item.link.endsWith(r.link))
+          item.link && (r.link === item.link || item.link.endsWith(r.link))
         );
         if (recipe && Array.isArray(recipe.parsedIngredients)) {
           allParsed.push(...recipe.parsedIngredients);

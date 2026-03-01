@@ -187,6 +187,8 @@ document.addEventListener("DOMContentLoaded", () => {
       // persist immediately
       saveMeals();
       updateTotalCost();
+      // notify shopping list to refresh when leftovers change
+      window.dispatchEvent(new Event('mealPlanUpdated'));
     });
     li.appendChild(leftovers);
 
@@ -202,6 +204,8 @@ document.addEventListener("DOMContentLoaded", () => {
       li.remove();
       saveMeals();
       updateTotalCost();
+      // notify shopping list to refresh when an item is removed
+      window.dispatchEvent(new Event('mealPlanUpdated'));
     });
     li.appendChild(del)
 
@@ -227,6 +231,8 @@ document.addEventListener("DOMContentLoaded", () => {
     targetBox.querySelector('.meal-list').appendChild(li);
     saveMeals();
     updateTotalCost();
+    // notify shopping list to refresh when meals change
+    window.dispatchEvent(new Event('mealPlanUpdated'));
   }
 
   // start an inline add row in the given meal box

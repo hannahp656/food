@@ -89,8 +89,12 @@ for (const file of files) {
   const jsonPath = path.join(inputDir, file);
   const recipeData = JSON.parse(fs.readFileSync(jsonPath, "utf8"));
 
-  // add parsed ingredient lines
-  recipeData.parsedIngredients = recipeData.ingredients.map(parseIngredient);
+  // add parsed ingredient lines (handle missing ingredients)
+  if (Array.isArray(recipeData.ingredients)) {
+    recipeData.parsedIngredients = recipeData.ingredients.map(parseIngredient);
+  } else {
+    recipeData.parsedIngredients = [];
+  }
 
   // inject JSON into template
   const outputHTML = templateHTML.replace(

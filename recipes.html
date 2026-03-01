@@ -50,6 +50,18 @@
                 <div id="selectedIngredients" class="selected-tags"></div>
               </div>
             </div>
+
+            <div class="filter-section">
+              <h4>Protein</h4>
+              <div class="tag-group protein-tags">
+                <button type="button" class="filter-tag" data-value="beef">Beef</button>
+                <button type="button" class="filter-tag" data-value="pork">Pork</button>
+                <button type="button" class="filter-tag" data-value="chicken">Chicken</button>
+                <button type="button" class="filter-tag" data-value="seafood">Seafood</button>
+                <button type="button" class="filter-tag" data-value="eggs">Eggs</button>
+              </div>
+            </div>
+
             <div class="filter-section">
               <h4>Meal Type</h4>
               <div class="tag-group meal-type">
@@ -97,16 +109,6 @@
               </div>
             </div>
 
-            <div class="filter-section">
-              <h4>Protein</h4>
-              <div class="tag-group protein-tags">
-                <button type="button" class="filter-tag" data-value="egg">Egg</button>
-                <button type="button" class="filter-tag" data-value="beef">Beef</button>
-                <button type="button" class="filter-tag" data-value="chicken">Chicken</button>
-                <button type="button" class="filter-tag" data-value="pork">Pork</button>
-                <button type="button" class="filter-tag" data-value="seafood">Seafood</button>
-              </div>
-            </div>
           </div>
     </header>
     <div class="wave-divider-bottom">
@@ -116,11 +118,11 @@
     </div>
     <!-- gallery container -->
     <main>
-      <div class="gallery-sort-bar" style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px;">
+      <div class="gallery-sort-bar">
         <label for="sortDropdown" style="margin-right: 8px; font-weight: 600; color: var(--accent-2);">Sort:</label>
         <div style="position: relative;">
           <button id="sortBtn" class="button button--secondary" style="min-width: 110px;">None <i class="fa fa-chevron-down" style="margin-left: 6px;"></i></button>
-          <ul id="sortDropdown" class="sort-dropdown" style="display: none; position: absolute; right: 0; top: 110%; background: #fff; border-radius: 8px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); padding: 0; margin: 0; list-style: none; min-width: 160px; z-index: 100;">
+          <ul id="sortDropdown" class="sort-dropdown">
             <li data-sort="none" class="sort-option active">None (Random)</li>
             <li data-sort="price">Price - low to high</li>
             <li data-sort="time">Time - low to high</li>
@@ -135,8 +137,6 @@
     </main>
     <script src="/food/recipe-files.js"></script>
     <script src="gallery.js"></script>
-    <footer>
-      oooo look its a footer
-    </footer>
+    <footer></footer>
   </body>
 </html>

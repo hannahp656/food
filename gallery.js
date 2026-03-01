@@ -475,8 +475,22 @@ function parsePrice(tag) {
 
       // Use allTags for tag-based filtering
       const tags = (r.allTags || []).map(t => t.toLowerCase());
-      // Protein filter
-      const matchesProtein = selectedProteinTags.length === 0 || selectedProteinTags.some(p => tags.includes(p));
+      // Protein filter - check ingredients for protein keywords
+      let matchesProtein = true;
+      if (selectedProteinTags.length > 0) {
+        const ingredientsStr = (r.ingredientsLower || []).join(" ").toLowerCase();
+        const proteinKeywords = {
+          beef: ['beef', 'chuck', 'ribeye', 'sirloin', 'ground beef', 'steak'],
+          pork: ['pork', 'bacon', 'ham', 'sausage'],
+          chicken: ['chicken'],
+          seafood: ['fish', 'shrimp', 'tuna', 'salmon', 'trout', 'crab'],
+          eggs: ['eggs', 'egg']
+        };
+        matchesProtein = selectedProteinTags.some(protein => {
+          const keywords = proteinKeywords[protein] || [];
+          return keywords.some(keyword => ingredientsStr.includes(keyword));
+        });
+      }
       const matchesMealType = selectedMealTypes.length === 0 || selectedMealTypes.some(m => tags.includes(m));
       const matchesOtherTags = selectedOtherTags.length === 0 || selectedOtherTags.some(t => tags.includes(t));
       const matchesLeftover = !leftoverOnly || tags.includes("leftover-safe");
