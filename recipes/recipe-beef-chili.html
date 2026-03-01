@@ -29,17 +29,21 @@
       <div class="container">
         <div class="top-row">
           <a class="back-link" href="../recipes.html"><i class="fa-solid fa-arrow-left"></i></a>
-          <div class="action-buttons">
-            <button id="viewOriginalBtn" class="button button--secondary" style="display:none;">
-              View Original
-            </button>
-            <button class="saveRecipeBtn">
-              <i class="fa-regular fa-bookmark"></i>
-            </button>
-          </div>
+          <button class="saveRecipeBtn"><i class="fa-regular fa-bookmark"></i></button>
         </div>
-        <h1></h1> <!-- JavaScript fills -->
-        <div class="tags"></div> <!-- JavaScript fills -->
+      </div>
+      <div class="container split" style="margin-top:20px;display:flex;gap:45px;align-items:flex-start;">
+        <div class="left-col"> <!--style="flex:0 0 420px;"-->
+          <div class="image-container"></div> <!-- JavaScript fills -->
+        </div>
+        <div class="right-col" ><!--style="flex:1;"-->  
+          <h1></h1> <!-- JavaScript fills -->
+          <div class="tags"></div> <!-- JavaScript fills -->
+          <button id="viewOriginalBtn" class="button button--outline" style="display:none;">
+            Original Recipe
+            <i class="fa-solid fa-arrow-up-right-from-square" style="color:white;"></i>
+          </button>
+        </div>
       </div>
     </header>
     <div class="wave-divider-bottom">
@@ -49,44 +53,34 @@
     </div>
     <!-- recipe section -->
     <div class="container split" style="margin-top:20px;display:flex;gap:24px;align-items:flex-start;">
-      <!-- recipe video & image -->
-      <div class="left-col"> <!--style="flex:0 0 420px;"-->
-        <div class="video-container"></div> <!-- JavaScript fills -->
+      <!-- ingredients -->
+      <div class="recipe-content left-col" >
+        <section class="ingredients">
+          <h3>Ingredients</h3>
+          <ul class="ingredients-list"></ul> <!-- JavaScript fills -->
+        </section>
       </div>
-      <!-- recipe content -->
-      <div class="right-col" ><!--style="flex:1;"-->
-        <main>
-          <div class="recipe-container">
-            <!-- ingredients -->
-            <div class="recipe-content">
-              <section class="ingredients">
-                <details open>
-                  <summary><h3>Ingredients</h3><i class="fa-solid fa-angle-right"></i></summary>
-                  <ul class="ingredients-list"></ul> <!-- JavaScript fills -->
-                </details>
-              </section>
-            </div>
-            <!-- prep & equipment -->
-            <div class="recipe-content prep-section" style="display:none;">
-              <section class="prep">
-                <details open>
-                  <summary><h3>Prep & Equipment</h3><i class="fa-solid fa-angle-right"></i></summary>
-                  <ul class="prep-list"></ul> <!-- JavaScript fills -->
-                </details>
-              </section>
-            </div>
-            <!-- instructions -->
-            <div class="recipe-content">
-              <section class="instructions">
-                <h3>Instructions</h3>
-                <ol class="instructions-list"></ol> <!-- JavaScript fills -->
-              </section>
-            </div>
-          </div>
-        </main>
+      <!-- prep -->
+       <div class="recipe-content right-col prep-section">
+        <section class="prep">
+          <h3>Prep</h3>
+          <ul class="prep-list"></ul> <!-- JavaScript fills -->
+        </section>
       </div>
     </div>
-
+    <div class="container" style="margin-top: 20px;">
+      <div class="recipe-content split" style="display:flex;gap:24px;align-items:flex-start;">
+        <div class="instructions-section"style="flex: 4;">
+          <section class="instructions">
+            <h3>Instructions</h3>
+            <ol class="instructions-list"></ol> <!-- JavaScript fills -->
+          </section>
+        </div>
+        <div class="video-section" style="flex: 2;">
+          <div class="video-container"></div> <!-- JavaScript fills -->
+        </div>
+      </div>
+    </div>
     <script id="recipe-data" type="application/json">
 {
   "title": "Beef Chili",
@@ -102,13 +96,17 @@
   ],
   "extra-tags": [
     "Full Meal",
-    "Leftover-Safe"
+    "Leftover-Safe",
+    "Beef"
   ],
   "ingredients": [
     "NEED INGREDIENTS"
   ],
   "prep": [
-    "NEED PREP"
+    "NEED PREP",
+    {
+      "image": "link"
+    }
   ],
   "instructions": [
     "NEED INSTRUCTIONS",
@@ -127,7 +125,8 @@
 }
 </script>
     <script src="../recipe-template.js"></script>
-      oooo look its a footer
+    <footer>
+      <!--ooo look its a footer-->
     </footer>
   </body>
 </html>
