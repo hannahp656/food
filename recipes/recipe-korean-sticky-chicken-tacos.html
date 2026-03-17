@@ -56,7 +56,15 @@
       <!-- ingredients -->
       <div class="recipe-content left-col" >
         <section class="ingredients">
-          <h3>Ingredients</h3>
+          <div class="ingredients-header">
+            <h3>Ingredients</h3>
+            <div class="servings-control">
+              <label for="servings-input">Servings:</label>
+              <button class="servings-arrow" data-direction="-1">-</button>
+              <input type="number" id="servings-input" min="0" max="10" step="1" style="width: 50px; text-align: center;">
+              <button class="servings-arrow" data-direction="1">+</button>
+            </div>
+          </div>
           <ul class="ingredients-list"></ul> <!-- JavaScript fills -->
         </section>
       </div>
@@ -87,10 +95,10 @@
   "image": "https://photos.smugmug.com/Food/Cooking-2015/i-9XLwzBT/0/b89d6393/X2/20181026-chicken-lettuce-wraps-2-Edit-X2.jpg",
   "link": "/food/recipes/recipe-korean-sticky-chicken-tacos.html",
   "original": "",
+  "servings": "4",
   "tags": [
     "$3.5",
-    "30 min",
-    "3"
+    "30 min"
   ],
   "extra-tags": [
     "Full Meal",
