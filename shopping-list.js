@@ -112,6 +112,19 @@ function parseAndCombineIngredients(recipes, mealPlan) {
             parsed.amount = formatAmount(scaled);
             allParsed.push(parsed);
           });
+        } else if (recipe && Array.isArray(recipe.ingredients)) {
+          // Fallback: parse ingredients on the fly if parsedIngredients not available
+          const recipeServings = parseFloat(recipe.servings) || 1;
+          const itemServings = parseFloat(item.servings) || recipeServings || 1;
+          const scaleFactor = recipeServings > 0 ? itemServings / recipeServings : 1;
+
+          recipe.ingredients.forEach(ingLine => {
+            const parsed = parseIngredient(ingLine);
+            const numeric = parseAmount(parsed.amount);
+            const scaled = numeric * scaleFactor;
+            parsed.amount = formatAmount(scaled);
+            allParsed.push(parsed);
+          });
         }
       });
     });
@@ -133,18 +146,26 @@ function parseAndCombineIngredients(recipes, mealPlan) {
     ingredient: i.ingredient
   }));
 
-  // 5. merge duplicates (singular/plural)
+  // 5. merge duplicates (singular/plural) by summing amounts
   const combined = {};
   allParsed.forEach(i => {
     const singular = singularize(i.ingredient);
-    if (!combined[singular]) combined[singular] = [];
-    if (i.measurement) combined[singular].push(i.measurement);
+    if (!combined[singular]) {
+      combined[singular] = { totalAmount: 0, unit: i.unit || "", measurements: [] };
+    }
+
+    // Parse and add the amount
+    const amount = parseAmount(i.amount);
+    combined[singular].totalAmount += amount;
+
+    // Keep track of measurements for display
+    if (i.measurement) combined[singular].measurements.push(i.measurement);
   });
 
-  // 6. format list
-  return Object.entries(combined).map(([ingredient, measurements]) => ({
+  // 6. format list with summed amounts
+  return Object.entries(combined).map(([ingredient, data]) => ({
     ingredient: ingredient.charAt(0).toUpperCase() + ingredient.slice(1),
-    measurement: measurements.join(", ")
+    measurement: data.measurements.length > 1 ? formatAmount(data.totalAmount) + " " + data.unit : data.measurements[0] || ""
   }));
 }
 
