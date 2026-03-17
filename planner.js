@@ -43,8 +43,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // cache for fetched recipe JSONs (keyed by href)
   const recipeTagCache = {};
+  const recipeDataCache = {};
   // cache parsed recipe index for inline suggestions
   let recipesCache = null;
+
+  async function fetchRecipeData(href) {
+    if (!href) return null;
+    if (recipeDataCache[href]) return recipeDataCache[href];
+    try {
+      const res = await fetch(href);
+      if (!res.ok) return null;
+      const text = await res.text();
+      const doc = new DOMParser().parseFromString(text, "text/html");
+      const dataEl = doc.querySelector("#recipe-data");
+      if (!dataEl) return null;
+      const json = JSON.parse(dataEl.textContent);
+      recipeDataCache[href] = json;
+      return json;
+    } catch (err) {
+      console.warn('Failed to fetch recipe data', href, err);
+      return null;
+    }
+  }
 
   async function fetchRecipesIndex() {
     if (recipesCache) return recipesCache;
@@ -118,11 +138,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // create a meal list <li> with cost, title/link, leftovers toggle, and delete button
-  function createMealListItem(title, link, costTag, leftoversActive = false) {
+  // create a meal list <li> with cost, title/link, servings control, and delete button
+  function createMealListItem(title, link, costTag, servings = 1) {
     const li = document.createElement('li');
     li.dataset.title = title;
     if (link) li.dataset.link = link;
+    li.dataset.servings = servings;
 
     // cost element (styled like a tag)
     const cost = document.createElement('span');
@@ -165,7 +186,14 @@ document.addEventListener("DOMContentLoaded", () => {
     // title element
     if (link) {
       const a = document.createElement('a');
-      a.href = link;
+      try {
+        const url = new URL(link, window.location.origin);
+        const servings = parseInt(li.dataset.servings) || 1;
+        url.searchParams.set('servings', servings);
+        a.href = url.toString();
+      } catch (e) {
+        a.href = link;
+      }
       a.textContent = title;
       li.appendChild(a);
     } else {
@@ -173,24 +201,45 @@ document.addEventListener("DOMContentLoaded", () => {
       li.appendChild(txt);
     }
 
-    // leftovers toggle (icon)
-    const leftovers = document.createElement('button');
-    leftovers.type = 'button';
-    leftovers.className = 'leftovers';
-    leftovers.title = 'Leftover-safe';
-    leftovers.setAttribute('aria-pressed', leftoversActive ? 'true' : 'false');
-    leftovers.innerHTML = '<i class="fa-solid fa-rotate-left" aria-hidden="true"></i>';
-    if (leftoversActive) leftovers.classList.add('active');
-    leftovers.addEventListener('click', () => {
-      const active = leftovers.classList.toggle('active');
-      leftovers.setAttribute('aria-pressed', active ? 'true' : 'false');
-      // persist immediately
+    // servings control
+    const servingsBtn = document.createElement('button');
+    servingsBtn.type = 'button';
+    servingsBtn.className = 'servings-btn';
+    servingsBtn.title = 'Adjust servings';
+
+    const updateLinkServings = () => {
+      const a = li.querySelector('a');
+      if (!a) return;
+      try {
+        const url = new URL(a.href, window.location.origin);
+        url.searchParams.set('servings', parseInt(li.dataset.servings) || 1);
+        a.href = url.toString();
+      } catch (e) {
+        // ignore
+      }
+    };
+
+    const updateServingsText = () => { servingsBtn.textContent = `Servings: ${li.dataset.servings || 1}`; };
+
+    const setServings = (newServings) => {
+      const clamped = Math.max(0, Math.min(10, parseInt(newServings) || 1));
+      li.dataset.servings = clamped;
+      updateServingsText();
+      updateLinkServings();
       saveMeals();
-      updateTotalCost();
-      // notify shopping list to refresh when leftovers change
       window.dispatchEvent(new Event('mealPlanUpdated'));
+    };
+
+    updateServingsText();
+    updateLinkServings();
+
+    servingsBtn.addEventListener('click', () => {
+      const current = parseInt(li.dataset.servings) || 1;
+      const value = prompt('Servings (0-10):', current);
+      if (value !== null) setServings(value);
     });
-    li.appendChild(leftovers);
+
+    li.appendChild(servingsBtn);
 
     // delete button
     //const del = document.createElement('button');
@@ -225,14 +274,27 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // add meal item to list (costTag optional)
-  function addMealItem(title, link, costTag = null, targetBox = activeMealBox, leftoversActive = false) {
+  function addMealItem(title, link, costTag = null, targetBox = activeMealBox, servings = 1) {
     if (!targetBox) return;
-    const li = createMealListItem(title, link, costTag, leftoversActive);
+    const li = createMealListItem(title, link, costTag, servings);
     targetBox.querySelector('.meal-list').appendChild(li);
     saveMeals();
     updateTotalCost();
     // notify shopping list to refresh when meals change
     window.dispatchEvent(new Event('mealPlanUpdated'));
+
+    // If we have a link, try to fetch recipe data to set a better default servings
+    if (link) {
+      fetchRecipeData(link).then(data => {
+        if (data && data.servings && servings === 1) {
+          li.dataset.servings = data.servings;
+          const btn = li.querySelector('.servings-btn');
+          if (btn) btn.textContent = `Servings: ${data.servings}`;
+          saveMeals();
+          window.dispatchEvent(new Event('mealPlanUpdated'));
+        }
+      });
+    }
   }
 
   // start an inline add row in the given meal box
@@ -431,13 +493,11 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!data[day]) data[day] = {};
       data[day][meal] = [];
       box.querySelectorAll("li").forEach(li => {
-        // title, link, and leftovers stored on dataset / DOM by createMealListItem
-        const leftoversEl = li.querySelector('.leftovers');
         const costEl = li.querySelector('.meal-cost');
         data[day][meal].push({
           title: li.dataset.title || '',
           link: li.dataset.link || null,
-          leftovers: !!(leftoversEl && leftoversEl.classList.contains('active')),
+          servings: parseInt(li.dataset.servings) || 1,
           cost: costEl ? costEl.textContent.trim() : null
         });
       });
@@ -453,7 +513,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (box) {
           const list = box.querySelector(".meal-list");
           data[day][meal].forEach(item => {
-            const li = createMealListItem(item.title, item.link, item.cost || null, !!item.leftovers);
+            const li = createMealListItem(item.title, item.link, item.cost || null, item.servings || 1);
             list.appendChild(li);
           });
         }

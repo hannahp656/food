@@ -50,6 +50,42 @@ function getMealPlan() {
 function parseAndCombineIngredients(recipes, mealPlan) {
   let allParsed = [];
 
+  // helper to parse a numeric amount (including fractions/mixed)
+  function parseAmount(amount) {
+    if (!amount) return 0;
+    const str = amount.toString().trim();
+    if (!str) return 0;
+
+    // mixed number like "1 1/2"
+    const mixedMatch = str.match(/^(\d+)\s+(\d+)\/(\d+)$/);
+    if (mixedMatch) {
+      return parseInt(mixedMatch[1], 10) + parseInt(mixedMatch[2], 10) / parseInt(mixedMatch[3], 10);
+    }
+
+    // simple fraction like "1/2"
+    const fracMatch = str.match(/^(\d+)\/(\d+)$/);
+    if (fracMatch) {
+      return parseInt(fracMatch[1], 10) / parseInt(fracMatch[2], 10);
+    }
+
+    const n = parseFloat(str);
+    return isNaN(n) ? 0 : n;
+  }
+
+  function formatAmount(n) {
+    if (n === 0) return "";
+    if (Number.isInteger(n)) return String(n);
+    if (n < 1) {
+      const denominator = 8;
+      const numerator = Math.round(n * denominator);
+      const gcd = (a, b) => (b === 0 ? a : gcd(b, a % b));
+      const divisor = gcd(numerator, denominator);
+      return `${numerator / divisor}/${denominator / divisor}`;
+    }
+    const rounded = Math.round(n * 100) / 100;
+    return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(2);
+  }
+
   // 1. collect all ingredients from all meals in mealPlan
   Object.values(mealPlan).forEach(dayObj => {
     Object.values(dayObj).forEach(mealArr => {
@@ -60,7 +96,22 @@ function parseAndCombineIngredients(recipes, mealPlan) {
           item.link && (r.link === item.link || item.link.endsWith(r.link))
         );
         if (recipe && Array.isArray(recipe.parsedIngredients)) {
-          allParsed.push(...recipe.parsedIngredients);
+          const recipeServings = parseFloat(recipe.servings) || 1;
+          const itemServings = parseFloat(item.servings) || recipeServings || 1;
+          const scaleFactor = recipeServings > 0 ? itemServings / recipeServings : 1;
+
+          recipe.parsedIngredients.forEach(i => {
+            const parsed = {
+              amount: i.amount || "",
+              unit: i.unit || "",
+              ingredient: i.ingredient || "",
+              descriptors: i.descriptors || "",
+            };
+            const numeric = parseAmount(parsed.amount);
+            const scaled = numeric * scaleFactor;
+            parsed.amount = formatAmount(scaled);
+            allParsed.push(parsed);
+          });
         }
       });
     });
