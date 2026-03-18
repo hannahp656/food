@@ -158,10 +158,6 @@ nav .button--active{background: var(--accent); color: white;}
 .ingredient-filter input {width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid #e6eae2;}
 /* meal cost tag in planner*/
 .meal-cost { padding:4px 8px; font-size:0.8rem}
-/* serving control in planner */
-.servings-btn { background: var(--tint); color: var(--accent-2); border: 1px solid rgba(58, 77, 57, 0.18); border-radius: 12px; padding: 4px 8px; font-size: 0.85rem; cursor: pointer; }
-.servings-btn:hover { background: rgba(122,157,84,0.12); }
-.servings-btn:active { transform: translateY(1px); }
 /* leftovers toggle */
 .leftovers {color: #c5c6c4; cursor: pointer; border: none; background: transparent; padding: 4px; border-radius: 15px; font-size: 1rem; display: inline-flex; align-items: center; justify-content: center;}
 .leftovers i { font-size: 1.05rem; }
@@ -208,12 +204,6 @@ nav .button--active{background: var(--accent); color: white;}
 .recipe-content { gap: 2em; background: var(--tint); border-radius: 18px; padding: 2em; border: 3px solid var(--accent); text-align: left;}
 @media (max-width: 800px) {.recipe-content {padding: 1em;}}
 .ingredients h3, .prep h3, .instructions h3{ color: var(--accent-2); font-family: Montserrat, Inter, sans-serif; margin-top: 0; margin-bottom: 0; display:inline;}
-.ingredients-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4em;}
-.servings-control { display: flex; align-items: center; gap: 8px; font-size: 0.9em; color: var(--accent-2); font-weight: 600;}
-.servings-arrow { background: var(--accent); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2em; font-weight: bold; transition: background 0.2s;}
-.servings-arrow:hover { background: var(--accent-2);}
-.servings-arrow:disabled { background: var(--muted); cursor: not-allowed;}
-#servings-input { width: 50px; text-align: center; border: 1px solid #ddd; border-radius: 4px; padding: 2px; font-size: 0.9em;}
 li {padding-top: 7px;}
 .ingredients ul, .prep ul, .instructions ol { margin: 0; padding-left: 1.2em; margin-top: 0.4em;}
 .ingredient-tag { background: #bcd7b4; color: #3a4d39; border-radius: 12px; padding: 0.1em 0.7em; font-size: 0.95em; font-weight: bold; margin: 0 0.2em; display: inline-block;}

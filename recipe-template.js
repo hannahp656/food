@@ -3,38 +3,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!dataEl) return;
   const data = JSON.parse(dataEl.textContent);
 
-  // Helper function to parse ingredients (copied from build-recipes.js)
-  function parseIngredient(line) {
-    if (!line) return { amount: "", unit: "", ingredient: "", descriptors: "" };
-    // descriptors
-    const [beforeComma, afterComma] = line.split(/,(.+)/);
-    const descriptors = afterComma ? afterComma.trim() : "";
-    // parts before comma
-    const parts = beforeComma.trim().split(/\s+/);
-    // amount
-    let amount = "";
-    if (parts.length > 0 && /^(\d+([\/\.]\d+)?|\d+\s+\d+\/\d+)$/.test(parts[0])) {
-      amount = parts.shift();
-      if (parts.length && /^\d+\/\d+$/.test(parts[0])) {
-        amount += " " + parts.shift();
-      }
-    }
-    // units
-    const units = [
-      "cup","cups","tbsp","tsp","teaspoon","teaspoons","tablespoon","tablespoons",
-      "g","kg","ml","l","oz","lb","pound","pounds","clove","cloves","slice","slices",
-      "can","cans","package","packages","breast","breasts","pinch","handful","dash", "head", "heads", "bunch", "bunches"
-    ];
-    let unit = "";
-    if (parts.length > 0 && units.includes(parts[0].toLowerCase())) {
-      unit = parts.shift();
-    }
-    // ingredient
-    const ingredient = parts.join(" ").trim();
-    // return parsed ingredient line
-    return { amount, unit, ingredient, descriptors };
-  }
-
   // set document title
   document.title = `${data.title} - Hannah's Recipes`;
 
@@ -187,76 +155,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // insert ingredients list
   const ingredientTags = (data.parsedIngredients || []).map(i => i.ingredient.toLowerCase().trim());
   const ingList = document.querySelector(".ingredients-list");
-  const servingsInput = document.getElementById("servings-input");
-  const servingsBtns = document.querySelectorAll(".servings-arrow");
-
-  // Initialize servings
-  let currentServings = parseInt(data.servings) || 1;
-  const urlServings = parseInt(new URLSearchParams(window.location.search).get('servings'));
-  if (!Number.isNaN(urlServings) && urlServings >= 0 && urlServings <= 10) {
-    currentServings = urlServings;
-  }
-  if (servingsInput) {
-    servingsInput.value = currentServings;
-  }
-
-  // Function to scale ingredient amounts
-  function scaleIngredient(line, scaleFactor) {
-    const parsed = parseIngredient(line);
-    if (!parsed.amount) return line;
-
-    // Parse amount (handle fractions and mixed numbers)
-    let totalAmount = 0;
-    const amountParts = parsed.amount.split(/\s+/);
-    for (const part of amountParts) {
-      if (part.includes('/')) {
-        const [num, den] = part.split('/').map(Number);
-        totalAmount += num / den;
-      } else {
-        totalAmount += parseFloat(part) || 0;
-      }
-    }
-
-    // Scale the amount
-    const scaledAmount = totalAmount * scaleFactor;
-
-    // Format back to readable amount
-    let formattedAmount;
-    if (scaledAmount % 1 === 0) {
-      formattedAmount = scaledAmount.toString();
-    } else if (scaledAmount < 1) {
-      // Convert to fraction for amounts less than 1
-      const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
-      const denominator = 8; // Use 1/8 as smallest unit
-      const numerator = Math.round(scaledAmount * denominator);
-      const divisor = gcd(numerator, denominator);
-      formattedAmount = `${numerator/divisor}/${denominator/divisor}`;
-    } else {
-      // Round to 2 decimal places for amounts >= 1
-      formattedAmount = Math.round(scaledAmount * 100) / 100;
-      if (formattedAmount % 1 === 0) {
-        formattedAmount = formattedAmount.toString();
-      } else {
-        formattedAmount = formattedAmount.toFixed(2);
-      }
-    }
-
-    // Reconstruct the line
-    const parts = [];
-    if (formattedAmount) parts.push(formattedAmount);
-    if (parsed.unit) parts.push(parsed.unit);
-    parts.push(parsed.ingredient);
-    if (parsed.descriptors) parts.push(',', parsed.descriptors);
-
-    return parts.join(' ');
-  }
-
-  // Function to update ingredients display
-  function updateIngredients() {
-    const scaleFactor = currentServings / (data.servings || 1);
+  if (ingList && data.ingredients) {
     ingList.innerHTML = data.ingredients.map(line => {
-      const scaledLine = scaleIngredient(line, scaleFactor);
-      let displayLine = scaledLine;
+      let displayLine = line;
       for (const ingr of ingredientTags.sort((a, b) => b.length - a.length)) {
         const regex = new RegExp(`\\b${ingr.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")}\\b`, "i");
         if (regex.test(displayLine)) {
@@ -267,46 +168,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return `<li>${displayLine}</li>`;
     }).join("");
   }
-
-  // Initialize ingredients
-  updateIngredients();
-
-  // Handle servings controls
-  function syncServingsControls() {
-    if (servingsInput) {
-      servingsInput.value = currentServings;
-    }
-    if (servingsBtns.length >= 2) {
-      servingsBtns[0].disabled = currentServings <= 0;
-      servingsBtns[1].disabled = currentServings >= 10;
-    }
-  }
-
-  if (servingsBtns.length > 0) {
-    servingsBtns.forEach(btn => {
-      btn.addEventListener("click", () => {
-        const direction = parseInt(btn.dataset.direction, 10);
-        if (!Number.isNaN(direction)) {
-          currentServings = Math.max(0, Math.min(10, currentServings + direction));
-          syncServingsControls();
-          updateIngredients();
-        }
-      });
-    });
-  }
-
-  if (servingsInput) {
-    servingsInput.addEventListener("input", () => {
-      const val = parseInt(servingsInput.value, 10);
-      if (!Number.isNaN(val)) {
-        currentServings = Math.max(0, Math.min(10, val));
-        syncServingsControls();
-        updateIngredients();
-      }
-    });
-  }
-
-  syncServingsControls();
 
   // insert prep steps
   //const prepSection = document.querySelector(".prep-section");
